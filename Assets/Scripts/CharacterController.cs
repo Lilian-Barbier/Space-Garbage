@@ -44,24 +44,31 @@ public class CharacterController : MonoBehaviour
     {
         Vector2 movement = playerInput.Redomino.Movement.ReadValue<Vector2>();
 
+        var isMovingSide = false;
+        var isMovingUp = false;
+        var isMovingDown = false;
+
         if (!isStopped)
         {
-
             if (movement.x != 0)
             {
-                animator.SetTrigger("MoveRight");
+                isMovingSide = true;
                 spriteRenderer.flipX = movement.x < 0;
             }
             else if (movement.y < 0)
             {
-                animator.SetTrigger("MoveDown");
+                isMovingDown = true;
             }
             else if (movement.y > 0)
             {
-                animator.SetTrigger("MoveUp");
+                isMovingUp = true;
             }
 
             rigidbody.MovePosition(rigidbody.position + movement * speed * Time.deltaTime);
         }
+
+        animator.SetBool("isMovingSide", isMovingSide);
+        animator.SetBool("isMovingUp", isMovingUp);
+        animator.SetBool("isMovingDown", isMovingDown);
     }
 }
