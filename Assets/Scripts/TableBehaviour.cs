@@ -25,7 +25,7 @@ public class TableBehaviour : MonoBehaviour
     {
         objectCarried = newObjectCarried;
         objectCarried.GetComponent<Collider2D>().isTrigger = true;
-        objectCarried.position = transform.position;
+        objectCarried.position = transform.position + new Vector3(0, 0.25f, 0);
     }
 
     public Transform GetObjectCarried()
