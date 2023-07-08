@@ -7,7 +7,9 @@ namespace Models {
 
     public Domino() {}
 
-    public Domino(bool[][] blocks)
+    public Domino(bool[][] blocks) : this(blocks, BlockColor.None) {}
+
+    public Domino(bool[][] blocks, BlockColor color)
     {
       Blocks = new Block[4][];
 
@@ -18,7 +20,7 @@ namespace Models {
         {
           Blocks[i][j] = new Block() {
             Exists = blocks[i][j],
-            Color = BlockColor.Blue
+            Color = color
           };
         }
       }

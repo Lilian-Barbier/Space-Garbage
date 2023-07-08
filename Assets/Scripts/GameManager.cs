@@ -9,25 +9,34 @@ public class GameManager : MonoBehaviour
   [SerializeField] public readonly float dominoRequestDuration = 40f;
 
   [SerializeField] private Sprite blockSprite;
-  [SerializeField] private float minTimeBetweenDominoRequests = 15f;
-  [SerializeField] private float maxTimeBetweenDominoRequests = 60f;
+  private float minTimeBetweenDominoRequests = 15f;
+  private float maxTimeBetweenDominoRequests = 60f;
 
   private Color blueOutline = new Color(27/255f, 33/255f, 114/255f, 1);
   
+  // UI Management
+
+  [SerializeField] private GameObject requestPrefab;
+
+  [SerializeField] private GameObject HudCanvas;
+
+  private List<GameObject> hudRequestList;
+
   private TetrisPlayer[] playerList;
 
   public List<DominoRequest> dominoRequestList;
-  public List<float> dominoRequestTimeList;
   
   float timeSinceLastBlockRequest;
   float timeBeforeNextBlockRequest;
 
   void Start()
   {
+    HudCanvas = GameObject.Find("HUD");
+    
     timeSinceLastBlockRequest = 0f;
     
     dominoRequestList = new List<DominoRequest>();
-    dominoRequestTimeList = new List<float>();
+    hudRequestList = new List<GameObject>();
 
     playerList = GetRandomPlayers();
   }
@@ -46,26 +55,31 @@ public class GameManager : MonoBehaviour
 
   private void DecreaseDominoRequestTimeList()
   {
-    for (var i = 0; i < dominoRequestTimeList.Count; i++) {
-      dominoRequestTimeList[i] -= Time.deltaTime;
-    }
+    for (var i = 0; i < dominoRequestList.Count; i++)
+      dominoRequestList[i].RemainingTime -= Time.deltaTime;
   }
 
   private void CheckForNewDominoRequest()
   {
     timeSinceLastBlockRequest += Time.deltaTime;
 
-    if (timeBeforeNextBlockRequest < timeSinceLastBlockRequest || dominoRequestList.Count == 0) {
+    if (timeBeforeNextBlockRequest < timeSinceLastBlockRequest || dominoRequestList.Count == 0)
       AddRandomDominoRequest();
-    }
   }
 
   private void DeleteUnsuccessfulDominoRequests()
   {
-    for (var i = 0; i < dominoRequestTimeList.Count; i++) {
-      if (dominoRequestTimeList[i] < 0) {
+    for (var i = dominoRequestList.Count - 1; i > -1; i--) {
+      if (dominoRequestList[i].RemainingTime < 0) {
         dominoRequestList.RemoveAt(i);
-        dominoRequestTimeList.RemoveAt(i);
+
+        Destroy(hudRequestList[i]);
+        hudRequestList.RemoveAt(i);
+
+        for (var j = i; j < hudRequestList.Count; j++) {
+          var requestRectTransform = hudRequestList[j].GetComponent<RectTransform>();
+          requestRectTransform.anchoredPosition = new Vector2(56 + 166 * j, 0);
+        }
       }
     }
   }
@@ -75,16 +89,33 @@ public class GameManager : MonoBehaviour
     timeSinceLastBlockRequest = 0f;
     timeBeforeNextBlockRequest = Random.Range(minTimeBetweenDominoRequests, maxTimeBetweenDominoRequests);
 
+    Debug.Log("Adding new domino request, time before next request: " + timeBeforeNextBlockRequest + "s");
+
     var dominoRequest = new DominoRequest() {
       Blocks = DominoUtils.GetRandomValidDomino(),
       Color = DominoUtils.GetRandomColor(),
       Player = playerList[Random.Range(0, playerList.Length)],
+      RemainingTime = dominoRequestDuration,
     };
 
-    // Debug.Log("Adding new domino request: " + dominoRequest.Player.Name + " " + dominoRequest.Player.Age + " " + dominoRequest.Color + "\n" + DominoUtils.PrintDomino(dominoRequest.Blocks));
+    Debug.Log("Adding new domino request: " + dominoRequest.Player.Name + " " + dominoRequest.Player.Age + " " + dominoRequest.Color + "\n" + DominoUtils.PrintDomino(dominoRequest.Blocks));
 
     dominoRequestList.Add(dominoRequest);
-    dominoRequestTimeList.Add(dominoRequestDuration);
+    AddDominoRequestToHUD(dominoRequest);
+  }
+
+  private void AddDominoRequestToHUD(DominoRequest dominoRequest)
+  {
+    var requestGameObject = Instantiate(requestPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+    requestGameObject.transform.SetParent(HudCanvas.transform, false);
+
+    var requestRectTransform = requestGameObject.GetComponent<RectTransform>();
+    requestRectTransform.anchoredPosition = new Vector2(56 + 166 * (dominoRequestList.Count - 1), 0);
+
+    var requestBehavior = requestGameObject.GetComponent<RequestBehavior>();
+    requestBehavior.SetDominoRequest(dominoRequest);
+
+    hudRequestList.Add(requestGameObject);
   }
 
   private TetrisPlayer[] GetRandomPlayers()
