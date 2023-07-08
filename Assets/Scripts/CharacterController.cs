@@ -12,12 +12,15 @@ public class CharacterController : MonoBehaviour
 {
     private PlayerInput playerInput;
     private bool isStopped;
-    private Rigidbody2D rigidbody;
+    private Rigidbody2D rigidbodyCharacter;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
 
     private Transform objectCarried;
     private Transform interactTriggerZone;
+
+    private float currentSpeed;
+    private float timeSinceLastDash;
 
     //Data from last frame for calculation and animation
     private float lastDirectionAngle;
@@ -28,20 +31,30 @@ public class CharacterController : MonoBehaviour
     [SerializeField]
     private float speed;
 
+    [SerializeField]
+    private float dashSpeed;
+
+    [SerializeField]
+    private float dashTime;
+
+
     private void Awake()
     {
         playerInput = new PlayerInput();
         playerInput.Redomino.Action.performed += ctx => Interact();
+        playerInput.Redomino.Back.performed += ctx => Dash();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        rigidbody = GetComponent<Rigidbody2D>();
+        rigidbodyCharacter = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         interactTriggerZone = transform.GetChild(0);
+
+        currentSpeed = speed;
     }
     private void OnEnable()
     {
@@ -82,7 +95,10 @@ public class CharacterController : MonoBehaviour
             }
 
             interactTriggerZone.rotation = Quaternion.Euler(0, 0, lastDirectionAngle);
-            rigidbody.MovePosition(rigidbody.position + movement * speed * Time.deltaTime);
+            rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + movement * currentSpeed * Time.deltaTime);
+
+            //Gestion du dash
+            //if(Time.)
         }
 
         animator.SetBool("isMovingSide", isMovingSide);
@@ -118,6 +134,11 @@ public class CharacterController : MonoBehaviour
         }
     }
 
+    void Dash()
+    {
+        
+    }
+
     private void GetObjectNear()
     {
         CapsuleCollider2D c = new CapsuleCollider2D();
@@ -127,7 +148,7 @@ public class CharacterController : MonoBehaviour
         List<Collider2D> interactableObjects = new List<Collider2D>();
         Physics2D.OverlapCollider(capsuleTriggerZone, new ContactFilter2D(), interactableObjects);
 
-        //D'abord on vérifie si on peut prendre un bloc devant nous
+        //D'abord on vÃ©rifie si on peut prendre un bloc devant nous
         if (interactableObjects.Any(o => o.transform.CompareTag("Blocks")))
         {
             var collider = interactableObjects.First(o => o.transform.CompareTag("Blocks"));
@@ -139,11 +160,23 @@ public class CharacterController : MonoBehaviour
 
         //Sinon on prend un bloc d'une table
         if (interactableObjects.Any(o => o.transform.CompareTag("Table"))){
-            objectCarried = interactableObjects.First(o => o.transform.CompareTag("Table")).GetComponent<TableBehaviour>().GetObjectCarried();
-            return;
+            var tables = interactableObjects.Where(o => o.transform.CompareTag("Table"));
+
+            //Dans le cas ou il y a plusieurs tables on trie par leurs distance
+            tables = tables.OrderBy(t => Vector2.Distance(t.transform.position, transform.position));
+
+            foreach (var table in tables)
+            {
+                TableBehaviour tableBehaviour = table.GetComponent<TableBehaviour>();
+                if (!tableBehaviour.CanAcceptObject())
+                {
+                    objectCarried = tableBehaviour.GetObjectCarried();
+                    return;
+                }
+            }
         }
 
-        //Dans le dernier cas on vérifie si on ne peux pas récupérer un bloc proche autour du joueur
+        //Dans le dernier cas on vÃ©rifie si on ne peux pas rï¿½cupï¿½rer un bloc proche autour du joueur
         var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
         interactableObjects = new List<Collider2D>();
         Physics2D.OverlapCollider(circleTriggerZone, new ContactFilter2D(), interactableObjects);
@@ -168,11 +201,15 @@ public class CharacterController : MonoBehaviour
         List<Collider2D> interactableObjects = new List<Collider2D>();
         Physics2D.OverlapCollider(capsuleTriggerZone, new ContactFilter2D(), interactableObjects);
 
-        //On vérifie si une table se trouve dans notre champs d'action
+        //On vÃ©rifie si une table se trouve dans notre champs d'action
         if (interactableObjects.Any(o => o.transform.CompareTag("Table")))
         {
             var tables = interactableObjects.Where(o => o.transform.CompareTag("Table"));
-            foreach(var table in tables)
+            
+            //Dans le cas ou il y a plusieurs tables on trie par leurs distance
+            tables = tables.OrderBy(t => Vector2.Distance(t.transform.position, transform.position));
+    
+            foreach (var table in tables)
             {
                 TableBehaviour tableBehaviour = table.GetComponent<TableBehaviour>();
                 if (tableBehaviour.CanAcceptObject())
@@ -183,11 +220,20 @@ public class CharacterController : MonoBehaviour
                 }
             }
         }
-        else
+
+        //On vÃ©rifie que l'objet ne tombe pas dans un mur
+        var objectCarriedCollider = objectCarried.GetComponent<Collider2D>();
+        List<Collider2D> collidersWhenDropObjectCarried = new List<Collider2D>();
+        Physics2D.OverlapCollider(objectCarriedCollider, new ContactFilter2D(), collidersWhenDropObjectCarried);
+
+        //Ici on compare Ã  la fois les mur et les tables, car si on arrive Ã  ce point dans la fonction c'est que toutes les tables sont prises
+        if(collidersWhenDropObjectCarried.Any(c => c.transform.CompareTag("Walls") || c.transform.CompareTag("Table")))
         {
-            //todo ajouter une vérification que l'objet ne tombe pas dans un mur
-            objectCarried.GetComponent<Collider2D>().isTrigger = false;
-            objectCarried = null;
+            objectCarried.position = transform.position;
         }
+
+        objectCarriedCollider.isTrigger = false;
+        objectCarried = null;
+        
     }
 }

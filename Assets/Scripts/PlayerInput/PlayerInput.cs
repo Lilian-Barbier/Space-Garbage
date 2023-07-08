@@ -44,6 +44,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Back"",
+                    ""type"": ""Button"",
+                    ""id"": ""c333ab7f-6821-4513-82de-b30da0a08151"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -167,6 +176,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Action"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cbc35c6d-cad1-4eb2-a69f-a2e50390ad6e"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -177,6 +197,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Redomino = asset.FindActionMap("Redomino", throwIfNotFound: true);
         m_Redomino_Movement = m_Redomino.FindAction("Movement", throwIfNotFound: true);
         m_Redomino_Action = m_Redomino.FindAction("Action", throwIfNotFound: true);
+        m_Redomino_Back = m_Redomino.FindAction("Back", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -240,12 +261,14 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private List<IRedominoActions> m_RedominoActionsCallbackInterfaces = new List<IRedominoActions>();
     private readonly InputAction m_Redomino_Movement;
     private readonly InputAction m_Redomino_Action;
+    private readonly InputAction m_Redomino_Back;
     public struct RedominoActions
     {
         private @PlayerInput m_Wrapper;
         public RedominoActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_Redomino_Movement;
         public InputAction @Action => m_Wrapper.m_Redomino_Action;
+        public InputAction @Back => m_Wrapper.m_Redomino_Back;
         public InputActionMap Get() { return m_Wrapper.m_Redomino; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -261,6 +284,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Action.started += instance.OnAction;
             @Action.performed += instance.OnAction;
             @Action.canceled += instance.OnAction;
+            @Back.started += instance.OnBack;
+            @Back.performed += instance.OnBack;
+            @Back.canceled += instance.OnBack;
         }
 
         private void UnregisterCallbacks(IRedominoActions instance)
@@ -271,6 +297,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Action.started -= instance.OnAction;
             @Action.performed -= instance.OnAction;
             @Action.canceled -= instance.OnAction;
+            @Back.started -= instance.OnBack;
+            @Back.performed -= instance.OnBack;
+            @Back.canceled -= instance.OnBack;
         }
 
         public void RemoveCallbacks(IRedominoActions instance)
@@ -292,5 +321,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnAction(InputAction.CallbackContext context);
+        void OnBack(InputAction.CallbackContext context);
     }
 }
