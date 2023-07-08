@@ -6,6 +6,7 @@ using Models;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private Sprite blockSprite;
+    [SerializeField] private Color blueOutline = new Color(27, 33, 114, 1);
     [SerializeField] private SpriteRenderer blockSpriteRenderer;
     
     DominoRequest[] dominoRequestList;
@@ -43,17 +44,30 @@ public class GameManager : MonoBehaviour
 
     private Sprite GenerateDominoSprite(Domino domino)
     { 
+      var minArea = DominoManager.GetMinimumDominoArea(domino);
+
+      int height = (minArea.Blocks.Length + 1) * 6;
+      int width = minArea.Blocks[0].Length * 7;
+
       Resources.UnloadUnusedAssets();
-      Color transparentColor = new Color(0, 0, 0, 0);
+      Color transparentColor = new Color(0, 0, 0, 1);
 
       var newTexture = new Texture2D(32, 32);
+
+      // INIT BACKGROUND
 
       for (var x = 0; x < 32; x++)
         for (var y = 0; y < 32; y++)
           newTexture.SetPixel(x, y, transparentColor);
 
-      for (var x = 0; x < 28; x++) {
-        for (var y = 0; y < 24; y++)
+      // DRAW OUTLINE
+
+
+
+      // DRAW BLOCKS
+
+      for (var x = 0; x < width; x++) {
+        for (var y = 0; y < height; y++)
         {
           int xPosInArray = (int) Mathf.Floor(x / 7);
           int yPosInArray = (int) Mathf.Floor(y / 6);
@@ -62,24 +76,28 @@ public class GameManager : MonoBehaviour
           int yPosInsideCell = y % 6;
           Color pixelColor = transparentColor;
 
-          if(!domino.Blocks[yPosInArray][xPosInArray].Exists) {
+          if(
+            yPosInArray == minArea.Blocks.Length ||
+            xPosInArray == minArea.Blocks[yPosInArray].Length ||
+            !minArea.Blocks[yPosInArray][xPosInArray].Exists
+          ) {
             
             var previousYPosInArray = yPosInArray - 1;
 
             if (
               previousYPosInArray < 0 
-              || !domino.Blocks[previousYPosInArray][xPosInArray].Exists
+              || !minArea.Blocks[previousYPosInArray][xPosInArray].Exists
               || yPosInsideCell == 5
             ) continue;
 
             pixelColor = blockSprite.texture.GetPixel(xPosInsideCell, 4 - yPosInsideCell);
-            newTexture.SetPixel(x + 2, 27 - y, pixelColor);
+            newTexture.SetPixel(x + (int) Mathf.Floor((32 - width)/2), 31 - (int) Mathf.Floor((32 - height)/2) - y, pixelColor);
             
             continue;
           }
 
           pixelColor = blockSprite.texture.GetPixel(xPosInsideCell, 10 - yPosInsideCell);
-          newTexture.SetPixel(x + 2, 27 - y, pixelColor);
+          newTexture.SetPixel(x + (int) Mathf.Floor((32 - width)/2), 31 - (int) Mathf.Floor((32 - height)/2) - y, pixelColor);
         }
       }
 

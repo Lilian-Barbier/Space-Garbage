@@ -49,7 +49,7 @@ public class DominoManager
     new bool[] { false, false, false, false }
   };
 
-  private static readonly bool[][] Line = new bool[][] {
+  public static readonly bool[][] Line = new bool[][] {
     new bool[] {  true, false, false, false },
     new bool[] {  true, false, false, false },
     new bool[] {  true, false, false, false },
@@ -66,21 +66,21 @@ public class DominoManager
     Line
   };
 
-  private static readonly bool[][] SingleBlock = new bool[][] {
+  public static readonly bool[][] SingleBlock = new bool[][] {
     new bool[] {  true, false, false, false },
     new bool[] { false, false, false, false },
     new bool[] { false, false, false, false },
     new bool[] { false, false, false, false }
   };
 
-  private static readonly bool[][] DoubleBlock = new bool[][] {
+  public static readonly bool[][] DoubleBlock = new bool[][] {
     new bool[] {  true, false, false, false },
     new bool[] {  true, false, false, false },
     new bool[] { false, false, false, false },
     new bool[] { false, false, false, false }
   };
 
-  private static readonly bool[][] TripleBlock = new bool[][] {
+  public static readonly bool[][] TripleBlock = new bool[][] {
     new bool[] {  true, false, false, false },
     new bool[] {  true,  true, false, false },
     new bool[] { false, false, false, false },
