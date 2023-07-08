@@ -43,6 +43,8 @@ public class CharacterController : MonoBehaviour
         playerInput = new PlayerInput();
         playerInput.Redomino.Action.performed += ctx => Interact();
         playerInput.Redomino.Back.performed += ctx => Dash();
+        playerInput.Redomino.RotateClockwise.performed += ctx => RotateClockwise();
+        playerInput.Redomino.RotateCounterClockwise.performed += ctx => RotateCounterClockwise();
     }
 
     // Start is called before the first frame update
@@ -77,7 +79,7 @@ public class CharacterController : MonoBehaviour
 
         if (!isStopped)
         {
-            if (movement.x != 0)
+            if (movement.x > 0.5 || movement.x < -0.5)
             {
                 isMovingSide = true;
                 spriteRenderer.flipX = movement.x < 0;
@@ -116,7 +118,7 @@ public class CharacterController : MonoBehaviour
             {
                 Vector3 direction = lastDirectionAngle == 0 ? Vector3.down : lastDirectionAngle == 180 ? Vector3.up : lastDirectionAngle == 90 ? Vector3.right : Vector3.left;
                 objectCarried.position = transform.position + direction * objectCarriedDistanceFactor;
-                objectCarried.GetComponent<SpriteRenderer>().sortingOrder = 15;
+                objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirectionAngle == 180 ? 5 : 15;
             }
            
         }
@@ -137,6 +139,22 @@ public class CharacterController : MonoBehaviour
     void Dash()
     {
         
+    }
+
+    void RotateClockwise()
+    {
+        if(objectCarried != null)
+        {
+            objectCarried.GetComponent<DominoBehavior>().RotateDominoClockwise();
+        }
+    }
+
+    void RotateCounterClockwise()
+    {
+        if (objectCarried != null)
+        {
+            objectCarried.GetComponent<DominoBehavior>().RotateDominoCounterClockwise();
+        }
     }
 
     private void GetObjectNear()

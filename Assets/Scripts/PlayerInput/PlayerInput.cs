@@ -53,6 +53,24 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RotateClockwise"",
+                    ""type"": ""Button"",
+                    ""id"": ""90883931-b676-4238-af81-041eec9984e0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RotateCounterClockwise"",
+                    ""type"": ""Button"",
+                    ""id"": ""68d7a55f-5529-46e5-9869-3c27e7254994"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -168,8 +186,30 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""29eeaa66-c9d9-463d-bef1-4cf051af3b0e"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""c0022f23-b4d3-45f9-8d93-54b1c3c0dfe3"",
                     ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Action"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""baecc5c3-a236-443e-a5f8-6f5ac58fa3a0"",
+                    ""path"": ""<Gamepad>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -187,6 +227,61 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Back"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9765ee12-bf2b-4a94-9d4d-9117bdbe3b70"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4d6c4140-c83b-4bbe-bc83-85da0e74b06d"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateClockwise"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5df39015-e0a7-4860-a82b-e061e7e693b6"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateClockwise"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cf42f89d-4a13-46dc-8055-24c7c3b80473"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateCounterClockwise"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""54085e19-5895-4f1f-88d4-cafd0d58a43b"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateCounterClockwise"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -198,6 +293,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Redomino_Movement = m_Redomino.FindAction("Movement", throwIfNotFound: true);
         m_Redomino_Action = m_Redomino.FindAction("Action", throwIfNotFound: true);
         m_Redomino_Back = m_Redomino.FindAction("Back", throwIfNotFound: true);
+        m_Redomino_RotateClockwise = m_Redomino.FindAction("RotateClockwise", throwIfNotFound: true);
+        m_Redomino_RotateCounterClockwise = m_Redomino.FindAction("RotateCounterClockwise", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -262,6 +359,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Redomino_Movement;
     private readonly InputAction m_Redomino_Action;
     private readonly InputAction m_Redomino_Back;
+    private readonly InputAction m_Redomino_RotateClockwise;
+    private readonly InputAction m_Redomino_RotateCounterClockwise;
     public struct RedominoActions
     {
         private @PlayerInput m_Wrapper;
@@ -269,6 +368,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @Movement => m_Wrapper.m_Redomino_Movement;
         public InputAction @Action => m_Wrapper.m_Redomino_Action;
         public InputAction @Back => m_Wrapper.m_Redomino_Back;
+        public InputAction @RotateClockwise => m_Wrapper.m_Redomino_RotateClockwise;
+        public InputAction @RotateCounterClockwise => m_Wrapper.m_Redomino_RotateCounterClockwise;
         public InputActionMap Get() { return m_Wrapper.m_Redomino; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -287,6 +388,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Back.started += instance.OnBack;
             @Back.performed += instance.OnBack;
             @Back.canceled += instance.OnBack;
+            @RotateClockwise.started += instance.OnRotateClockwise;
+            @RotateClockwise.performed += instance.OnRotateClockwise;
+            @RotateClockwise.canceled += instance.OnRotateClockwise;
+            @RotateCounterClockwise.started += instance.OnRotateCounterClockwise;
+            @RotateCounterClockwise.performed += instance.OnRotateCounterClockwise;
+            @RotateCounterClockwise.canceled += instance.OnRotateCounterClockwise;
         }
 
         private void UnregisterCallbacks(IRedominoActions instance)
@@ -300,6 +407,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Back.started -= instance.OnBack;
             @Back.performed -= instance.OnBack;
             @Back.canceled -= instance.OnBack;
+            @RotateClockwise.started -= instance.OnRotateClockwise;
+            @RotateClockwise.performed -= instance.OnRotateClockwise;
+            @RotateClockwise.canceled -= instance.OnRotateClockwise;
+            @RotateCounterClockwise.started -= instance.OnRotateCounterClockwise;
+            @RotateCounterClockwise.performed -= instance.OnRotateCounterClockwise;
+            @RotateCounterClockwise.canceled -= instance.OnRotateCounterClockwise;
         }
 
         public void RemoveCallbacks(IRedominoActions instance)
@@ -322,5 +435,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnMovement(InputAction.CallbackContext context);
         void OnAction(InputAction.CallbackContext context);
         void OnBack(InputAction.CallbackContext context);
+        void OnRotateClockwise(InputAction.CallbackContext context);
+        void OnRotateCounterClockwise(InputAction.CallbackContext context);
     }
 }
