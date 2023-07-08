@@ -9,8 +9,8 @@ public class GameManager : MonoBehaviour
   [SerializeField] public readonly float dominoRequestDuration = 40f;
 
   [SerializeField] private Sprite blockSprite;
-  private float minTimeBetweenDominoRequests = 15f;
-  private float maxTimeBetweenDominoRequests = 60f;
+  private float minTimeBetweenDominoRequests = 12f;
+  private float maxTimeBetweenDominoRequests = 36f;
 
   private Color blueOutline = new Color(27/255f, 33/255f, 114/255f, 1);
   
@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
 
   private List<GameObject> hudRequestList;
 
-  private TetrisPlayer[] playerList;
+  private List<TetrisPlayer> playerList;
 
   public List<DominoRequest> dominoRequestList;
   
@@ -63,6 +63,12 @@ public class GameManager : MonoBehaviour
   {
     timeSinceLastBlockRequest += Time.deltaTime;
 
+    // Skip if there are already 10 requests or no players left
+    if (dominoRequestList.Count >= 10 || playerList.Count == 0) {
+      timeSinceLastBlockRequest = 0f;
+      return;
+    }
+
     if (timeBeforeNextBlockRequest < timeSinceLastBlockRequest || dominoRequestList.Count == 0)
       AddRandomDominoRequest();
   }
@@ -71,6 +77,9 @@ public class GameManager : MonoBehaviour
   {
     for (var i = dominoRequestList.Count - 1; i > -1; i--) {
       if (dominoRequestList[i].RemainingTime < 0) {
+        var player = dominoRequestList[i].Player;
+        playerList.Add(player);
+
         dominoRequestList.RemoveAt(i);
 
         Destroy(hudRequestList[i]);
@@ -89,16 +98,18 @@ public class GameManager : MonoBehaviour
     timeSinceLastBlockRequest = 0f;
     timeBeforeNextBlockRequest = Random.Range(minTimeBetweenDominoRequests, maxTimeBetweenDominoRequests);
 
-    Debug.Log("Adding new domino request, time before next request: " + timeBeforeNextBlockRequest + "s");
+    var playerIndex = Random.Range(0, playerList.Count);
+    var player = playerList[playerIndex];
+    playerList.RemoveAt(playerIndex);
 
     var dominoRequest = new DominoRequest() {
       Blocks = DominoUtils.GetRandomValidDomino(),
       Color = DominoUtils.GetRandomColor(),
-      Player = playerList[Random.Range(0, playerList.Length)],
+      Player = player,
       RemainingTime = dominoRequestDuration,
     };
 
-    Debug.Log("Adding new domino request: " + dominoRequest.Player.Name + " " + dominoRequest.Player.Age + " " + dominoRequest.Color + "\n" + DominoUtils.PrintDomino(dominoRequest.Blocks));
+    // Debug.Log("Adding new domino request: " + dominoRequest.Player.Name + " " + dominoRequest.Player.Age + " " + dominoRequest.Color + "\n" + DominoUtils.PrintDomino(dominoRequest.Blocks));
 
     dominoRequestList.Add(dominoRequest);
     AddDominoRequestToHUD(dominoRequest);
@@ -118,17 +129,17 @@ public class GameManager : MonoBehaviour
     hudRequestList.Add(requestGameObject);
   }
 
-  private TetrisPlayer[] GetRandomPlayers()
+  private List<TetrisPlayer> GetRandomPlayers()
   {
-    var playerList = new TetrisPlayer[10];
+    var playerList = new List<TetrisPlayer>();
 
-    for (var i = 0; i < playerList.Length; i++) {
+    for (var i = 0; i < 10; i++) {
       var player = new TetrisPlayer() {
         Name = RequestUtils.GetRandomPlayerName(),
         Age = RequestUtils.GetRandomPlayerAge(),
       };
 
-      playerList[i] = player;
+      playerList.Add(player);
     }
 
     return playerList;
