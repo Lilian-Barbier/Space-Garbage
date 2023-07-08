@@ -26,11 +26,11 @@ namespace Models {
 
     public bool[][] GetBlocksAsBools()
     {
-      var blocks = new bool[4][];
-      for (var i = 0; i < 4; i++)
+      var blocks = new bool[Blocks.Length][];
+      for (var i = 0; i < Blocks.Length; i++)
       {
-        blocks[i] = new bool[4];
-        for (var j = 0; j < 4; j++)
+        blocks[i] = new bool[Blocks[i].Length];
+        for (var j = 0; j < Blocks[i].Length; j++)
         {
           blocks[i][j] = Blocks[i][j].Exists;
         }

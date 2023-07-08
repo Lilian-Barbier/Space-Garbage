@@ -7,42 +7,42 @@ public class DominoManager
 {
   #region Dominos
 
-  private static readonly bool[][] Skew = new bool[][] {
+  public static readonly bool[][] Skew = new bool[][] {
     new bool[] {  true, false, false, false },
     new bool[] {  true,  true, false, false },
     new bool[] { false,  true, false, false },
     new bool[] { false, false, false, false }
   };
 
-  private static readonly bool[][] ReverseSkew = new bool[][] {
+  public static readonly bool[][] ReverseSkew = new bool[][] {
     new bool[] { false,  true, false, false },
     new bool[] {  true,  true, false, false },
     new bool[] {  true, false, false, false },
     new bool[] { false, false, false, false }
   };
 
-  private static readonly bool[][] Square = new bool[][] {
+  public static readonly bool[][] Square = new bool[][] {
     new bool[] {  true,  true, false, false },
     new bool[] {  true,  true, false, false },
     new bool[] { false, false, false, false },
     new bool[] { false, false, false, false }
   };
 
-  private static readonly bool[][] L = new bool[][] {
+  public static readonly bool[][] L = new bool[][] {
     new bool[] {  true, false, false, false },
     new bool[] {  true, false, false, false },
     new bool[] {  true,  true, false, false },
     new bool[] { false, false, false, false }
   };
 
-  private static readonly bool[][] ReverseL = new bool[][] {
+  public static readonly bool[][] ReverseL = new bool[][] {
     new bool[] { false,  true, false, false },
     new bool[] { false,  true, false, false },
     new bool[] {  true,  true, false, false },
     new bool[] { false, false, false, false }
   };
 
-  private static readonly bool[][] T = new bool[][] {
+  public static readonly bool[][] T = new bool[][] {
     new bool[] {  true, false, false, false },
     new bool[] {  true,  true, false, false },
     new bool[] {  true, false, false, false },
@@ -56,7 +56,7 @@ public class DominoManager
     new bool[] {  true, false, false, false }
   };
 
-  private static readonly bool[][][] ValidDomino = new bool[][][] {
+  public static readonly bool[][][] ValidDomino = new bool[][][] {
     Skew,
     ReverseSkew,
     Square,
@@ -116,15 +116,9 @@ public class DominoManager
 
     for(int x = 0; x < minimumDominoArea.Length; x++) {
       minimumDominoArea[x] = new bool[maxCol - minCol + 1];
-    }
-
-    for(int x = 0; x < domino.Length; x++) {
-      for(int y = 0; y < domino[x].Length; y++) {
-        if(domino[x][y]) {
-          minimumDominoArea[x - minRow][y - minCol] = true;
-        }
-      }
-    }
+      for(int y = 0; y < minimumDominoArea[x].Length; y++)
+        minimumDominoArea[x][y] = domino[x + minRow][y + minCol];
+    }      
 
     return minimumDominoArea;
   }
@@ -151,14 +145,8 @@ public class DominoManager
 
     for(int x = 0; x < minimumDominoArea.Length; x++) {
       minimumDominoArea[x] = new Block[maxCol - minCol + 1];
-    }
-
-    for(int x = 0; x < domino.Blocks.Length; x++) {
-      for(int y = 0; y < domino.Blocks[x].Length; y++) {
-        if(domino.Blocks[x][y].Exists) {
-          minimumDominoArea[x - minRow][y - minCol] = domino.Blocks[x][y];
-        }
-      }
+      for(int y = 0; y < minimumDominoArea[x].Length; y++)
+        minimumDominoArea[x][y] = domino.Blocks[x + minRow][y + minCol];
     }
 
     return new Domino() {
