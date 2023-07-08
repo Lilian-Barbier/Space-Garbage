@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Models;
 
-public class DominoManager : MonoBehaviour
+public class DominoManager
 {
   #region Dominos
 
@@ -89,12 +89,12 @@ public class DominoManager : MonoBehaviour
 
   #endregion
 
-  public bool[][] GetRandomValidDomino()
+  public static bool[][] GetRandomValidDomino()
   {
     return ValidDomino[Random.Range(0, ValidDomino.Length)];
   }
 
-  public bool[][] GetMinimumDominoArea(bool[][] domino) {
+  public static bool[][] GetMinimumDominoArea(bool[][] domino) {
     int minCol = 10000;
     int maxCol = 0;
     int minRow = 10000;
@@ -111,8 +111,6 @@ public class DominoManager : MonoBehaviour
         }
       }
     }
-
-    // Debug.Log("minRow: " + minRow + "\nmaxRow: " + maxRow + "\nminCol: " + minCol + "\nmaxCol: " + maxCol);
 
     bool[][] minimumDominoArea = new bool[maxRow - minRow + 1][];
 
@@ -131,7 +129,44 @@ public class DominoManager : MonoBehaviour
     return minimumDominoArea;
   }
 
-  public bool[][] RotateDominoClockwise(bool[][] domino) {
+  public static Domino GetMinimumDominoArea(Domino domino) {
+    int minCol = 10000;
+    int maxCol = 0;
+    int minRow = 10000;
+    int maxRow = 0;
+
+    for (int row = 0; row < domino.Blocks.Length; row ++) {
+      for (int col = 0; col < domino.Blocks[row].Length; col++) {
+        if (domino.Blocks[row][col].Exists) {
+          if (row < minRow) minRow = row;
+          if (row > maxRow) maxRow = row;
+
+          if (col < minCol) minCol = col;
+          if (col > maxCol) maxCol = col;
+        }
+      }
+    }
+
+    Block[][] minimumDominoArea = new Block[maxRow - minRow + 1][];
+
+    for(int x = 0; x < minimumDominoArea.Length; x++) {
+      minimumDominoArea[x] = new Block[maxCol - minCol + 1];
+    }
+
+    for(int x = 0; x < domino.Blocks.Length; x++) {
+      for(int y = 0; y < domino.Blocks[x].Length; y++) {
+        if(domino.Blocks[x][y].Exists) {
+          minimumDominoArea[x - minRow][y - minCol] = domino.Blocks[x][y];
+        }
+      }
+    }
+
+    return new Domino() {
+      Blocks =  minimumDominoArea
+    };
+  }
+
+  public static bool[][] RotateDominoClockwise(bool[][] domino) {
     bool[][] rotatedDomino = new bool[domino[0].Length][];
 
     for(int x = 0; x < rotatedDomino.Length; x++) {
@@ -147,7 +182,7 @@ public class DominoManager : MonoBehaviour
     return rotatedDomino;
   }
 
-  public bool CompareDominos(bool[][] domino1, bool[][] domino2) {
+  public static bool CompareDominos(bool[][] domino1, bool[][] domino2) {
 
     var rotatedDomino1 = RotateDominoClockwise(domino1);
 
@@ -182,7 +217,7 @@ public class DominoManager : MonoBehaviour
     return false;
   }
 
-  public bool isDominoFullfillingRequest(Domino domino, DominoRequest dominoRequest) 
+  public static bool isDominoFullfillingRequest(Domino domino, DominoRequest dominoRequest) 
   {  
     var isCorrectShape = CompareDominos(domino.GetBlocksAsBools(), dominoRequest.Blocks);
 
@@ -205,7 +240,7 @@ public class DominoManager : MonoBehaviour
 
   #region Debug
 
-  string PrintDomino(bool[][] domino) {
+  public static string PrintDomino(bool[][] domino) {
     string dominoString = "";
 
     for(int x = 0; x < domino.Length; x++) {
