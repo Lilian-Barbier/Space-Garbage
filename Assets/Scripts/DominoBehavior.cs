@@ -7,6 +7,9 @@ public class DominoBehavior : MonoBehaviour
     [SerializeField]
     private bool setRandomDomino = false;
 
+    [SerializeField]
+    private bool useDominoPieces = false;
+
     // get own SpriteRenderer
     SpriteRenderer spriteRenderer;
     GameManager gameManager;
@@ -17,8 +20,16 @@ public class DominoBehavior : MonoBehaviour
     {
         gameManager = FindObjectOfType<GameManager>().GetComponent<GameManager>();
 
-        if(setRandomDomino)
-            domino = new Domino(DominoUtils.GetRandomValidDomino());
+        
+        
+        
+        if(setRandomDomino) {
+          if(useDominoPieces)
+            domino = new Domino(DominoUtils.GetRandomDominoPiece(), DominoUtils.GetRandomColor());
+          else
+            domino = new Domino(DominoUtils.GetRandomValidDomino(), DominoUtils.GetRandomColor());
+
+        }
 
         SetSpriteAndCollider();
     }
@@ -61,7 +72,7 @@ public class DominoBehavior : MonoBehaviour
         collider.size = croppedRect.size;
     }
 
-    //Fonctions utilisés dans l'assembleur
+    //Fonctions utilisï¿½s dans l'assembleur
     public void MoveDominoUp()
     {
         domino.Blocks = DominoUtils.MoveDominoUp(domino.Blocks);

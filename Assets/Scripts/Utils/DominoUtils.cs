@@ -6,60 +6,60 @@ using Enums;
 
 namespace Utils
 {
-    public class DominoUtils
-    {
-        #region Dominos
+  public class DominoUtils
+  {
+    #region Dominos
 
-        public static readonly bool[][] Skew = new bool[][] {
+    public static readonly bool[][] Skew = new bool[][] {
       new bool[] {  true, false, false, false },
       new bool[] {  true,  true, false, false },
       new bool[] { false,  true, false, false },
       new bool[] { false, false, false, false }
     };
 
-        public static readonly bool[][] ReverseSkew = new bool[][] {
+    public static readonly bool[][] ReverseSkew = new bool[][] {
       new bool[] { false,  true, false, false },
       new bool[] {  true,  true, false, false },
       new bool[] {  true, false, false, false },
       new bool[] { false, false, false, false }
     };
 
-        public static readonly bool[][] Square = new bool[][] {
+    public static readonly bool[][] Square = new bool[][] {
       new bool[] {  true,  true, false, false },
       new bool[] {  true,  true, false, false },
       new bool[] { false, false, false, false },
       new bool[] { false, false, false, false }
     };
 
-        public static readonly bool[][] L = new bool[][] {
+    public static readonly bool[][] L = new bool[][] {
       new bool[] {  true, false, false, false },
       new bool[] {  true, false, false, false },
       new bool[] {  true,  true, false, false },
       new bool[] { false, false, false, false }
     };
 
-        public static readonly bool[][] ReverseL = new bool[][] {
+    public static readonly bool[][] ReverseL = new bool[][] {
       new bool[] { false,  true, false, false },
       new bool[] { false,  true, false, false },
       new bool[] {  true,  true, false, false },
       new bool[] { false, false, false, false }
     };
 
-        public static readonly bool[][] T = new bool[][] {
+    public static readonly bool[][] T = new bool[][] {
       new bool[] {  true, false, false, false },
       new bool[] {  true,  true, false, false },
       new bool[] {  true, false, false, false },
       new bool[] { false, false, false, false }
     };
 
-        public static readonly bool[][] Line = new bool[][] {
+    public static readonly bool[][] Line = new bool[][] {
       new bool[] {  true, false, false, false },
       new bool[] {  true, false, false, false },
       new bool[] {  true, false, false, false },
       new bool[] {  true, false, false, false }
     };
 
-        public static readonly bool[][][] ValidDomino = new bool[][][] {
+    public static readonly bool[][][] ValidDomino = new bool[][][] {
       Skew,
       ReverseSkew,
       Square,
@@ -69,32 +69,42 @@ namespace Utils
       Line
     };
 
-        public static readonly bool[][] SingleBlock = new bool[][] {
+    public static readonly bool[][] SingleBlock = new bool[][] {
       new bool[] {  true, false, false, false },
       new bool[] { false, false, false, false },
       new bool[] { false, false, false, false },
       new bool[] { false, false, false, false }
     };
 
-        public static readonly bool[][] DoubleBlock = new bool[][] {
+    public static readonly bool[][] DoubleBlock = new bool[][] {
       new bool[] {  true, false, false, false },
       new bool[] {  true, false, false, false },
       new bool[] { false, false, false, false },
       new bool[] { false, false, false, false }
     };
 
-        public static readonly bool[][] TripleBlock = new bool[][] {
+    public static readonly bool[][] TripleBlock = new bool[][] {
       new bool[] {  true, false, false, false },
       new bool[] {  true,  true, false, false },
       new bool[] { false, false, false, false },
       new bool[] { false, false, false, false }
     };
 
+    public static readonly bool[][][] DominoPieces = new bool[][][] {
+      SingleBlock,
+      DoubleBlock,
+      TripleBlock
+    };
+
         #endregion
 
         public static bool[][] GetRandomValidDomino()
         {
-            return ValidDomino[Random.Range(0, ValidDomino.Length)];
+          return ValidDomino[Random.Range(0, ValidDomino.Length)];
+        }
+
+        public static bool[][] GetRandomDominoPiece() {
+          return DominoPieces[Random.Range(0, DominoPieces.Length)];
         }
 
         public static bool[][] GetMinimumDominoArea(bool[][] domino)

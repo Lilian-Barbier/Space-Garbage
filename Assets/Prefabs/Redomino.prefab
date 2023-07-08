@@ -138,7 +138,7 @@ Transform:
   m_Children:
   - {fileID: 8224879395397601629}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5246783677351079528
 SpriteRenderer:
@@ -206,6 +206,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectCarriedDistanceFactor: 0.7
   speed: 4
+  dashSpeed: 0
+  dashTime: 0
 --- !u!50 &7708331017817771909
 Rigidbody2D:
   serializedVersion: 4
