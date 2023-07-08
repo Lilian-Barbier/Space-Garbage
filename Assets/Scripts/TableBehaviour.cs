@@ -23,7 +23,6 @@ public class TableBehaviour : MonoBehaviour
 
     public void SetObjectCarried(Transform newObjectCarried)
     {
-        Debug.Log("SetObject");
         objectCarried = newObjectCarried;
         objectCarried.GetComponent<Collider2D>().isTrigger = true;
         objectCarried.position = transform.position;

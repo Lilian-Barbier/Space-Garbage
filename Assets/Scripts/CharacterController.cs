@@ -18,6 +18,8 @@ public class CharacterController : MonoBehaviour
 
     private Transform objectCarried;
     private Transform interactTriggerZone;
+
+    //Data from last frame for calculation and animation
     private float lastDirectionAngle;
 
     [SerializeField]
@@ -96,7 +98,8 @@ public class CharacterController : MonoBehaviour
             }
             else
             {
-                objectCarried.position = transform.position + Vector3.down * objectCarriedDistanceFactor;
+                Vector3 direction = lastDirectionAngle == 0 ? Vector3.down : lastDirectionAngle == 180 ? Vector3.up : lastDirectionAngle == 90 ? Vector3.right : Vector3.left;
+                objectCarried.position = transform.position + direction * objectCarriedDistanceFactor;
                 objectCarried.GetComponent<SpriteRenderer>().sortingOrder = 15;
             }
            
@@ -156,6 +159,8 @@ public class CharacterController : MonoBehaviour
 
     private void DropObject()
     {
+        objectCarried.GetComponent<SpriteRenderer>().sortingOrder = 5;
+
         CapsuleCollider2D c = new CapsuleCollider2D();
 
         var capsuleTriggerZone = interactTriggerZone.GetComponent<CapsuleCollider2D>();
@@ -180,6 +185,7 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
+            //todo ajouter une vérification que l'objet ne tombe pas dans un mur
             objectCarried.GetComponent<Collider2D>().isTrigger = false;
             objectCarried = null;
         }
