@@ -1011,12 +1011,20 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6301321840936278143, guid: b84fd55a10e93284abd66c1f2caec2d0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6301321840936278143, guid: b84fd55a10e93284abd66c1f2caec2d0, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6301321840936278143, guid: b84fd55a10e93284abd66c1f2caec2d0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.11
+      value: 0.8815
       objectReference: {fileID: 0}
     - target: {fileID: 6301321840936278143, guid: b84fd55a10e93284abd66c1f2caec2d0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.64
+      value: 1.934
       objectReference: {fileID: 0}
     - target: {fileID: 6301321840936278143, guid: b84fd55a10e93284abd66c1f2caec2d0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1216,6 +1224,26 @@ PrefabInstance:
     - target: {fileID: 5772732472768559995, guid: 51c122a057ef21946860a2c937e80dac, type: 3}
       propertyPath: m_Name
       value: Assembler
+      objectReference: {fileID: 0}
+    - target: {fileID: 5853130553970598063, guid: 51c122a057ef21946860a2c937e80dac, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7089113079002144882, guid: 51c122a057ef21946860a2c937e80dac, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 788517676775ddd4594f1de807b59016, type: 2}
+    - target: {fileID: 7274585824690069017, guid: 51c122a057ef21946860a2c937e80dac, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7274585824690069017, guid: 51c122a057ef21946860a2c937e80dac, type: 3}
+      propertyPath: m_Color.g
+      value: 0.31886768
+      objectReference: {fileID: 0}
+    - target: {fileID: 7274585824690069017, guid: 51c122a057ef21946860a2c937e80dac, type: 3}
+      propertyPath: m_Color.r
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8439931434776912826, guid: 51c122a057ef21946860a2c937e80dac, type: 3}
       propertyPath: m_RootOrder
@@ -3027,7 +3055,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -12
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
