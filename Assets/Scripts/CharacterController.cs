@@ -77,7 +77,7 @@ public class CharacterController : MonoBehaviour
 
         if (!isStopped)
         {
-            if (movement.x != 0)
+            if (movement.x > 0.5 || movement.x < -0.5)
             {
                 isMovingSide = true;
                 spriteRenderer.flipX = movement.x < 0;
