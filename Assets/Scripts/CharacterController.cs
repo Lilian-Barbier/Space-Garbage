@@ -1,3 +1,4 @@
+using Models;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,10 @@ public class CharacterController : MonoBehaviour
     private Rigidbody2D rigidbodyCharacter;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    private AssemblerManager assemblerManager;
+
+    //A retirer
+    private GameObject assembler;
 
     private Transform objectCarried;
     private Transform interactTriggerZone;
@@ -37,6 +42,10 @@ public class CharacterController : MonoBehaviour
     [SerializeField]
     private float dashTime;
 
+    private bool IsInAssembler;
+
+    private bool alreadyMoveInAssembler;
+
 
     private void Awake()
     {
@@ -45,6 +54,8 @@ public class CharacterController : MonoBehaviour
         playerInput.Redomino.Back.performed += ctx => Dash();
         playerInput.Redomino.RotateClockwise.performed += ctx => RotateClockwise();
         playerInput.Redomino.RotateCounterClockwise.performed += ctx => RotateCounterClockwise();
+        playerInput.Redomino.MoveDominoInAssembler.performed += ctx => MoveDominosInAssembler();
+        playerInput.Redomino.MoveDominoInAssembler.canceled += ctx => alreadyMoveInAssembler = false;
     }
 
     // Start is called before the first frame update
@@ -55,6 +66,8 @@ public class CharacterController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         interactTriggerZone = transform.GetChild(0);
+        assembler = GameObject.FindGameObjectWithTag("Assembler");
+        assemblerManager = assembler.GetComponent<AssemblerManager>();
 
         currentSpeed = speed;
     }
@@ -71,81 +84,169 @@ public class CharacterController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector2 movement = playerInput.Redomino.Movement.ReadValue<Vector2>();
-
-        var isMovingSide = false;
-        var isMovingUp = false;
-        var isMovingDown = false;
-
-        if (!isStopped)
+        if (IsInAssembler)
         {
-            if (movement.x > 0.5 || movement.x < -0.5)
-            {
-                isMovingSide = true;
-                spriteRenderer.flipX = movement.x < 0;
-                lastDirectionAngle = movement.x > 0 ? 90 : -90 ;
-            }
-            else if (movement.y < 0)
-            {
-                isMovingDown = true;
-                lastDirectionAngle = 0;
-            }
-            else if (movement.y > 0)
-            {
-                isMovingUp = true;
-                lastDirectionAngle = 180;
-            }
 
-            interactTriggerZone.rotation = Quaternion.Euler(0, 0, lastDirectionAngle);
-            rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + movement * currentSpeed * Time.deltaTime);
-
-            //Gestion du dash
-            //if(Time.)
         }
-
-        animator.SetBool("isMovingSide", isMovingSide);
-        animator.SetBool("isMovingUp", isMovingUp);
-        animator.SetBool("isMovingDown", isMovingDown);
-
-        if(objectCarried != null)
+        else
         {
-            if(movement != Vector2.zero)
+            #region In movement
+            Vector2 movement = playerInput.Redomino.Movement.ReadValue<Vector2>();
+
+            var isMovingSide = false;
+            var isMovingUp = false;
+            var isMovingDown = false;
+
+            if (!isStopped)
             {
-                objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor;
-                objectCarried.GetComponent<SpriteRenderer>().sortingOrder = movement.y < 0 && movement.x < 0.4 && movement.x > -0.4 ? 15 : 5;
+                if (movement.x > 0.5 || movement.x < -0.5)
+                {
+                    isMovingSide = true;
+                    spriteRenderer.flipX = movement.x < 0;
+                    lastDirectionAngle = movement.x > 0 ? 90 : -90;
+                }
+                else if (movement.y < 0)
+                {
+                    isMovingDown = true;
+                    lastDirectionAngle = 0;
+                }
+                else if (movement.y > 0)
+                {
+                    isMovingUp = true;
+                    lastDirectionAngle = 180;
+                }
+
+                interactTriggerZone.rotation = Quaternion.Euler(0, 0, lastDirectionAngle);
+                rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + movement * currentSpeed * Time.deltaTime);
+
+                //Gestion du dash
+                //if(Time.)
+
             }
-            else
+
+            animator.SetBool("isMovingSide", isMovingSide);
+            animator.SetBool("isMovingUp", isMovingUp);
+            animator.SetBool("isMovingDown", isMovingDown);
+
+            if (objectCarried != null)
             {
-                Vector3 direction = lastDirectionAngle == 0 ? Vector3.down : lastDirectionAngle == 180 ? Vector3.up : lastDirectionAngle == 90 ? Vector3.right : Vector3.left;
-                objectCarried.position = transform.position + direction * objectCarriedDistanceFactor;
-                objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirectionAngle == 180 ? 5 : 15;
+                if (movement != Vector2.zero)
+                {
+                    objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor;
+                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = movement.y < 0 && movement.x < 0.4 && movement.x > -0.4 ? 15 : 5;
+                }
+                else
+                {
+                    Vector3 direction = lastDirectionAngle == 0 ? Vector3.down : lastDirectionAngle == 180 ? Vector3.up : lastDirectionAngle == 90 ? Vector3.right : Vector3.left;
+                    objectCarried.position = transform.position + direction * objectCarriedDistanceFactor;
+                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirectionAngle == 180 ? 5 : 15;
+                }
+
             }
-           
+
+            #endregion In movement
         }
     }
 
     void Interact()
     {
-        if(objectCarried != null)
+        if (IsInAssembler)
         {
-            DropObject();
+            var domino = objectCarried.GetComponent<DominoBehavior>().domino;
+            if (assemblerManager.CanAddDomino(domino))
+            {
+                assemblerManager.AddDomino(domino);
+                objectCarried.gameObject.SetActive(false);
+                objectCarried = null;
+                IsInAssembler = false;
+            }
         }
         else
         {
-            GetObjectNear();
+            var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
+
+            var interactableObjects = new List<Collider2D>();
+            var contactFilter = new ContactFilter2D();
+            contactFilter.useTriggers = true;
+            Physics2D.OverlapCollider(circleTriggerZone, contactFilter, interactableObjects);
+
+            if (objectCarried != null)
+            {
+                if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerButton")))
+                {
+                    var domino = objectCarried.GetComponent<DominoBehavior>();
+                    assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+
+                    objectCarried.position = new Vector3(100, 100);
+                    IsInAssembler = true;
+                }
+                else
+                {
+                    DropObject();
+                }
+            }
+            else
+            {
+                if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerOutButton")))
+                {
+                    objectCarried = assemblerManager.GetDomino().transform;
+                    objectCarried.GetComponent<Collider2D>().isTrigger = true;
+                }
+                else
+                {
+                    GetObjectNear();
+                }
+            }
+
         }
     }
 
     void Dash()
     {
-        
+
+    }
+
+    void MoveDominosInAssembler()
+    {
+        if (IsInAssembler && !alreadyMoveInAssembler)
+        {
+            alreadyMoveInAssembler = true;
+
+            var domino = objectCarried.GetComponent<DominoBehavior>();
+
+            Vector2 movement = playerInput.Redomino.MoveDominoInAssembler.ReadValue<Vector2>();
+
+            if (movement.x > 0.5)
+            {
+                domino.MoveDominoRight();
+            }
+            else if (movement.x < -0.5)
+            {
+                domino.MoveDominoLeft();
+            }
+            else if (movement.y < 0)
+            {
+                domino.MoveDominoDown();
+            }
+            else if (movement.y > 0)
+            {
+                domino.MoveDominoUp();
+            }
+
+            assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+        }
     }
 
     void RotateClockwise()
     {
-        if(objectCarried != null)
+        if (objectCarried != null)
         {
-            objectCarried.GetComponent<DominoBehavior>().RotateDominoClockwise();
+            var domino = objectCarried.GetComponent<DominoBehavior>();
+            domino.RotateDominoClockwise();
+            if(IsInAssembler)
+            {
+                assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+            }
         }
     }
 
@@ -153,7 +254,12 @@ public class CharacterController : MonoBehaviour
     {
         if (objectCarried != null)
         {
-            objectCarried.GetComponent<DominoBehavior>().RotateDominoCounterClockwise();
+            var domino = objectCarried.GetComponent<DominoBehavior>();
+            domino.RotateDominoCounterClockwise();
+            if (IsInAssembler)
+            {
+                assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+            }
         }
     }
 
@@ -177,7 +283,8 @@ public class CharacterController : MonoBehaviour
         }
 
         //Sinon on prend un bloc d'une table
-        if (interactableObjects.Any(o => o.transform.CompareTag("Table"))){
+        if (interactableObjects.Any(o => o.transform.CompareTag("Table")))
+        {
             var tables = interactableObjects.Where(o => o.transform.CompareTag("Table"));
 
             //Dans le cas ou il y a plusieurs tables on trie par leurs distance
@@ -223,10 +330,10 @@ public class CharacterController : MonoBehaviour
         if (interactableObjects.Any(o => o.transform.CompareTag("Table")))
         {
             var tables = interactableObjects.Where(o => o.transform.CompareTag("Table"));
-            
+
             //Dans le cas ou il y a plusieurs tables on trie par leurs distance
             tables = tables.OrderBy(t => Vector2.Distance(t.transform.position, transform.position));
-    
+
             foreach (var table in tables)
             {
                 TableBehaviour tableBehaviour = table.GetComponent<TableBehaviour>();
@@ -245,13 +352,13 @@ public class CharacterController : MonoBehaviour
         Physics2D.OverlapCollider(objectCarriedCollider, new ContactFilter2D(), collidersWhenDropObjectCarried);
 
         //Ici on compare à la fois les mur et les tables, car si on arrive à ce point dans la fonction c'est que toutes les tables sont prises
-        if(collidersWhenDropObjectCarried.Any(c => c.transform.CompareTag("Walls") || c.transform.CompareTag("Table")))
+        if (collidersWhenDropObjectCarried.Any(c => c.transform.CompareTag("Walls") || c.transform.CompareTag("Table")))
         {
             objectCarried.position = transform.position;
         }
 
         objectCarriedCollider.isTrigger = false;
         objectCarried = null;
-        
+
     }
 }
