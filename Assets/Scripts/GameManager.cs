@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Models;
+using Utils;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,10 +13,12 @@ public class GameManager : MonoBehaviour
   
   float timeSinceLastBlockRequest;
   float maxTimeBetweenBlockRequests = 60f;
+  float minTimeBetweenBlockRequests = 15f;
 
   void Start()
   {
-
+    // timeSinceLastBlockRequest = 0f;
+    // BlockRequestList = GenerateBlockRequestList();
   }
 
   void Update()
@@ -25,6 +28,26 @@ public class GameManager : MonoBehaviour
 
   void FixedUpdate() 
   {
+    timeSinceLastBlockRequest += Time.deltaTime;
+
+    // random number between 0 and maxTimeBetweenBlockRequests
+
+    var randomChance = Random.Range(0, maxTimeBetweenBlockRequests);
+
+    if (randomChance < timeSinceLastBlockRequest) {
+      timeSinceLastBlockRequest = 0f;
+
+      var dominoRequest = new DominoRequest() {
+        Blocks = DominoUtils.GetRandomValidDomino(),
+        Color = DominoUtils.GetRandomColor()
+      };
+
+
+      // BlockRequestList = GenerateBlockRequestList();
+    }
+
+
+
     // if(dominoRequestList.Length == 0)
     // {
     //   // timeSinceLastBlockRequest += Time.deltaTime;
@@ -38,9 +61,9 @@ public class GameManager : MonoBehaviour
 
   public Sprite GenerateDominoSprite(Domino domino)
   { 
-    var minArea = DominoManager.GetMinimumDominoArea(domino);
+    var minArea = DominoUtils.GetMinimumDominoArea(domino);
 
-    DominoManager.PrintDomino(minArea.GetBlocksAsBools());
+    DominoUtils.PrintDomino(minArea.GetBlocksAsBools());
 
     int height = (minArea.Blocks.Length + 1) * 6;
     int width = minArea.Blocks[0].Length * 7;
