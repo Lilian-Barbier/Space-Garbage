@@ -4,17 +4,28 @@ using Utils;
 
 public class DominoBehavior : MonoBehaviour
 {
+    [SerializeField]
+    private bool setRandomDomino = false;
+
     // get own SpriteRenderer
     SpriteRenderer spriteRenderer;
     GameManager gameManager;
-    Domino domino;
+    public Domino domino;
 
     // Start is called before the first frame update
     void Start()
     {
         gameManager = FindObjectOfType<GameManager>().GetComponent<GameManager>();
 
-        domino = new Domino(DominoUtils.GetRandomValidDomino());
+        if(setRandomDomino)
+            domino = new Domino(DominoUtils.GetRandomValidDomino());
+
+        SetSpriteAndCollider();
+    }
+
+    public void SetDomino(Domino domino)
+    {
+        this.domino = domino;
         SetSpriteAndCollider();
     }
 
@@ -50,9 +61,21 @@ public class DominoBehavior : MonoBehaviour
         collider.size = croppedRect.size;
     }
 
-    // Update is called once per frame
-    void Update()
+    //Fonctions utilisés dans l'assembleur
+    public void MoveDominoUp()
     {
-        
+        domino.Blocks = DominoUtils.MoveDominoUp(domino.Blocks);
+    }
+    public void MoveDominoRight()
+    {
+        domino.Blocks = DominoUtils.MoveDominoRight(domino.Blocks);
+    }
+    public void MoveDominoLeft()
+    {
+        domino.Blocks = DominoUtils.MoveDominoLeft(domino.Blocks);
+    }
+    public void MoveDominoDown()
+    {
+        domino.Blocks = DominoUtils.MoveDominoDown(domino.Blocks);
     }
 }

@@ -71,6 +71,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MoveDominoInAssembler"",
+                    ""type"": ""Value"",
+                    ""id"": ""184d9971-732e-45e9-8687-5b7045820ad5"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -282,6 +291,171 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""RotateCounterClockwise"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Joystick"",
+                    ""id"": ""7b9fda1b-a3cc-4ced-a816-6ce59abb00dd"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""806d7660-8b29-4c6d-b7e6-a0adce34a203"",
+                    ""path"": ""<Gamepad>/leftStick/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""e25a488c-51d0-4a8c-a9b9-71d0e247f63c"",
+                    ""path"": ""<Gamepad>/leftStick/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""f65989ee-680c-48e6-8547-546eb7f588f5"",
+                    ""path"": ""<Gamepad>/leftStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""2e364149-7ec1-4c16-bf49-76357f02b5e6"",
+                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""DPad"",
+                    ""id"": ""741fdb8d-0b28-4434-b012-40ef48799077"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""9cb305a7-0919-4b9a-9516-04a194cc8fc6"",
+                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""d752707b-bc05-4585-a060-9a6a2d55e655"",
+                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""d32cec66-73aa-4040-9652-fc5c659f44d4"",
+                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""5dca5cb7-0d65-4b9b-b36a-ecf6f1971492"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""130bf2b6-952a-4518-b240-7b1ea5485313"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""e7159d6e-5fb0-4be9-9874-0827d5e0865c"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""e9c308a2-778b-48ad-afc8-69b21297e52c"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""a6afff33-82ba-4846-9b38-d818c267578e"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""df41d001-9488-45cf-a281-567d6f3f353b"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveDominoInAssembler"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -295,6 +469,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Redomino_Back = m_Redomino.FindAction("Back", throwIfNotFound: true);
         m_Redomino_RotateClockwise = m_Redomino.FindAction("RotateClockwise", throwIfNotFound: true);
         m_Redomino_RotateCounterClockwise = m_Redomino.FindAction("RotateCounterClockwise", throwIfNotFound: true);
+        m_Redomino_MoveDominoInAssembler = m_Redomino.FindAction("MoveDominoInAssembler", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -361,6 +536,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Redomino_Back;
     private readonly InputAction m_Redomino_RotateClockwise;
     private readonly InputAction m_Redomino_RotateCounterClockwise;
+    private readonly InputAction m_Redomino_MoveDominoInAssembler;
     public struct RedominoActions
     {
         private @PlayerInput m_Wrapper;
@@ -370,6 +546,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @Back => m_Wrapper.m_Redomino_Back;
         public InputAction @RotateClockwise => m_Wrapper.m_Redomino_RotateClockwise;
         public InputAction @RotateCounterClockwise => m_Wrapper.m_Redomino_RotateCounterClockwise;
+        public InputAction @MoveDominoInAssembler => m_Wrapper.m_Redomino_MoveDominoInAssembler;
         public InputActionMap Get() { return m_Wrapper.m_Redomino; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -394,6 +571,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @RotateCounterClockwise.started += instance.OnRotateCounterClockwise;
             @RotateCounterClockwise.performed += instance.OnRotateCounterClockwise;
             @RotateCounterClockwise.canceled += instance.OnRotateCounterClockwise;
+            @MoveDominoInAssembler.started += instance.OnMoveDominoInAssembler;
+            @MoveDominoInAssembler.performed += instance.OnMoveDominoInAssembler;
+            @MoveDominoInAssembler.canceled += instance.OnMoveDominoInAssembler;
         }
 
         private void UnregisterCallbacks(IRedominoActions instance)
@@ -413,6 +593,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @RotateCounterClockwise.started -= instance.OnRotateCounterClockwise;
             @RotateCounterClockwise.performed -= instance.OnRotateCounterClockwise;
             @RotateCounterClockwise.canceled -= instance.OnRotateCounterClockwise;
+            @MoveDominoInAssembler.started -= instance.OnMoveDominoInAssembler;
+            @MoveDominoInAssembler.performed -= instance.OnMoveDominoInAssembler;
+            @MoveDominoInAssembler.canceled -= instance.OnMoveDominoInAssembler;
         }
 
         public void RemoveCallbacks(IRedominoActions instance)
@@ -437,5 +620,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnBack(InputAction.CallbackContext context);
         void OnRotateClockwise(InputAction.CallbackContext context);
         void OnRotateCounterClockwise(InputAction.CallbackContext context);
+        void OnMoveDominoInAssembler(InputAction.CallbackContext context);
     }
 }
