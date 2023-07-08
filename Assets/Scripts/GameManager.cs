@@ -6,19 +6,30 @@ using Utils;
 
 public class GameManager : MonoBehaviour
 {
+  [SerializeField] public readonly float dominoRequestDuration = 40f;
+
   [SerializeField] private Sprite blockSprite;
+  [SerializeField] private float minTimeBetweenDominoRequests = 15f;
+  [SerializeField] private float maxTimeBetweenDominoRequests = 60f;
+
   private Color blueOutline = new Color(27/255f, 33/255f, 114/255f, 1);
   
-  DominoRequest[] dominoRequestList;
+  private TetrisPlayer[] playerList;
+
+  public List<DominoRequest> dominoRequestList;
+  public List<float> dominoRequestTimeList;
   
   float timeSinceLastBlockRequest;
-  float maxTimeBetweenBlockRequests = 60f;
-  float minTimeBetweenBlockRequests = 15f;
+  float timeBeforeNextBlockRequest;
 
   void Start()
   {
-    // timeSinceLastBlockRequest = 0f;
-    // BlockRequestList = GenerateBlockRequestList();
+    timeSinceLastBlockRequest = 0f;
+    
+    dominoRequestList = new List<DominoRequest>();
+    dominoRequestTimeList = new List<float>();
+
+    playerList = GetRandomPlayers();
   }
 
   void Update()
@@ -28,35 +39,68 @@ public class GameManager : MonoBehaviour
 
   void FixedUpdate() 
   {
+    DecreaseDominoRequestTimeList();
+    CheckForNewDominoRequest();
+    DeleteUnsuccessfulDominoRequests();
+  }
+
+  private void DecreaseDominoRequestTimeList()
+  {
+    for (var i = 0; i < dominoRequestTimeList.Count; i++) {
+      dominoRequestTimeList[i] -= Time.deltaTime;
+    }
+  }
+
+  private void CheckForNewDominoRequest()
+  {
     timeSinceLastBlockRequest += Time.deltaTime;
 
-    // random number between 0 and maxTimeBetweenBlockRequests
+    if (timeBeforeNextBlockRequest < timeSinceLastBlockRequest || dominoRequestList.Count == 0) {
+      AddRandomDominoRequest();
+    }
+  }
 
-    var randomChance = Random.Range(0, maxTimeBetweenBlockRequests);
+  private void DeleteUnsuccessfulDominoRequests()
+  {
+    for (var i = 0; i < dominoRequestTimeList.Count; i++) {
+      if (dominoRequestTimeList[i] < 0) {
+        dominoRequestList.RemoveAt(i);
+        dominoRequestTimeList.RemoveAt(i);
+      }
+    }
+  }
 
-    if (randomChance < timeSinceLastBlockRequest) {
-      timeSinceLastBlockRequest = 0f;
+  private void AddRandomDominoRequest()
+  {
+    timeSinceLastBlockRequest = 0f;
+    timeBeforeNextBlockRequest = Random.Range(minTimeBetweenDominoRequests, maxTimeBetweenDominoRequests);
 
-      var dominoRequest = new DominoRequest() {
-        Blocks = DominoUtils.GetRandomValidDomino(),
-        Color = DominoUtils.GetRandomColor()
+    var dominoRequest = new DominoRequest() {
+      Blocks = DominoUtils.GetRandomValidDomino(),
+      Color = DominoUtils.GetRandomColor(),
+      Player = playerList[Random.Range(0, playerList.Length)],
+    };
+
+    // Debug.Log("Adding new domino request: " + dominoRequest.Player.Name + " " + dominoRequest.Player.Age + " " + dominoRequest.Color + "\n" + DominoUtils.PrintDomino(dominoRequest.Blocks));
+
+    dominoRequestList.Add(dominoRequest);
+    dominoRequestTimeList.Add(dominoRequestDuration);
+  }
+
+  private TetrisPlayer[] GetRandomPlayers()
+  {
+    var playerList = new TetrisPlayer[10];
+
+    for (var i = 0; i < playerList.Length; i++) {
+      var player = new TetrisPlayer() {
+        Name = RequestUtils.GetRandomPlayerName(),
+        Age = RequestUtils.GetRandomPlayerAge(),
       };
 
-
-      // BlockRequestList = GenerateBlockRequestList();
+      playerList[i] = player;
     }
 
-
-
-    // if(dominoRequestList.Length == 0)
-    // {
-    //   // timeSinceLastBlockRequest += Time.deltaTime;
-    //   // if(timeSinceLastBlockRequest >= maxTimeBetweenBlockRequests)
-    //   // {
-    //   //   timeSinceLastBlockRequest = 0f;
-    //   //   BlockRequestList = GenerateBlockRequestList();
-    //   // }
-    // }
+    return playerList;
   }
 
   public Sprite GenerateDominoSprite(Domino domino)
