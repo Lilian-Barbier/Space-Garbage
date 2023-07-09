@@ -1,0 +1,13 @@
+Font: Karmatic Arcade  Style: Regular
+Point Size: 240   Padding: 5   SP/PD Ratio: 2,1٪
+
+Characters included: 98/99
+Missing characters: 1
+Excluded characters: 0
+
+Characters missing from font file:
+----------------------------------------
+ID: 8203	Hex: 200B	Char [​]
+
+Characters excluded from packing:
+----------------------------------------

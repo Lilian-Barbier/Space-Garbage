@@ -9,7 +9,8 @@ using Utils;
 
 public class DeliveryPointBehaviour : MonoBehaviour
 {
-
+    public List<Domino> distribuedDomino = new List<Domino>();
+ 
     GameManager gameManager;
     private void Start()
     {
@@ -18,6 +19,7 @@ public class DeliveryPointBehaviour : MonoBehaviour
 
     public void DeliveryDomino(Domino domino)
     {
+        distribuedDomino.Add(domino);
         for (var i = gameManager.dominoRequestList.Count - 1; i > -1; i--)
         {
             var res = DominoUtils.isDominoFullfillingRequest(domino, gameManager.dominoRequestList[i]);

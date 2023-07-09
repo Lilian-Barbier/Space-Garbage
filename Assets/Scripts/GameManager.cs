@@ -60,6 +60,8 @@ public class GameManager : MonoBehaviour
     HearthManager hearthManager;
     private int score;
 
+    private bool gameInProgress = true;
+
     void Start()
     {
         hearthManager = FindObjectOfType<HearthManager>().GetComponent<HearthManager>();
@@ -76,12 +78,15 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        hearthManager.ScoreChanged(score);
-        DecreaseDominoRequestTimeList();
-        CheckForNewDominoRequest();
-        DeleteUnsuccessfulDominoRequests();
+        if (gameInProgress)
+        {
+            hearthManager.ScoreChanged(score);
+            DecreaseDominoRequestTimeList();
+            CheckForNewDominoRequest();
+            DeleteUnsuccessfulDominoRequests();
 
-        CalculateNewDurations();
+            CalculateNewDurations();
+        }
     }
 
     private void DecreaseDominoRequestTimeList()
@@ -115,13 +120,25 @@ public class GameManager : MonoBehaviour
                 hearthManager.LifeChanged(life);
                 if (life <= 0)
                 {
-                    //Todo Load GameOver scene
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                    EndLevel();
+                    return;
                 }
 
                 DeleteDominoRequest(i);
             }
         }
+    }
+
+    void EndLevel()
+    {
+        gameInProgress = false;
+        for (var i = dominoRequestList.Count - 1; i > -1; i--)
+        {
+            DeleteDominoRequest(i);
+        }
+        EndMenuManager menu = FindObjectOfType<EndMenuManager>().GetComponent<EndMenuManager>();
+        menu.EndLevel(score);
+
     }
 
     public void DeleteDominoRequest(int i)
