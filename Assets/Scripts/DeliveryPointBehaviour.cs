@@ -22,12 +22,13 @@ public class DeliveryPointBehaviour : MonoBehaviour
         distribuedDomino.Add(domino);
         for (var i = gameManager.dominoRequestList.Count - 1; i > -1; i--)
         {
-            var res = DominoUtils.isDominoFullfillingRequest(domino, gameManager.dominoRequestList[i]);
+            var dominoReq = gameManager.dominoRequestList[i];
+            var res = DominoUtils.isDominoFullfillingRequest(domino, dominoReq);
 
             if (res)
             {
                 gameManager.DeleteDominoRequest(i);
-                gameManager.GainScore();
+                gameManager.GainScore(dominoReq.RemainingTime/dominoReq.InitialDuration);
                 return;
             }
         }

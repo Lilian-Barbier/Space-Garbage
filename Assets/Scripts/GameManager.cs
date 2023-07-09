@@ -385,9 +385,9 @@ public class GameManager : MonoBehaviour
       delayBetweenRequestsLowerBound -= delayBetweenRequestsDelta;
     }
 
-    public void GainScore()
+    public void GainScore(float result)
     {
-        score += 100;
+        score += 50 + (int) (50 * Mathf.Floor(result));
     }
 
     public void LooseScore()
