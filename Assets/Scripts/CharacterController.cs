@@ -216,7 +216,7 @@ public class CharacterController : MonoBehaviour
                     }
                     else
                     {
-                        if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerOutButton")))
+                        if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerButton")) && !assemblerManager.isEmpty())
                         {
                             objectCarried = assemblerManager.GetDomino().transform;
                             objectCarried.GetComponent<Collider2D>().isTrigger = true;
