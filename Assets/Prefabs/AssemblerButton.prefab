@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4697036091254674356}
   - component: {fileID: 1047282684577197551}
-  - component: {fileID: 9215025572753983454}
+  - component: {fileID: 4232340114942839022}
   m_Layer: 0
   m_Name: AssemblerButton
   m_TagString: AssemblerButton
@@ -84,9 +84,9 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
---- !u!58 &9215025572753983454
-CircleCollider2D:
+  m_SpriteSortPoint: 1
+--- !u!61 &4232340114942839022
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -118,5 +118,15 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
   serializedVersion: 2
-  m_Radius: 0.3125
+  m_Size: {x: 1.4, y: 0.9}
+  m_EdgeRadius: 0

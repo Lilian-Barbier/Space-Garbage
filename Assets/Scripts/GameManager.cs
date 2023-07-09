@@ -10,7 +10,13 @@ using UnityEngine.SocialPlatforms.Impl;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private int life = 3;
-    [SerializeField] public float dominoRequestDuration = 40f;
+
+    private static readonly float initialDominoRequestDuration = 40f;
+    private static readonly float minDominoRequestDuration = 30f;
+    
+    public float dominoRequestDuration = initialDominoRequestDuration;
+
+    private static readonly  float timeToReachMinimumRequestDuration = 300f;
 
     [SerializeField] private Sprite defaultBlockSprite;
     [SerializeField] private Sprite blueBlockSprite;
@@ -19,8 +25,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite lightRedBlockSprite;
     [SerializeField] private Sprite blackBlockSprite;
 
-    private float minTimeBetweenDominoRequests = 12f;
-    private float maxTimeBetweenDominoRequests = 36f;
+    private static readonly float minUpperBound = 20f;
+    private static readonly float initialUpperBound = 36f;
+    private static readonly float minLowerBound = 8f;
+    private static readonly float initialLowerBound = 16f;
+
+    private static readonly  float timeToReachMinimumDelayBetweenRequests = 600f;
+
+    private float delayBetweenRequestsLowerBound = initialLowerBound;
+    private float delayBetweenRequestsUpperBound = initialUpperBound;
 
     private Color blueOutline = new Color(27 / 255f, 33 / 255f, 114 / 255f, 1);
     private Color lightBlueOutline = new Color(51 / 255f, 57 / 255f, 132 / 255f, 1);
@@ -67,17 +80,19 @@ public class GameManager : MonoBehaviour
         DecreaseDominoRequestTimeList();
         CheckForNewDominoRequest();
         DeleteUnsuccessfulDominoRequests();
+
+        CalculateNewDurations();
     }
 
     private void DecreaseDominoRequestTimeList()
     {
         for (var i = 0; i < dominoRequestList.Count; i++)
-            dominoRequestList[i].RemainingTime -= Time.deltaTime;
+            dominoRequestList[i].RemainingTime -= Time.fixedDeltaTime;
     }
 
     private void CheckForNewDominoRequest()
     {
-        timeSinceLastBlockRequest += Time.deltaTime;
+        timeSinceLastBlockRequest += Time.fixedDeltaTime;
 
         // Skip if there are already 10 requests or no players left
         if (dominoRequestList.Count >= 10 || playerList.Count == 0)
@@ -128,15 +143,8 @@ public class GameManager : MonoBehaviour
 
     private void AddRandomDominoRequest()
     {
-        //Todo � retirer, juste pour tester
-        if(dominoRequestDuration>26)
-            dominoRequestDuration -= 6;
-
-        if (maxTimeBetweenDominoRequests > 15)
-            maxTimeBetweenDominoRequests -= 3;
-
         timeSinceLastBlockRequest = 0f;
-        timeBeforeNextBlockRequest = Random.Range(minTimeBetweenDominoRequests, maxTimeBetweenDominoRequests);
+        timeBeforeNextBlockRequest = Random.Range(delayBetweenRequestsLowerBound, delayBetweenRequestsUpperBound);
 
         var playerIndex = Random.Range(0, playerList.Count);
         var player = playerList[playerIndex];
@@ -144,9 +152,10 @@ public class GameManager : MonoBehaviour
 
         var dominoRequest = new DominoRequest()
         {
-            Blocks = DominoUtils.GetRandomValidDomino(),
+            Blocks = DominoUtils.T,
             Color = DominoUtils.GetRandomColor(),
             Player = player,
+            InitialDuration = dominoRequestDuration,
             RemainingTime = dominoRequestDuration,
         };
 
@@ -345,6 +354,18 @@ public class GameManager : MonoBehaviour
         var finalSprite = Sprite.Create(newTexture, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f), 32);
         finalSprite.name = "DominoSprite";
         return finalSprite;
+    }
+
+    private void CalculateNewDurations()
+    {
+      var dominoRequestDelta = (initialDominoRequestDuration - minDominoRequestDuration) * Time.fixedDeltaTime / timeToReachMinimumRequestDuration;
+      dominoRequestDuration -= dominoRequestDelta;
+
+      var delayBetweenRequestsDelta = (initialUpperBound - minUpperBound) * Time.fixedDeltaTime / timeToReachMinimumDelayBetweenRequests;
+      delayBetweenRequestsUpperBound -= delayBetweenRequestsDelta;
+
+      delayBetweenRequestsDelta = (initialLowerBound - minLowerBound) * Time.fixedDeltaTime / timeToReachMinimumDelayBetweenRequests;
+      delayBetweenRequestsLowerBound -= delayBetweenRequestsDelta;
     }
 
     public void GainScore()

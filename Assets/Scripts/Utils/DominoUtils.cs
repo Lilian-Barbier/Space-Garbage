@@ -364,53 +364,36 @@ namespace Utils
         }
 
 
+        public static bool CompareAllDominosRotations(bool[][] domino1, bool[][] domino2) {
+          var rotatedDomino1 = RotateDominoClockwise(domino1);
+          var rotatedDomino2 = RotateDominoClockwise(rotatedDomino1);
+          var rotatedDomino3 = RotateDominoClockwise(rotatedDomino2);
+
+          return CompareDominos(domino1, domino2) || 
+            CompareDominos(rotatedDomino1, domino2) || 
+            CompareDominos(rotatedDomino2, domino2) ||
+            CompareDominos(rotatedDomino3, domino2);
+        }
+
         public static bool CompareDominos(bool[][] domino1, bool[][] domino2)
         {
-
-            var rotatedDomino1 = RotateDominoClockwise(domino1);
-
             var minDomino1 = GetMinimumDominoArea(domino1);
-            var minRotatedDomino1 = GetMinimumDominoArea(rotatedDomino1);
             var minDomino2 = GetMinimumDominoArea(domino2);
 
             if (minDomino1.Length == minDomino2.Length && minDomino1[0].Length == minDomino2[0].Length)
-            {
                 for (int x = 0; x < minDomino1.Length; x++)
-                {
                     for (int y = 0; y < minDomino1[x].Length; y++)
-                    {
                         if (minDomino1[x][y] != minDomino2[x][y])
-                        {
                             return false;
-                        }
-                    }
-                }
 
                 return true;
-            }
-
-            if (minRotatedDomino1.Length == minDomino2.Length && minRotatedDomino1[0].Length == minDomino2[0].Length)
-            {
-                for (int x = 0; x < minRotatedDomino1.Length; x++)
-                {
-                    for (int y = 0; y < minRotatedDomino1[x].Length; y++)
-                    {
-                        if (minRotatedDomino1[x][y] != minDomino2[x][y])
-                        {
-                            return false;
-                        }
-                    }
-                }
-
-                return true;
-            }
 
             return false;
         }
 
         public static bool isDominoFullfillingRequest(Domino domino, DominoRequest dominoRequest)
         {
-            var isCorrectShape = CompareDominos(domino.GetBlocksAsBools(), dominoRequest.Blocks);
+            var isCorrectShape = CompareAllDominosRotations(domino.GetBlocksAsBools(), dominoRequest.Blocks);
 
             if (!isCorrectShape)
             {

@@ -44,7 +44,7 @@ public class RequestBehavior : MonoBehaviour
 
     while (dominoRequest.RemainingTime >= 0f)
     {
-      timerFill.fillAmount = dominoRequest.RemainingTime / gameManager.dominoRequestDuration;
+      timerFill.fillAmount = dominoRequest.RemainingTime / dominoRequest.InitialDuration;
       yield return new WaitForSeconds(1/60f);
     }
   }
