@@ -381,39 +381,33 @@ namespace Utils
             var minDomino2 = GetMinimumDominoArea(domino2);
 
             if (minDomino1.Length == minDomino2.Length && minDomino1[0].Length == minDomino2[0].Length)
-                for (int x = 0; x < minDomino1.Length; x++)
-                    for (int y = 0; y < minDomino1[x].Length; y++)
-                        if (minDomino1[x][y] != minDomino2[x][y])
-                            return false;
+            {
+              for (int x = 0; x < minDomino1.Length; x++)
+                  for (int y = 0; y < minDomino1[x].Length; y++)
+                      if (minDomino1[x][y] != minDomino2[x][y])
+                          return false;
 
-                return true;
+              return true;
+            }
+
 
             return false;
         }
 
         public static bool isDominoFullfillingRequest(Domino domino, DominoRequest dominoRequest)
         {
-            var isCorrectShape = CompareAllDominosRotations(domino.GetBlocksAsBools(), dominoRequest.Blocks);
+          var isCorrectShape = CompareAllDominosRotations(domino.GetBlocksAsBools(), dominoRequest.Blocks);
 
-            if (!isCorrectShape)
-            {
-                return false;
-            }
+          if (!isCorrectShape) return false;
 
-            var isCorrectColor = true;
+          var isCorrectColor = true;
 
-            for (int x = 0; x < domino.Blocks.Length; x++)
-            {
-                for (int y = 0; y < domino.Blocks[x].Length; y++)
-                {
-                    if (domino.Blocks[x][y].Exists && domino.Blocks[x][y].Color != dominoRequest.Color)
-                    {
-                        isCorrectColor = false;
-                    }
-                }
-            }
+          for (int x = 0; x < domino.Blocks.Length; x++)
+              for (int y = 0; y < domino.Blocks[x].Length; y++)
+                  if (domino.Blocks[x][y].Exists && domino.Blocks[x][y].Color != dominoRequest.Color)
+                      isCorrectColor = false;
 
-            return isCorrectShape && isCorrectColor;
+          return isCorrectShape && isCorrectColor;
         }
 
         public static BlockColor GetRandomColor()
