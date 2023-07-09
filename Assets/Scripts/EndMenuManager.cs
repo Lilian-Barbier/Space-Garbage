@@ -31,6 +31,6 @@ public class EndMenuManager : MonoBehaviour
 
     public void LoadMenu()
     {
-        SceneManager.LoadScene("Levels");
+        SceneManager.LoadScene("ChooseLvl");
     }
 }

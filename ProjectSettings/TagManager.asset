@@ -13,6 +13,8 @@ TagManager:
   - Painter
   - Box
   - DeliveryPoint
+  - SpawnP1
+  - SpawnP2
   layers:
   - Default
   - TransparentFX
