@@ -213,8 +213,6 @@ public class CharacterController : MonoBehaviour
           var collider = interactableObjects.First(o => o.transform.CompareTag("Blocks"));
           var objectDetected = collider.transform;
 
-          Debug.Log("Object detected : " + objectDetected.name);
-
           if (objectDetected != this.objectDetected && this.objectDetected != null)
             this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
 

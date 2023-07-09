@@ -442,7 +442,6 @@ namespace Utils
             {
                 for (int y = 0; y < domino[x].Length; y++)
                 {
-                    Debug.Log(x + "-" + y);
                     dominoString += domino[x][y].Exists ? "■" : "□";
                 }
                 dominoString += "\n";

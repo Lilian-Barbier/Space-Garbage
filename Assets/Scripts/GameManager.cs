@@ -80,7 +80,8 @@ public class GameManager : MonoBehaviour
     {
         if (gameInProgress)
         {
-            hearthManager.ScoreChanged(score);
+            if(hearthManager.GetCurrentScore() != score) 
+              hearthManager.ScoreChanged(score);
             DecreaseDominoRequestTimeList();
             CheckForNewDominoRequest();
             DeleteUnsuccessfulDominoRequests();
@@ -175,8 +176,6 @@ public class GameManager : MonoBehaviour
             InitialDuration = dominoRequestDuration,
             RemainingTime = dominoRequestDuration,
         };
-
-        // Debug.Log("Adding new domino request: " + dominoRequest.Player.Name + " " + dominoRequest.Player.Age + " " + dominoRequest.Color + "\n" + DominoUtils.PrintDomino(dominoRequest.Blocks));
 
         dominoRequestList.Add(dominoRequest);
         AddDominoRequestToHUD(dominoRequest);
@@ -383,8 +382,6 @@ public class GameManager : MonoBehaviour
 
       delayBetweenRequestsDelta = (initialLowerBound - minLowerBound) * Time.fixedDeltaTime / timeToReachMinimumDelayBetweenRequests;
       delayBetweenRequestsLowerBound -= delayBetweenRequestsDelta;
-
-      Debug.Log(dominoRequestDuration + ", " + delayBetweenRequestsUpperBound + ", " + delayBetweenRequestsLowerBound);
     }
 
     public void GainScore(float result)
