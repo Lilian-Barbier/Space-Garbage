@@ -69,6 +69,20 @@ public class AssemblerManager : MonoBehaviour
         return newDomino;
     }
 
+    public bool isEmpty()
+    {
+        for (var i = 0; i < 4; i++)
+        {
+            for (var j = 0; j < 4; j++)
+            {
+                if(currentDomino.Blocks[i][j].Exists){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public bool CanAddDomino(Domino domino)
     {
         for (var i = 0; i < 4; i++)
