@@ -209,8 +209,9 @@ MonoBehaviour:
   bludomino: {fileID: 0}
   objectCarriedDistanceFactor: 0.7
   speed: 4
-  dashSpeed: 0
-  dashTime: 0
+  dashSpeed: 8
+  dashDuration: 0.2
+  dashCooldown: 1
   playerNumber: 0
 --- !u!50 &7708331017817771909
 Rigidbody2D:
