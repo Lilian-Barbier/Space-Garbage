@@ -1,13 +1,15 @@
 // enum 
 
-namespace Enums {
-  public enum BlockColor
-  {
-    None,
-    LightRed,
-    Red,
-    LightBlue,
-    Blue
-  }
+namespace Enums
+{
+    public enum BlockColor
+    {
+        None,
+        Failed,
+        LightRed,
+        Red,
+        LightBlue,
+        Blue
+    }
 }
 

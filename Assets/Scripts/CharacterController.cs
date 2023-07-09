@@ -46,16 +46,8 @@ public class CharacterController : MonoBehaviour
 
     private bool alreadyMoveInAssembler;
 
-
     private void Awake()
     {
-        playerInput = new PlayerInput();
-        playerInput.Redomino.Action.performed += ctx => Interact();
-        playerInput.Redomino.Back.performed += ctx => Dash();
-        playerInput.Redomino.RotateClockwise.performed += ctx => RotateClockwise();
-        playerInput.Redomino.RotateCounterClockwise.performed += ctx => RotateCounterClockwise();
-        playerInput.Redomino.MoveDominoInAssembler.performed += ctx => MoveDominosInAssembler();
-        playerInput.Redomino.MoveDominoInAssembler.canceled += ctx => alreadyMoveInAssembler = false;
     }
 
     // Start is called before the first frame update
@@ -73,14 +65,19 @@ public class CharacterController : MonoBehaviour
     }
     private void OnEnable()
     {
-        playerInput.Redomino.Enable();
+        //playerInput.Redomino.Enable();
     }
 
     private void OnDisable()
     {
-        playerInput.Redomino.Disable();
+        //playerInput.Redomino.Disable();
     }
 
+    private Vector2 movement = Vector2.zero;
+    public void Move(InputAction.CallbackContext ctx)
+    {
+        movement = ctx.ReadValue<Vector2>();
+    }
 
     private void FixedUpdate()
     {
@@ -91,8 +88,6 @@ public class CharacterController : MonoBehaviour
         else
         {
             #region In movement
-            Vector2 movement = playerInput.Redomino.Movement.ReadValue<Vector2>();
-
             var isMovingSide = false;
             var isMovingUp = false;
             var isMovingDown = false;
@@ -148,117 +143,135 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    void Interact()
+    public void Interact(InputAction.CallbackContext ctx)
     {
-        if (IsInAssembler)
+        if (ctx.performed)
         {
-            var domino = objectCarried.GetComponent<DominoBehavior>().domino;
-            if (assemblerManager.CanAddDomino(domino))
+            if (IsInAssembler)
             {
-                assemblerManager.AddDomino(domino);
-                objectCarried.gameObject.SetActive(false);
-                objectCarried = null;
-                IsInAssembler = false;
-            }
-        }
-        else
-        {
-            var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
-
-            var interactableObjects = new List<Collider2D>();
-            var contactFilter = new ContactFilter2D();
-            contactFilter.useTriggers = true;
-            Physics2D.OverlapCollider(circleTriggerZone, contactFilter, interactableObjects);
-
-            if (objectCarried != null)
-            {
-                if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerButton")))
+                var domino = objectCarried.GetComponent<DominoBehavior>().domino;
+                if (assemblerManager.CanAddDomino(domino))
                 {
-                    var domino = objectCarried.GetComponent<DominoBehavior>();
-                    assemblerManager.CreateSpriteForAddedDomino(domino.domino);
-
-                    objectCarried.position = new Vector3(100, 100);
-                    IsInAssembler = true;
-                }
-                else
-                {
-                    DropObject();
+                    assemblerManager.AddDomino(domino);
+                    objectCarried.gameObject.SetActive(false);
+                    objectCarried = null;
+                    IsInAssembler = false;
                 }
             }
             else
             {
-                if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerOutButton")))
+                var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
+
+                var interactableObjects = new List<Collider2D>();
+                var contactFilter = new ContactFilter2D();
+                contactFilter.useTriggers = true;
+                Physics2D.OverlapCollider(circleTriggerZone, contactFilter, interactableObjects);
+
+                if (objectCarried != null)
                 {
-                    objectCarried = assemblerManager.GetDomino().transform;
-                    objectCarried.GetComponent<Collider2D>().isTrigger = true;
+                    if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerButton")))
+                    {
+                        var domino = objectCarried.GetComponent<DominoBehavior>();
+                        assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+
+                        objectCarried.position = new Vector3(100, 100);
+                        IsInAssembler = true;
+                    }
+                    else
+                    {
+                        DropObject();
+                    }
                 }
                 else
                 {
-                    GetObjectNear();
+                    if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerOutButton")))
+                    {
+                        objectCarried = assemblerManager.GetDomino().transform;
+                        objectCarried.GetComponent<Collider2D>().isTrigger = true;
+                    }
+                    else
+                    {
+                        GetObjectNear();
+                    }
+                }
+
+            }
+        }
+    }
+
+    public void Dash()
+    {
+
+    }
+
+    public void MoveDominosInAssembler(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed)
+        { 
+
+            if (IsInAssembler && !alreadyMoveInAssembler)
+            {
+                alreadyMoveInAssembler = true;
+
+                var domino = objectCarried.GetComponent<DominoBehavior>();
+
+                Vector2 movement = ctx.ReadValue<Vector2>();
+
+                if (movement.x > 0.5)
+                {
+                    domino.MoveDominoRight();
+                }
+                else if (movement.x < -0.5)
+                {
+                    domino.MoveDominoLeft();
+                }
+                else if (movement.y < 0)
+                {
+                    domino.MoveDominoDown();
+                }
+                else if (movement.y > 0)
+                {
+                    domino.MoveDominoUp();
+                }
+
+                assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+            }
+
+        }
+        else if (ctx.canceled)
+        {
+            alreadyMoveInAssembler = false;
+        }
+    }
+
+    public void RotateClockwise(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed)
+        {
+            if (objectCarried != null)
+            {
+                var domino = objectCarried.GetComponent<DominoBehavior>();
+                domino.RotateDominoClockwise();
+                if (IsInAssembler)
+                {
+                    assemblerManager.CreateSpriteForAddedDomino(domino.domino);
                 }
             }
-
         }
     }
 
-    void Dash()
+    public void RotateCounterClockwise(InputAction.CallbackContext ctx)
     {
-
-    }
-
-    void MoveDominosInAssembler()
-    {
-        if (IsInAssembler && !alreadyMoveInAssembler)
+        if (ctx.performed)
         {
-            alreadyMoveInAssembler = true;
-
-            var domino = objectCarried.GetComponent<DominoBehavior>();
-
-            Vector2 movement = playerInput.Redomino.MoveDominoInAssembler.ReadValue<Vector2>();
-
-            if (movement.x > 0.5)
+            if (objectCarried != null)
             {
-                domino.MoveDominoRight();
-            }
-            else if (movement.x < -0.5)
-            {
-                domino.MoveDominoLeft();
-            }
-            else if (movement.y < 0)
-            {
-                domino.MoveDominoDown();
-            }
-            else if (movement.y > 0)
-            {
-                domino.MoveDominoUp();
-            }
-
-            assemblerManager.CreateSpriteForAddedDomino(domino.domino);
-        }
-    }
-
-    void RotateClockwise()
-    {
-        if (objectCarried != null)
-        {
-            var domino = objectCarried.GetComponent<DominoBehavior>();
-            domino.RotateDominoClockwise();
-            if(IsInAssembler)
-            {
-                assemblerManager.CreateSpriteForAddedDomino(domino.domino);
-            }
-        }
-    }
-
-    void RotateCounterClockwise()
-    {
-        if (objectCarried != null)
-        {
-            var domino = objectCarried.GetComponent<DominoBehavior>();
-            domino.RotateDominoCounterClockwise();
-            if (IsInAssembler)
-            {
-                assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+                var domino = objectCarried.GetComponent<DominoBehavior>();
+                domino.RotateDominoCounterClockwise();
+                if (IsInAssembler)
+                {
+                    assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+                }
             }
         }
     }
@@ -301,6 +314,22 @@ public class CharacterController : MonoBehaviour
             }
         }
 
+        //Sinon on regarde si on peut prendre un domino d'une caisse
+        if (interactableObjects.Any(o => o.transform.CompareTag("Box")))
+        {
+            var boxes = interactableObjects.Where(o => o.transform.CompareTag("Box"));
+
+            //Dans le cas ou il y a plusieurs tables on trie par leurs distance
+            boxes = boxes.OrderBy(t => Vector2.Distance(t.transform.position, transform.position));
+
+            foreach (var box in boxes)
+            {
+                BoxBehaviour boxBehaviour = box.GetComponent<BoxBehaviour>();
+                objectCarried = boxBehaviour.GetObject();
+                return;
+            }
+        }
+
         //Dans le dernier cas on vérifie si on ne peux pas r�cup�rer un bloc proche autour du joueur
         var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
         interactableObjects = new List<Collider2D>();
@@ -325,6 +354,18 @@ public class CharacterController : MonoBehaviour
 
         List<Collider2D> interactableObjects = new List<Collider2D>();
         Physics2D.OverlapCollider(capsuleTriggerZone, new ContactFilter2D(), interactableObjects);
+
+        //On vérifie si le point de livraison se trouve dans dans notre champs d'action 
+        if (interactableObjects.Any(o => o.transform.CompareTag("DeliveryPoint")))
+        {
+            var deliveryPoint = interactableObjects.First(o => o.transform.CompareTag("DeliveryPoint")).GetComponent<DeliveryPointBehaviour>();
+            var domino = objectCarried.GetComponent<DominoBehavior>().domino;
+
+            deliveryPoint.DeliveryDomino(domino);
+            objectCarried.gameObject.SetActive(false);
+            objectCarried = null;
+            return;
+        }
 
         //On vérifie si une table se trouve dans notre champs d'action
         if (interactableObjects.Any(o => o.transform.CompareTag("Table")))

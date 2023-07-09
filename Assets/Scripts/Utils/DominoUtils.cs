@@ -435,7 +435,7 @@ namespace Utils
 
         public static BlockColor GetRandomColor()
         {
-            var randomColor = Random.Range(1, BlockColor.GetNames(typeof(BlockColor)).Length);
+            var randomColor = Random.Range(2, BlockColor.GetNames(typeof(BlockColor)).Length);
             return (BlockColor)randomColor;
         }
 

@@ -1,4 +1,6 @@
+using Enums;
 using Models;
+using System;
 using UnityEngine;
 using Utils;
 
@@ -7,29 +9,20 @@ public class DominoBehavior : MonoBehaviour
     [SerializeField]
     private bool setRandomDomino = false;
 
-    [SerializeField]
-    private bool useDominoPieces = false;
-
     // get own SpriteRenderer
     SpriteRenderer spriteRenderer;
     GameManager gameManager;
     public Domino domino;
+
+    int paintingLayer = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         gameManager = FindObjectOfType<GameManager>().GetComponent<GameManager>();
 
-        
-        
-        
-        if(setRandomDomino) {
-          if(useDominoPieces)
-            domino = new Domino(DominoUtils.GetRandomDominoPiece(), DominoUtils.GetRandomColor());
-          else
-            domino = new Domino(DominoUtils.GetRandomValidDomino(), DominoUtils.GetRandomColor());
-
-        }
+        if (setRandomDomino)
+            domino = new Domino(DominoUtils.GetRandomValidDomino());
 
         SetSpriteAndCollider();
     }
@@ -72,7 +65,7 @@ public class DominoBehavior : MonoBehaviour
         collider.size = croppedRect.size;
     }
 
-    //Fonctions utilis�s dans l'assembleur
+    //Fonctions utilisés dans l'assembleur
     public void MoveDominoUp()
     {
         domino.Blocks = DominoUtils.MoveDominoUp(domino.Blocks);
@@ -88,5 +81,66 @@ public class DominoBehavior : MonoBehaviour
     public void MoveDominoDown()
     {
         domino.Blocks = DominoUtils.MoveDominoDown(domino.Blocks);
+    }
+
+    internal void AddColor(bool isPainterBlue, bool isPainterRed)
+    {
+        paintingLayer++;
+
+        if(domino.isAssembled)
+        {
+            domino.SetColor(BlockColor.Failed);
+            SetSpriteAndCollider();
+            return;
+        }
+
+        if (isPainterBlue)
+        {
+            var color = domino.GetColor();
+            if (color == BlockColor.Failed || color == BlockColor.Red || color == BlockColor.LightRed)
+            {
+                domino.SetColor(BlockColor.Failed);
+            }
+            else
+            {
+                switch (paintingLayer)
+                {
+                    case 1:
+                        domino.SetColor(BlockColor.LightBlue);
+                        break;
+                    case 2:
+                        domino.SetColor(BlockColor.Blue);
+                        break;
+                    case 3:
+                        domino.SetColor(BlockColor.Failed);
+                        break;
+                }
+            }
+
+        }
+        else if (isPainterRed)
+        {
+            var color = domino.GetColor();
+            if (color == BlockColor.Failed || color == BlockColor.Blue || color == BlockColor.LightBlue)
+            {
+                domino.SetColor(BlockColor.Failed);
+            }
+            else
+            {
+                switch (paintingLayer)
+                {
+                    case 1:
+                        domino.SetColor(BlockColor.LightRed);
+                        break;
+                    case 2:
+                        domino.SetColor(BlockColor.Red);
+                        break;
+                    case 3:
+                        domino.SetColor(BlockColor.Failed);
+                        break;
+                }
+            }
+        }
+        SetSpriteAndCollider();
     }
 }

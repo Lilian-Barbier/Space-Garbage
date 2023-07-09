@@ -10,6 +10,9 @@ TagManager:
   - Assembler
   - AssemblerButton
   - AssemblerOutButton
+  - Painter
+  - Box
+  - DeliveryPoint
   layers:
   - Default
   - TransparentFX
