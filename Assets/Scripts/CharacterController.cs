@@ -25,11 +25,9 @@ public class CharacterController : MonoBehaviour
     private Transform objectCarried;
     private Transform interactTriggerZone;
 
-    private float currentSpeed;
-    private float timeSinceLastDash;
-
     //Data from last frame for calculation and animation
     private float lastDirectionAngle;
+    private Vector2 lastDirection;
 
     [SerializeField] Animator redomino;
     [SerializeField] Animator bludomino;
@@ -40,11 +38,15 @@ public class CharacterController : MonoBehaviour
     [SerializeField]
     private float speed;
 
-    [SerializeField]
-    private float dashSpeed;
+    [SerializeField] float dashSpeed = 0.5f;
 
-    [SerializeField]
-    private float dashTime;
+    [SerializeField] float dashDuration = 0.5f;
+    [SerializeField] float dashCooldown = 1f;
+
+    private bool isDashing = false;
+    private bool canDash = true;
+    private float dashTimer;
+
 
     public int playerNumber;
 
@@ -84,16 +86,14 @@ public class CharacterController : MonoBehaviour
             assembler = GameObject.FindGameObjectWithTag("Assembler");
             assemblerManager = assembler.GetComponent<AssemblerManager>();
 
-            currentSpeed = speed;
-
             if (playerNumber == 0)
             {
-                transform.position = Vector3.zero;
+                transform.position = new Vector3(0, 1.7f);
                 animator.SetTrigger("isRed");
             }
             else
             {
-                transform.position = new Vector3(6, 0);
+                transform.position = new Vector3(6.5f, -1.7f);
                 animator.SetTrigger("isBlue");
             }
 
@@ -123,28 +123,47 @@ public class CharacterController : MonoBehaviour
 
                 if (!isStopped)
                 {
-                    if (movement.x > 0.5 || movement.x < -0.5)
+                    dashTimer += Time.deltaTime;
+
+                    if(dashTimer > dashCooldown)
                     {
-                        isMovingSide = true;
-                        spriteRenderer.flipX = movement.x < 0;
-                        lastDirectionAngle = movement.x > 0 ? 90 : -90;
-                    }
-                    else if (movement.y < 0)
-                    {
-                        isMovingDown = true;
-                        lastDirectionAngle = 0;
-                    }
-                    else if (movement.y > 0)
-                    {
-                        isMovingUp = true;
-                        lastDirectionAngle = 180;
+                        canDash = true;
                     }
 
-                    interactTriggerZone.rotation = Quaternion.Euler(0, 0, lastDirectionAngle);
-                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + movement * currentSpeed * Time.deltaTime);
+                    if (isDashing)
+                    {
+                        rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + lastDirection * dashSpeed * Time.deltaTime);
+                        
 
-                    //Gestion du dash
-                    //if(Time.)
+                        if(dashTimer > dashDuration)
+                        {
+                            isDashing = false;
+                        }
+                    }
+                    else
+                    {
+                        lastDirection = movement;
+                        if (movement.x > 0.5 || movement.x < -0.5)
+                        {
+                            isMovingSide = true;
+                            spriteRenderer.flipX = movement.x < 0;
+                            lastDirectionAngle = movement.x > 0 ? 90 : -90;
+                        }
+                        else if (movement.y < 0)
+                        {
+                            isMovingDown = true;
+                            lastDirectionAngle = 0;
+                        }
+                        else if (movement.y > 0)
+                        {
+                            isMovingUp = true;
+                            lastDirectionAngle = 180;
+                        }
+
+                        interactTriggerZone.rotation = Quaternion.Euler(0, 0, lastDirectionAngle);
+                        rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + movement * speed * Time.deltaTime);
+
+                    }
 
                 }
 
@@ -235,7 +254,12 @@ public class CharacterController : MonoBehaviour
 
     public void Dash()
     {
-
+        if (canDash)
+        {
+            canDash = false;
+            isDashing = true;
+            dashTimer = 0f;
+        }
     }
 
     public void MoveDominosInAssembler(InputAction.CallbackContext ctx)
