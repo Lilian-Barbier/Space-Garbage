@@ -383,6 +383,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 184d9971-732e-45e9-8687-5b7045820ad5
     m_ActionName: Redomino/MoveDominoInAssembler[/DualShock4GamepadHID/leftStick/up,/DualShock4GamepadHID/leftStick/down,/DualShock4GamepadHID/leftStick/left,/DualShock4GamepadHID/leftStick/right,/DualShock4GamepadHID/dpad/up,/DualShock4GamepadHID/dpad/down,/DualShock4GamepadHID/dpad/left,/DualShock4GamepadHID/dpad/right,/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8608328819623727129}
+        m_TargetAssemblyTypeName: CharacterController, Assembly-CSharp
+        m_MethodName: LoadChooseLevel
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 4ba3924b-05ae-4545-8917-3bb5e7c192e0
+    m_ActionName: Redomino/Start[/Keyboard/enter,/DualShock4GamepadHID/start,/Keyboard/escape]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Redomino
