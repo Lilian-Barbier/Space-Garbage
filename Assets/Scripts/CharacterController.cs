@@ -89,12 +89,12 @@ public class CharacterController : MonoBehaviour
 
             if (playerNumber == 0)
             {
-                transform.position = new Vector3(0, 1.7f);
+                transform.position = GameObject.FindGameObjectWithTag("SpawnP1").transform.position;
                 animator.SetTrigger("isRed");
             }
             else
             {
-                transform.position = new Vector3(6.5f, -1.7f);
+                transform.position = GameObject.FindGameObjectWithTag("SpawnP2").transform.position;
                 animator.SetTrigger("isBlue");
             }
 
@@ -212,8 +212,6 @@ public class CharacterController : MonoBehaviour
       {
           var collider = interactableObjects.First(o => o.transform.CompareTag("Blocks"));
           var objectDetected = collider.transform;
-
-          Debug.Log("Object detected : " + objectDetected.name);
 
           if (objectDetected != this.objectDetected && this.objectDetected != null)
             this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);

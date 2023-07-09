@@ -383,8 +383,6 @@ public class GameManager : MonoBehaviour
 
       delayBetweenRequestsDelta = (initialLowerBound - minLowerBound) * Time.fixedDeltaTime / timeToReachMinimumDelayBetweenRequests;
       delayBetweenRequestsLowerBound -= delayBetweenRequestsDelta;
-
-      Debug.Log(dominoRequestDuration + ", " + delayBetweenRequestsUpperBound + ", " + delayBetweenRequestsLowerBound);
     }
 
     public void GainScore(float result)
