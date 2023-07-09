@@ -21,7 +21,7 @@ public class TableBehaviour : MonoBehaviour
         }
     }
 
-    public void SetObjectCarried(Transform newObjectCarried)
+    public virtual void SetObjectCarried(Transform newObjectCarried)
     {
         timeOnTable = 0;
         objectCarried = newObjectCarried;
@@ -29,7 +29,7 @@ public class TableBehaviour : MonoBehaviour
         objectCarried.position = transform.position + new Vector3(0, 0.25f, 0);
     }
 
-    public Transform GetObjectCarried()
+    public virtual Transform GetObjectCarried()
     {
         timeOnTable = 0;
         var tmpObjectCarried = objectCarried;

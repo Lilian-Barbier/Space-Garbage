@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        hearthManager = FindObjectOfType<HearthManager>().GetComponent<HearthManager>();
+        // hearthManager = FindObjectOfType<HearthManager>().GetComponent<HearthManager>();
 
         HudCanvas = GameObject.Find("HUD");
 
@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        hearthManager.ScoreChanged(score);
+        // hearthManager.ScoreChanged(score);
         DecreaseDominoRequestTimeList();
         CheckForNewDominoRequest();
         DeleteUnsuccessfulDominoRequests();
@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour
             if (dominoRequestList[i].RemainingTime < 0)
             {
                 life--;
-                hearthManager.LifeChanged(life);
+                // hearthManager.LifeChanged(life);
                 if (life <= 0)
                 {
                     //Todo Load GameOver scene
@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour
 
     private void AddRandomDominoRequest()
     {
-        //Todo à retirer, juste pour tester
+        //Todo ï¿½ retirer, juste pour tester
         if(dominoRequestDuration>26)
             dominoRequestDuration -= 6;
 

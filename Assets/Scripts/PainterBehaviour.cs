@@ -12,11 +12,16 @@ public class PainterBehaviour : TableBehaviour
 
     [SerializeField] private float timeForPaint;
 
+    private Animator animator;
+
     private Slider slider;
 
     private void Start()
     {
         slider = GetComponentInChildren<Slider>();
+        animator = GetComponent<Animator>();
+
+        slider.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -52,4 +57,21 @@ public class PainterBehaviour : TableBehaviour
         }
     }
 
+
+    public override void SetObjectCarried(Transform newObjectCarried) {
+      slider.gameObject.SetActive(true);
+
+      base.SetObjectCarried(newObjectCarried);
+      animator.SetBool("IsPainting", true);
+    }
+
+    public override Transform GetObjectCarried() {
+      slider.gameObject.SetActive(false);
+
+      var obj = base.GetObjectCarried();
+      animator.SetBool("IsPainting", false);
+      return obj;
+
+
+    }
 }
