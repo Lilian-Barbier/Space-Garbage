@@ -23,6 +23,7 @@ public class CharacterController : MonoBehaviour
     private GameObject assembler;
 
     private Transform objectCarried;
+    private Transform objectDetected;
     private Transform interactTriggerZone;
 
     //Data from last frame for calculation and animation
@@ -188,8 +189,45 @@ public class CharacterController : MonoBehaviour
                 }
 
                 #endregion In movement
+            
+                UpdateOutlines();
             }
         }
+    }
+
+    private void UpdateOutlines() {
+      CapsuleCollider2D c = new CapsuleCollider2D();
+
+      var capsuleTriggerZone = interactTriggerZone.GetComponent<CapsuleCollider2D>();
+
+      List<Collider2D> interactableObjects = new List<Collider2D>();
+
+      ContactFilter2D contactFilter = new ContactFilter2D();
+      contactFilter.useTriggers = true;
+
+      Physics2D.OverlapCollider(capsuleTriggerZone, contactFilter, interactableObjects);
+
+      //D'abord on vérifie si on peut prendre un bloc devant nous
+      if (interactableObjects.Any(o => o.transform.CompareTag("Blocks")))
+      {
+          var collider = interactableObjects.First(o => o.transform.CompareTag("Blocks"));
+          var objectDetected = collider.transform;
+
+          Debug.Log("Object detected : " + objectDetected.name);
+
+          if (objectDetected != this.objectDetected && this.objectDetected != null)
+            this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
+
+          objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 1);
+          this.objectDetected = objectDetected;
+
+          return;
+      }
+      
+      if(this.objectDetected != null) {
+        this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
+        this.objectDetected = null;
+      }
     }
 
     public void Interact(InputAction.CallbackContext ctx)
