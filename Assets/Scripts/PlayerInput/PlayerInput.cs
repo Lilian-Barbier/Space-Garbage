@@ -80,6 +80,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Start"",
+                    ""type"": ""Button"",
+                    ""id"": ""4ba3924b-05ae-4545-8917-3bb5e7c192e0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -456,6 +465,28 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""MoveDominoInAssembler"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eda9066d-d4d1-4d5c-b659-e5957016d82d"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Start"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bb4d2351-3d5a-424a-84f2-893a73676959"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Start"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -470,6 +501,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Redomino_RotateClockwise = m_Redomino.FindAction("RotateClockwise", throwIfNotFound: true);
         m_Redomino_RotateCounterClockwise = m_Redomino.FindAction("RotateCounterClockwise", throwIfNotFound: true);
         m_Redomino_MoveDominoInAssembler = m_Redomino.FindAction("MoveDominoInAssembler", throwIfNotFound: true);
+        m_Redomino_Start = m_Redomino.FindAction("Start", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -537,6 +569,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Redomino_RotateClockwise;
     private readonly InputAction m_Redomino_RotateCounterClockwise;
     private readonly InputAction m_Redomino_MoveDominoInAssembler;
+    private readonly InputAction m_Redomino_Start;
     public struct RedominoActions
     {
         private @PlayerInput m_Wrapper;
@@ -547,6 +580,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @RotateClockwise => m_Wrapper.m_Redomino_RotateClockwise;
         public InputAction @RotateCounterClockwise => m_Wrapper.m_Redomino_RotateCounterClockwise;
         public InputAction @MoveDominoInAssembler => m_Wrapper.m_Redomino_MoveDominoInAssembler;
+        public InputAction @Start => m_Wrapper.m_Redomino_Start;
         public InputActionMap Get() { return m_Wrapper.m_Redomino; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -574,6 +608,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @MoveDominoInAssembler.started += instance.OnMoveDominoInAssembler;
             @MoveDominoInAssembler.performed += instance.OnMoveDominoInAssembler;
             @MoveDominoInAssembler.canceled += instance.OnMoveDominoInAssembler;
+            @Start.started += instance.OnStart;
+            @Start.performed += instance.OnStart;
+            @Start.canceled += instance.OnStart;
         }
 
         private void UnregisterCallbacks(IRedominoActions instance)
@@ -596,6 +633,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @MoveDominoInAssembler.started -= instance.OnMoveDominoInAssembler;
             @MoveDominoInAssembler.performed -= instance.OnMoveDominoInAssembler;
             @MoveDominoInAssembler.canceled -= instance.OnMoveDominoInAssembler;
+            @Start.started -= instance.OnStart;
+            @Start.performed -= instance.OnStart;
+            @Start.canceled -= instance.OnStart;
         }
 
         public void RemoveCallbacks(IRedominoActions instance)
@@ -621,5 +661,6 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnRotateClockwise(InputAction.CallbackContext context);
         void OnRotateCounterClockwise(InputAction.CallbackContext context);
         void OnMoveDominoInAssembler(InputAction.CallbackContext context);
+        void OnStart(InputAction.CallbackContext context);
     }
 }
