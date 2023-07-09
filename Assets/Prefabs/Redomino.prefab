@@ -65,8 +65,8 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.77}
-  m_Size: {x: 1.01, y: 1.18}
+  m_Offset: {x: 0, y: -0.5}
+  m_Size: {x: 0.6, y: 0.8}
   m_Direction: 0
 --- !u!58 &2722529476702274203
 CircleCollider2D:
@@ -100,9 +100,9 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.21}
+  m_Offset: {x: 0, y: -0.25}
   serializedVersion: 2
-  m_Radius: 0.57
+  m_Radius: 0.36
 --- !u!1 &2439958737592973062
 GameObject:
   m_ObjectHideFlags: 0
