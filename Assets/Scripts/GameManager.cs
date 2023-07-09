@@ -11,12 +11,12 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private int life = 3;
 
-    private static readonly float initialDominoRequestDuration = 40f;
-    private static readonly float minDominoRequestDuration = 30f;
+    private static readonly float initialDominoRequestDuration = 42f;
+    private static readonly float minDominoRequestDuration = 34f;
     
     public float dominoRequestDuration = initialDominoRequestDuration;
 
-    private static readonly  float timeToReachMinimumRequestDuration = 300f;
+    private static readonly  float timeToReachMinimumRequestDuration = 900f;
 
     [SerializeField] private Sprite defaultBlockSprite;
     [SerializeField] private Sprite blueBlockSprite;
@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite blackBlockSprite;
 
     private static readonly float minUpperBound = 20f;
-    private static readonly float initialUpperBound = 36f;
+    private static readonly float initialUpperBound = 32f;
     private static readonly float minLowerBound = 8f;
     private static readonly float initialLowerBound = 16f;
 
@@ -383,16 +383,18 @@ public class GameManager : MonoBehaviour
 
       delayBetweenRequestsDelta = (initialLowerBound - minLowerBound) * Time.fixedDeltaTime / timeToReachMinimumDelayBetweenRequests;
       delayBetweenRequestsLowerBound -= delayBetweenRequestsDelta;
+
+      Debug.Log(dominoRequestDuration + ", " + delayBetweenRequestsUpperBound + ", " + delayBetweenRequestsLowerBound);
     }
 
     public void GainScore(float result)
     {
-        score += 50 + (int) (50 * Mathf.Floor(result));
+        score += 60 + (int) Mathf.Floor(180 * result);
     }
 
     public void LooseScore()
     {
-        score -= 50;
+        score -= 40;
     }
 
 }
