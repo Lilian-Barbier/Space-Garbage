@@ -881,12 +881,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
-  m_ReferencePixelsPerUnit: 100
+  m_UiScaleMode: 1
+  m_ReferencePixelsPerUnit: 32
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ScreenMatchMode: 1
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -976,7 +976,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_AnchorMax.y
@@ -984,7 +984,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_AnchorMin.y
@@ -992,11 +992,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -847.30005
+      value: 1022.074
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_SizeDelta.y
-      value: -467.0428
+      value: -496.02
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1028,11 +1028,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1.3125
+      value: 0.000026703
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.04522705
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6514368760491400690, guid: f69dba819bdc1fa4f9b11e42dd5d3ce8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
