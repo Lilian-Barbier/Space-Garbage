@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class TableBehaviour : MonoBehaviour
 {
-    private Transform objectCarried;
-
+    protected Transform objectCarried;
+    protected float timeOnTable;
 
     // Update is called once per frame
     void Update()
@@ -23,6 +23,7 @@ public class TableBehaviour : MonoBehaviour
 
     public void SetObjectCarried(Transform newObjectCarried)
     {
+        timeOnTable = 0;
         objectCarried = newObjectCarried;
         objectCarried.GetComponent<Collider2D>().isTrigger = true;
         objectCarried.position = transform.position + new Vector3(0, 0.25f, 0);
@@ -30,6 +31,7 @@ public class TableBehaviour : MonoBehaviour
 
     public Transform GetObjectCarried()
     {
+        timeOnTable = 0;
         var tmpObjectCarried = objectCarried;
         objectCarried = null;
         return tmpObjectCarried;
