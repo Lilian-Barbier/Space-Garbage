@@ -276,7 +276,6 @@ public class AssemblerManager : MonoBehaviour
 
         newTexture.filterMode = FilterMode.Point;
         newTexture.wrapMode = TextureWrapMode.Clamp;
-        newTexture.alphaIsTransparency = true;
 
         newTexture.Apply();
 
