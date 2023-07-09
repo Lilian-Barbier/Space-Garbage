@@ -716,7 +716,7 @@
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
-    "m_Value": 0.10000000149011612,
+    "m_Value": -0.10000000149011612,
     "m_FloatType": 0,
     "m_RangeValues": {
         "x": 0.0,
@@ -1247,7 +1247,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Y",
     "m_StageCapability": 3,
-    "m_Value": 32.0,
+    "m_Value": 14.0,
     "m_DefaultValue": 0.0,
     "m_Labels": [
         "Y"
@@ -4340,7 +4340,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "X",
     "m_StageCapability": 3,
-    "m_Value": 32.0,
+    "m_Value": 28.0,
     "m_DefaultValue": 0.0,
     "m_Labels": []
 }
@@ -4436,12 +4436,12 @@
     },
     "m_Color": {
         "color": {
-            "r": 0.04341983050107956,
-            "g": 0.0012014980893582106,
-            "b": 0.25471699237823489,
+            "r": 0.24528300762176515,
+            "g": 0.24528300762176515,
+            "b": 0.24528300762176515,
             "a": 0.0
         },
-        "mode": 1
+        "mode": 0
     }
 }
 

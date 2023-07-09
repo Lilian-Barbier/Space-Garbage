@@ -1290,22 +1290,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 726449503836114520, guid: 5710af972064b354ebe28bbb85473a64, type: 3}
-      propertyPath: m_Size.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 726449503836114520, guid: 5710af972064b354ebe28bbb85473a64, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -758350424, guid: 846f87824d38a9c47b52799ef7b0161d, type: 3}
-    - target: {fileID: 726449503836114520, guid: 5710af972064b354ebe28bbb85473a64, type: 3}
-      propertyPath: m_WasSpriteAssigned
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1806996776051315288, guid: 5710af972064b354ebe28bbb85473a64, type: 3}
-      propertyPath: m_Size.y
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2801163428510861881, guid: 5710af972064b354ebe28bbb85473a64, type: 3}
       propertyPath: m_Name
       value: DeliveryPoint
