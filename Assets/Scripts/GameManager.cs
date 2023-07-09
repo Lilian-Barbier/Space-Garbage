@@ -387,7 +387,7 @@ public class GameManager : MonoBehaviour
 
     public void GainScore(float result)
     {
-        score += 50 + 50 * result;
+        score += 50 + (int) (50 * Mathf.Floor(result));
     }
 
     public void LooseScore()
