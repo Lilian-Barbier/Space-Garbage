@@ -6,14 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/ChoosePlayer.unity
-    guid: 9898fadedda090e4c910d87785b95499
-  - enabled: 0
-    path: Assets/Scenes/InteractObject.unity
-    guid: 603369cafca1dc248a1389cb1704f2de
-  - enabled: 1
     path: Assets/Scenes/Title.unity
     guid: c109c683093a1de428a1a8a6b992eb23
+  - enabled: 1
+    path: Assets/Scenes/ChoosePlayer.unity
+    guid: 9898fadedda090e4c910d87785b95499
   - enabled: 1
     path: Assets/Scenes/Levels/Level-CageMatch.unity
     guid: 64ec39247b4c64542a00f6d39cc0675b
