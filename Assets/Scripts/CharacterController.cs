@@ -101,6 +101,10 @@ public class CharacterController : MonoBehaviour
             }
 
         }
+        else
+        {
+            transform.position = new Vector3(200, 200);
+        }
     }
 
     private Vector2 movement = Vector2.zero;
@@ -501,5 +505,14 @@ public class CharacterController : MonoBehaviour
         objectCarriedCollider.isTrigger = false;
         objectCarried = null;
 
+    }
+
+
+    public void LoadChooseLevel(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed)
+        {
+            SceneManager.LoadScene("ChooseLvl");
+        }
     }
 }
