@@ -71,7 +71,7 @@ public class PlayersManager : MonoBehaviour
 
                 playerInput.currentActionMap.FindAction("Start").performed += OnPlayerStart;
 
-                text.text = "Press any button of another controller (keyboard or gamepad) to join.\n Or press Start / Space to play alone";
+                text.text = "Press any button of another controller (keyboard or gamepad) to join.\n Or press Start / Enter to play alone";
             }
             else
             {
