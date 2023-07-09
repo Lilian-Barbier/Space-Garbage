@@ -207,7 +207,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   redomino: {fileID: 0}
   bludomino: {fileID: 0}
-  objectCarriedDistanceFactor: 0.7
+  objectCarriedDistanceFactor: 0.6
+  offset: {x: 0, y: 0.25, z: 0}
   speed: 4
   dashSpeed: 8
   dashDuration: 0.2

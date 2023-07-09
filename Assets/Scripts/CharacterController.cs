@@ -35,6 +35,8 @@ public class CharacterController : MonoBehaviour
 
     [SerializeField]
     private float objectCarriedDistanceFactor = 0.7f;
+    [SerializeField]
+    private Vector3 offset;
 
     [SerializeField]
     private float speed;
@@ -176,13 +178,13 @@ public class CharacterController : MonoBehaviour
                 {
                     if (movement != Vector2.zero)
                     {
-                        objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor;
+                        objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor + offset;
                         objectCarried.GetComponent<SpriteRenderer>().sortingOrder = movement.y < 0 && movement.x < 0.4 && movement.x > -0.4 ? 15 : 5;
                     }
                     else
                     {
                         Vector3 direction = lastDirectionAngle == 0 ? Vector3.down : lastDirectionAngle == 180 ? Vector3.up : lastDirectionAngle == 90 ? Vector3.right : Vector3.left;
-                        objectCarried.position = transform.position + direction * objectCarriedDistanceFactor;
+                        objectCarried.position = transform.position + direction * objectCarriedDistanceFactor + offset;
                         objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirectionAngle == 180 ? 5 : 15;
                     }
 

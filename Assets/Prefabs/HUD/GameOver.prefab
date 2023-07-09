@@ -108,7 +108,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 328441d00a261d5469720b7c27425421, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabPhysicDomino: {fileID: 6612857792162729695, guid: 11c37fd52f216124499075dc876ab95a, type: 3}
 --- !u!1 &2219530942296933945
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,7 +652,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 9015586564020223098, guid: 78d6de375bb367b4db156ee6e41d62b0, type: 3}
+      - m_Target: {fileID: 6418883613218342862}
         m_TargetAssemblyTypeName: EndMenuManager, Assembly-CSharp
         m_MethodName: Restart
         m_Mode: 1
@@ -787,7 +786,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 9015586564020223098, guid: 78d6de375bb367b4db156ee6e41d62b0, type: 3}
+      - m_Target: {fileID: 6418883613218342862}
         m_TargetAssemblyTypeName: EndMenuManager, Assembly-CSharp
         m_MethodName: LoadMenu
         m_Mode: 1
