@@ -82,7 +82,7 @@ public class PlayersManager : MonoBehaviour
     IEnumerator StartLevelAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene("Level-Clover");
+        SceneManager.LoadScene("Level-CageMatch");
     }
 
 }

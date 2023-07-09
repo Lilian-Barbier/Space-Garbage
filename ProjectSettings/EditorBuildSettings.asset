@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level-Clover.unity
     guid: 8821b0ad67a19634ea5df9943fa62dd6
+  - enabled: 1
+    path: Assets/Scenes/Level-CageMatch.unity
+    guid: f7f9958a491f9654c858890668f3f86d
   m_configObjects: {}

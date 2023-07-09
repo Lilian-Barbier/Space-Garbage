@@ -152,7 +152,7 @@ public class GameManager : MonoBehaviour
 
         var dominoRequest = new DominoRequest()
         {
-            Blocks = DominoUtils.T,
+            Blocks = DominoUtils.GetRandomValidDomino(),
             Color = DominoUtils.GetRandomColor(),
             Player = player,
             InitialDuration = dominoRequestDuration,
