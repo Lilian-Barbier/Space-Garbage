@@ -1,297 +1,236 @@
-using Models;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
-using UnityEngine.Windows;
 
 public class CharacterController : MonoBehaviour
 {
 
-    private bool isStopped;
-    private Rigidbody2D rigidbodyCharacter;
-    private Animator animator;
-    private SpriteRenderer spriteRenderer;
-    private AssemblerManager assemblerManager;
+    bool isStopped;
+    Rigidbody2D rigidbodyCharacter;
+    Animator animator;
+    SpriteRenderer spriteRenderer;
+    AssemblerManager assemblerManager;
 
-    //A retirer
-    private GameObject assembler;
+    Transform objectCarried;
+    Transform objectDetected;
 
-    private Transform objectCarried;
-    private Transform objectDetected;
-    private Transform interactTriggerZone;
+    bool isDashing = false;
+    bool canDash = true;
+    float dashTimer;
+
+    bool IsInAssembler;
+    bool alreadyMoveInAssembler;
+    
+    Transform interactTriggerZone;
+    Vector2 movement = Vector2.zero;
 
     //Data from last frame for calculation and animation
-    private float lastDirectionAngle;
-    private Vector2 lastDirection;
+    float lastDirectionAngle;
+    Vector2 lastDirection;
 
-    [SerializeField] Animator redomino;
-    [SerializeField] Animator bludomino;
+    [SerializeField] float objectCarriedDistanceFactor = 0.7f;
+    [SerializeField] Vector3 offsetObjectCarriedDistance;
 
-    [SerializeField]
-    private float objectCarriedDistanceFactor = 0.7f;
-    [SerializeField]
-    private Vector3 offset;
-
-    [SerializeField]
-    private float speed;
-
+    [SerializeField] float speed;
     [SerializeField] float dashSpeed = 0.5f;
 
     [SerializeField] float dashDuration = 0.5f;
     [SerializeField] float dashCooldown = 1f;
 
-    private bool isDashing = false;
-    private bool canDash = true;
-    private float dashTimer;
-
-
-    public int playerNumber;
-
-    private bool IsInAssembler;
-
-    private bool alreadyMoveInAssembler;
-
-    void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        InitObject();
-    }
+    public PlayerInput playerInput { get; set; }
 
     void Start()
     {
-        InitObject();
+        rigidbodyCharacter = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
+
+        interactTriggerZone = transform.GetChild(0);
     }
 
-    private void InitObject()
-    {
-        if (SceneManager.GetActiveScene().name.Contains("Level"))
-        {
-            rigidbodyCharacter = GetComponent<Rigidbody2D>();
-            animator = GetComponent<Animator>();
-            spriteRenderer = GetComponent<SpriteRenderer>();
-
-            interactTriggerZone = transform.GetChild(0);
-            assembler = GameObject.FindGameObjectWithTag("Assembler");
-            assemblerManager = assembler.GetComponent<AssemblerManager>();
-
-            if (playerNumber == 0)
-            {
-                transform.position = GameObject.FindGameObjectWithTag("SpawnP1").transform.position;
-                animator.SetTrigger("isRed");
-            }
-            else
-            {
-                transform.position = GameObject.FindGameObjectWithTag("SpawnP2").transform.position;
-                animator.SetTrigger("isBlue");
-            }
-
-        }
-        else
-        {
-            transform.position = new Vector3(200, 200);
-        }
-    }
-
-    private Vector2 movement = Vector2.zero;
     public void Move(InputAction.CallbackContext ctx)
     {
         movement = ctx.ReadValue<Vector2>();
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
-        if (SceneManager.GetActiveScene().name.Contains("Level"))
+        if (IsInAssembler)
         {
-            if (IsInAssembler)
-            {
 
-            }
-            else
-            {
-                #region In movement
-                var isMovingSide = false;
-                var isMovingUp = false;
-                var isMovingDown = false;
-
-                if (!isStopped)
-                {
-                    dashTimer += Time.deltaTime;
-
-                    if(dashTimer > dashCooldown)
-                    {
-                        canDash = true;
-                    }
-
-                    if (isDashing)
-                    {
-                        rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + lastDirection * dashSpeed * Time.deltaTime);
-                        
-
-                        if(dashTimer > dashDuration)
-                        {
-                            isDashing = false;
-                        }
-                    }
-                    else
-                    {
-                        lastDirection = movement;
-                        if (movement.x > 0.5 || movement.x < -0.5)
-                        {
-                            isMovingSide = true;
-                            spriteRenderer.flipX = movement.x < 0;
-                            lastDirectionAngle = movement.x > 0 ? 90 : -90;
-                        }
-                        else if (movement.y < 0)
-                        {
-                            isMovingDown = true;
-                            lastDirectionAngle = 0;
-                        }
-                        else if (movement.y > 0)
-                        {
-                            isMovingUp = true;
-                            lastDirectionAngle = 180;
-                        }
-
-                        interactTriggerZone.rotation = Quaternion.Euler(0, 0, lastDirectionAngle);
-                        rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + movement * speed * Time.deltaTime);
-
-                    }
-
-                }
-
-                animator.SetBool("isMovingSide", isMovingSide);
-                animator.SetBool("isMovingUp", isMovingUp);
-                animator.SetBool("isMovingDown", isMovingDown);
-
-                if (objectCarried != null)
-                {
-                    if (movement != Vector2.zero)
-                    {
-                        objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor + offset;
-                        objectCarried.GetComponent<SpriteRenderer>().sortingOrder = movement.y < 0 && movement.x < 0.4 && movement.x > -0.4 ? 15 : 5;
-                    }
-                    else
-                    {
-                        Vector3 direction = lastDirectionAngle == 0 ? Vector3.down : lastDirectionAngle == 180 ? Vector3.up : lastDirectionAngle == 90 ? Vector3.right : Vector3.left;
-                        objectCarried.position = transform.position + direction * objectCarriedDistanceFactor + offset;
-                        objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirectionAngle == 180 ? 5 : 15;
-                    }
-
-                }
-
-                #endregion In movement
-            
-                UpdateOutlines();
-            }
         }
-    }
-
-    private void UpdateOutlines() {
-      CapsuleCollider2D c = new CapsuleCollider2D();
-
-      var capsuleTriggerZone = interactTriggerZone.GetComponent<CapsuleCollider2D>();
-
-      List<Collider2D> interactableObjects = new List<Collider2D>();
-
-      ContactFilter2D contactFilter = new ContactFilter2D();
-      contactFilter.useTriggers = true;
-
-      Physics2D.OverlapCollider(capsuleTriggerZone, contactFilter, interactableObjects);
-
-      //D'abord on vérifie si on peut prendre un bloc devant nous
-      if (interactableObjects.Any(o => o.transform.CompareTag("Blocks")))
-      {
-          var collider = interactableObjects.First(o => o.transform.CompareTag("Blocks"));
-          var objectDetected = collider.transform;
-
-          if (objectDetected != this.objectDetected && this.objectDetected != null)
-            this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
-
-          objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 1);
-          this.objectDetected = objectDetected;
-
-          return;
-      }
-      
-      if(this.objectDetected != null) {
-        this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
-        this.objectDetected = null;
-      }
-    }
-
-    public void Interact(InputAction.CallbackContext ctx)
-    {
-        if (SceneManager.GetActiveScene().name.Contains("Level"))
+        else
         {
-            if (ctx.performed)
+            #region In movement
+            var isMovingSide = false;
+            var isMovingUp = false;
+            var isMovingDown = false;
+
+            if (!isStopped)
             {
-                if (IsInAssembler)
+                dashTimer += Time.deltaTime;
+
+                if (dashTimer > dashCooldown)
                 {
-                    var domino = objectCarried.GetComponent<DominoBehavior>().domino;
-                    if (assemblerManager.CanAddDomino(domino))
+                    canDash = true;
+                }
+
+                if (isDashing)
+                {
+                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + lastDirection * dashSpeed * Time.deltaTime);
+
+
+                    if (dashTimer > dashDuration)
                     {
-                        assemblerManager.AddDomino(domino);
-                        objectCarried.gameObject.SetActive(false);
-                        objectCarried = null;
-                        IsInAssembler = false;
+                        isDashing = false;
                     }
                 }
                 else
                 {
-                    var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
-
-                    var interactableObjects = new List<Collider2D>();
-                    var contactFilter = new ContactFilter2D();
-                    contactFilter.useTriggers = true;
-                    Physics2D.OverlapCollider(circleTriggerZone, contactFilter, interactableObjects);
-
-                    if (objectCarried != null)
+                    lastDirection = movement;
+                    if (movement.x > 0.5 || movement.x < -0.5)
                     {
-                        if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerButton")))
-                        {
-                            var domino = objectCarried.GetComponent<DominoBehavior>();
-                            assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+                        isMovingSide = true;
+                        spriteRenderer.flipX = movement.x < 0;
+                        lastDirectionAngle = movement.x > 0 ? 90 : -90;
+                    }
+                    else if (movement.y < 0)
+                    {
+                        isMovingDown = true;
+                        lastDirectionAngle = 0;
+                    }
+                    else if (movement.y > 0)
+                    {
+                        isMovingUp = true;
+                        lastDirectionAngle = 180;
+                    }
 
-                            objectCarried.position = new Vector3(100, 100);
-                            IsInAssembler = true;
-                        }
-                        else
-                        {
-                            DropObject();
-                        }
+                    interactTriggerZone.rotation = Quaternion.Euler(0, 0, lastDirectionAngle);
+                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + movement * speed * Time.deltaTime);
+
+                }
+
+            }
+
+            animator.SetBool("isMovingSide", isMovingSide);
+            animator.SetBool("isMovingUp", isMovingUp);
+            animator.SetBool("isMovingDown", isMovingDown);
+
+            if (objectCarried != null)
+            {
+                if (movement != Vector2.zero)
+                {
+                    objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor + offsetObjectCarriedDistance;
+                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = movement.y < 0 && movement.x < 0.4 && movement.x > -0.4 ? 15 : 5;
+                }
+                else
+                {
+                    Vector3 direction = lastDirectionAngle == 0 ? Vector3.down : lastDirectionAngle == 180 ? Vector3.up : lastDirectionAngle == 90 ? Vector3.right : Vector3.left;
+                    objectCarried.position = transform.position + direction * objectCarriedDistanceFactor + offsetObjectCarriedDistance;
+                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirectionAngle == 180 ? 5 : 15;
+                }
+
+            }
+
+            #endregion In movement
+
+            UpdateOutlines();
+        }
+    }
+
+    void UpdateOutlines()
+    {
+        CapsuleCollider2D c = new CapsuleCollider2D();
+
+        var capsuleTriggerZone = interactTriggerZone.GetComponent<CapsuleCollider2D>();
+
+        List<Collider2D> interactableObjects = new List<Collider2D>();
+
+        ContactFilter2D contactFilter = new ContactFilter2D();
+        contactFilter.useTriggers = true;
+
+        Physics2D.OverlapCollider(capsuleTriggerZone, contactFilter, interactableObjects);
+
+        //D'abord on vérifie si on peut prendre un bloc devant nous
+        if (interactableObjects.Any(o => o.transform.CompareTag("Blocks")))
+        {
+            var collider = interactableObjects.First(o => o.transform.CompareTag("Blocks"));
+            var objectDetected = collider.transform;
+
+            if (objectDetected != this.objectDetected && this.objectDetected != null)
+                this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
+
+            objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 1);
+            this.objectDetected = objectDetected;
+
+            return;
+        }
+
+        if (this.objectDetected != null)
+        {
+            this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
+            this.objectDetected = null;
+        }
+    }
+
+    public void Interact(InputAction.CallbackContext ctx)
+    {
+
+        if (ctx.performed)
+        {
+            if (IsInAssembler)
+            {
+                var domino = objectCarried.GetComponent<DominoBehavior>().domino;
+                if (assemblerManager.CanAddDomino(domino))
+                {
+                    assemblerManager.AddDomino(domino);
+                    objectCarried.gameObject.SetActive(false);
+                    objectCarried = null;
+                    IsInAssembler = false;
+                }
+            }
+            else
+            {
+                var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
+
+                var interactableObjects = new List<Collider2D>();
+                var contactFilter = new ContactFilter2D();
+                contactFilter.useTriggers = true;
+                Physics2D.OverlapCollider(circleTriggerZone, contactFilter, interactableObjects);
+
+                if (objectCarried != null)
+                {
+                    if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerButton")))
+                    {
+                        var domino = objectCarried.GetComponent<DominoBehavior>();
+                        assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+
+                        objectCarried.position = new Vector3(100, 100);
+                        IsInAssembler = true;
                     }
                     else
                     {
-                        if (interactableObjects.Any(o => o.transform.CompareTag("Assembler")) && !assemblerManager.isEmpty())
-                        {
-                            objectCarried = assemblerManager.GetDomino().transform;
-                            objectCarried.GetComponent<Collider2D>().isTrigger = true;
-                        }
-                        else
-                        {
-                            GetObjectNear();
-                        }
+                        DropObject();
                     }
-
                 }
-            }
+                else
+                {
+                    if (interactableObjects.Any(o => o.transform.CompareTag("Assembler")) && !assemblerManager.isEmpty())
+                    {
+                        objectCarried = assemblerManager.GetDomino().transform;
+                        objectCarried.GetComponent<Collider2D>().isTrigger = true;
+                    }
+                    else
+                    {
+                        GetObjectNear();
+                    }
+                }
 
+            }
         }
+
     }
 
     public void Dash()
@@ -306,46 +245,44 @@ public class CharacterController : MonoBehaviour
 
     public void MoveDominosInAssembler(InputAction.CallbackContext ctx)
     {
-        if (SceneManager.GetActiveScene().name.Contains("Level"))
+
+        if (ctx.performed)
         {
-            if (ctx.performed)
+
+            if (IsInAssembler && !alreadyMoveInAssembler)
             {
+                alreadyMoveInAssembler = true;
 
-                if (IsInAssembler && !alreadyMoveInAssembler)
+                var domino = objectCarried.GetComponent<DominoBehavior>();
+
+                Vector2 movement = ctx.ReadValue<Vector2>();
+
+                if (movement.x > 0.5)
                 {
-                    alreadyMoveInAssembler = true;
-
-                    var domino = objectCarried.GetComponent<DominoBehavior>();
-
-                    Vector2 movement = ctx.ReadValue<Vector2>();
-
-                    if (movement.x > 0.5)
-                    {
-                        domino.MoveDominoRight();
-                    }
-                    else if (movement.x < -0.5)
-                    {
-                        domino.MoveDominoLeft();
-                    }
-                    else if (movement.y < 0)
-                    {
-                        domino.MoveDominoDown();
-                    }
-                    else if (movement.y > 0)
-                    {
-                        domino.MoveDominoUp();
-                    }
-
-                    assemblerManager.CreateSpriteForAddedDomino(domino.domino);
+                    domino.MoveDominoRight();
+                }
+                else if (movement.x < -0.5)
+                {
+                    domino.MoveDominoLeft();
+                }
+                else if (movement.y < 0)
+                {
+                    domino.MoveDominoDown();
+                }
+                else if (movement.y > 0)
+                {
+                    domino.MoveDominoUp();
                 }
 
-            }
-            else if (ctx.canceled)
-            {
-                alreadyMoveInAssembler = false;
+                assemblerManager.CreateSpriteForAddedDomino(domino.domino);
             }
 
         }
+        else if (ctx.canceled)
+        {
+            alreadyMoveInAssembler = false;
+        }
+
     }
 
     public void RotateClockwise(InputAction.CallbackContext ctx)
@@ -380,7 +317,7 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    private void GetObjectNear()
+    void GetObjectNear()
     {
         CapsuleCollider2D c = new CapsuleCollider2D();
 
@@ -448,7 +385,7 @@ public class CharacterController : MonoBehaviour
 
     }
 
-    private void DropObject()
+    void DropObject()
     {
         objectCarried.GetComponent<SpriteRenderer>().sortingOrder = 5;
 
