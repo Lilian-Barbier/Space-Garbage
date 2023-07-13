@@ -51,29 +51,30 @@ public class CharacterController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (IsInAssembler)
-        {
+        if(IsInAssembler) return;
+        
+        UpdateMovements();
+        UpdateOutlines();
+    }
 
-        }
-        else
-        {
-            #region Move player
-            var isMovingSide = false;
-            var isMovingUp = false;
-            var isMovingDown = false;
+    void UpdateMovements()
+    {
+        var isMovingSide = false;
+        var isMovingUp = false;
+        var isMovingDown = false;
 
-            if (!isStopped)
+        if (!isStopped)
+        {
+            dashTimer += Time.fixedDeltaTime;
+
+            if (dashTimer > dashCooldown)
             {
-                dashTimer += Time.deltaTime;
-
-                if (dashTimer > dashCooldown)
-                {
-                    canDash = true;
-                }
+                canDash = true;
+            }
 
                 if (isDashing)
                 {
-                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + dashSpeed * Time.deltaTime * lastDirection);
+                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + dashSpeed * Time.fixedDeltaTime * lastDirection);
 
 
                     if (dashTimer > dashDuration)
@@ -88,30 +89,30 @@ public class CharacterController : MonoBehaviour
                         lastDirection = movement;
                     }
 
-                    if (movement.x > 0.5 || movement.x < -0.5)
+                    if (movement.y < -0.5)
+                    {
+                        isMovingDown = true;
+                    }
+                    else if (movement.y > 0.5)
+                    {
+                        isMovingUp = true;
+                    }
+                    else if (movement.x != 0)
                     {
                         isMovingSide = true;
                         spriteRenderer.flipX = movement.x < 0;
                     }
-                    else if (movement.y < 0)
-                    {
-                        isMovingDown = true;
-                    }
-                    else if (movement.y > 0)
-                    {
-                        isMovingUp = true;
-                    }
 
                     interactTriggerZone.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.down, lastDirection));
-                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + speed * Time.deltaTime * movement);
-
-                }
+                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + speed * Time.fixedDeltaTime * movement);
 
             }
 
-            animator.SetBool("isMovingSide", isMovingSide);
-            animator.SetBool("isMovingUp", isMovingUp);
-            animator.SetBool("isMovingDown", isMovingDown);
+        }
+
+        animator.SetBool("isMovingSide", isMovingSide);
+        animator.SetBool("isMovingUp", isMovingUp);
+        animator.SetBool("isMovingDown", isMovingDown);
 
             if (objectCarried != null)
             {
@@ -126,11 +127,6 @@ public class CharacterController : MonoBehaviour
                     objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirection.y > 0.5 ? 5 : 15;
                 }
 
-            }
-
-            #endregion In movement
-
-            UpdateOutlines();
         }
     }
 
