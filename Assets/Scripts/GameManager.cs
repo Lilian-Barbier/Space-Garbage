@@ -1,11 +1,8 @@
-using System.Collections;
+using Enums;
+using Models;
 using System.Collections.Generic;
 using UnityEngine;
-using Models;
 using Utils;
-using Enums;
-using UnityEngine.SceneManagement;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class GameManager : MonoBehaviour
 {
@@ -64,6 +61,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        //Todo : spawn players
+
         hearthManager = FindObjectOfType<HearthManager>().GetComponent<HearthManager>();
 
         HudCanvas = GameObject.Find("HUD");

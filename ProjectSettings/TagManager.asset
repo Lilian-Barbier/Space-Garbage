@@ -15,6 +15,7 @@ TagManager:
   - DeliveryPoint
   - SpawnP1
   - SpawnP2
+  - Spawns
   layers:
   - Default
   - TransparentFX

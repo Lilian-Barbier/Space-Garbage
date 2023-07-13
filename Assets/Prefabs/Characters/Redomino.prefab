@@ -139,7 +139,7 @@ Transform:
   m_Children:
   - {fileID: 8224879395397601629}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5246783677351079528
 SpriteRenderer:
@@ -205,15 +205,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9048b0053e6044147918fff05907c015, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  redomino: {fileID: 0}
-  bludomino: {fileID: 0}
   objectCarriedDistanceFactor: 0.6
-  offset: {x: 0, y: 0.25, z: 0}
+  offsetObjectCarriedDistance: {x: 0, y: 0, z: 0}
   speed: 4
   dashSpeed: 8
   dashDuration: 0.2
   dashCooldown: 1
-  playerNumber: 0
+  interactTriggerZone: {fileID: 8224879395397601629}
 --- !u!50 &7708331017817771909
 Rigidbody2D:
   serializedVersion: 4
@@ -401,7 +399,7 @@ MonoBehaviour:
     m_ActionName: Redomino/Start[/Keyboard/enter,/DualShock4GamepadHID/start,/Keyboard/escape]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: Redomino
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!61 &1448313786891901397
