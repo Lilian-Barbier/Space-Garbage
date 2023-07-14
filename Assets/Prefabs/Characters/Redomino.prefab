@@ -65,8 +65,8 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.32}
-  m_Size: {x: 0.6, y: 0.95085496}
+  m_Offset: {x: -0.000000014901161, y: -0.29117152}
+  m_Size: {x: 0.261265, y: 0.89319795}
   m_Direction: 0
 --- !u!58 &2722529476702274203
 CircleCollider2D:
@@ -139,7 +139,7 @@ Transform:
   m_Children:
   - {fileID: 8224879395397601629}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5246783677351079528
 SpriteRenderer:
@@ -211,7 +211,6 @@ MonoBehaviour:
   dashSpeed: 8
   dashDuration: 0.2
   dashCooldown: 1
-  interactTriggerZone: {fileID: 8224879395397601629}
 --- !u!50 &7708331017817771909
 Rigidbody2D:
   serializedVersion: 4

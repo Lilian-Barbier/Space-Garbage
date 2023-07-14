@@ -27,7 +27,6 @@ public class CharacterController : MonoBehaviour
     Vector2 movement = Vector2.zero;
 
     //Data from last frame for calculation and animation
-    float lastDirectionAngle;
     Vector2 lastDirection;
 
     [SerializeField] float objectCarriedDistanceFactor = 0.7f;
@@ -46,6 +45,9 @@ public class CharacterController : MonoBehaviour
         rigidbodyCharacter = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+
+        var assembler = GameObject.FindGameObjectWithTag("Assembler");
+        assemblerManager = assembler.GetComponent<AssemblerManager>();
 
         interactTriggerZone = transform.GetChild(0);
     }
@@ -79,7 +81,7 @@ public class CharacterController : MonoBehaviour
 
                 if (isDashing)
                 {
-                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + lastDirection * dashSpeed * Time.deltaTime);
+                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + dashSpeed * Time.deltaTime * lastDirection);
 
 
                     if (dashTimer > dashDuration)
@@ -89,26 +91,27 @@ public class CharacterController : MonoBehaviour
                 }
                 else
                 {
-                    lastDirection = movement;
+                    if(movement != Vector2.zero && movement.magnitude > 0.8)
+                    {
+                        lastDirection = movement;
+                    }
+
                     if (movement.x > 0.5 || movement.x < -0.5)
                     {
                         isMovingSide = true;
                         spriteRenderer.flipX = movement.x < 0;
-                        lastDirectionAngle = movement.x > 0 ? 90 : -90;
                     }
                     else if (movement.y < 0)
                     {
                         isMovingDown = true;
-                        lastDirectionAngle = 0;
                     }
                     else if (movement.y > 0)
                     {
                         isMovingUp = true;
-                        lastDirectionAngle = 180;
                     }
 
-                    interactTriggerZone.rotation = Quaternion.Euler(0, 0, lastDirectionAngle);
-                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + movement * speed * Time.deltaTime);
+                    interactTriggerZone.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.down, lastDirection));
+                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + speed * Time.deltaTime * movement);
 
                 }
 
@@ -127,9 +130,8 @@ public class CharacterController : MonoBehaviour
                 }
                 else
                 {
-                    Vector3 direction = lastDirectionAngle == 0 ? Vector3.down : lastDirectionAngle == 180 ? Vector3.up : lastDirectionAngle == 90 ? Vector3.right : Vector3.left;
-                    objectCarried.position = transform.position + direction * objectCarriedDistanceFactor + offsetObjectCarriedDistance;
-                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirectionAngle == 180 ? 5 : 15;
+                    objectCarried.position = transform.position + (Vector3)(lastDirection * objectCarriedDistanceFactor) + offsetObjectCarriedDistance;
+                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirection.y > 0.5 ? 5 : 15;
                 }
 
             }
