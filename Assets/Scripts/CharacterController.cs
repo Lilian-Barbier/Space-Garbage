@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class CharacterController : MonoBehaviour
 {
-
     bool isStopped;
     Rigidbody2D rigidbodyCharacter;
     Animator animator;
@@ -22,23 +21,21 @@ public class CharacterController : MonoBehaviour
 
     bool IsInAssembler;
     bool alreadyMoveInAssembler;
-    
+
     Transform interactTriggerZone;
     Vector2 movement = Vector2.zero;
 
     //Data from last frame for calculation and animation
     Vector2 lastDirection;
 
-    [SerializeField] float objectCarriedDistanceFactor = 0.7f;
+    [SerializeField] float objectCarriedDistanceFactor;
     [SerializeField] Vector3 offsetObjectCarriedDistance;
 
     [SerializeField] float speed;
-    [SerializeField] float dashSpeed = 0.5f;
+    [SerializeField] float dashSpeed;
 
-    [SerializeField] float dashDuration = 0.5f;
-    [SerializeField] float dashCooldown = 1f;
-
-    public PlayerInput playerInput { get; set; }
+    [SerializeField] float dashDuration;
+    [SerializeField] float dashCooldown;
 
     void Start()
     {
@@ -52,11 +49,6 @@ public class CharacterController : MonoBehaviour
         interactTriggerZone = transform.GetChild(0);
     }
 
-    public void Move(InputAction.CallbackContext ctx)
-    {
-        movement = ctx.ReadValue<Vector2>();
-    }
-
     void FixedUpdate()
     {
         if (IsInAssembler)
@@ -65,7 +57,7 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
-            #region In movement
+            #region Move player
             var isMovingSide = false;
             var isMovingUp = false;
             var isMovingDown = false;
@@ -91,7 +83,7 @@ public class CharacterController : MonoBehaviour
                 }
                 else
                 {
-                    if(movement != Vector2.zero && movement.magnitude > 0.8)
+                    if (movement != Vector2.zero && movement.magnitude > 0.8)
                     {
                         lastDirection = movement;
                     }
@@ -142,44 +134,23 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    void UpdateOutlines()
+    #region InputAction CallBack
+    public void Move(InputAction.CallbackContext ctx)
     {
-        CapsuleCollider2D c = new CapsuleCollider2D();
-
-        var capsuleTriggerZone = interactTriggerZone.GetComponent<CapsuleCollider2D>();
-
-        List<Collider2D> interactableObjects = new List<Collider2D>();
-
-        ContactFilter2D contactFilter = new ContactFilter2D();
-        contactFilter.useTriggers = true;
-
-        Physics2D.OverlapCollider(capsuleTriggerZone, contactFilter, interactableObjects);
-
-        //D'abord on vérifie si on peut prendre un bloc devant nous
-        if (interactableObjects.Any(o => o.transform.CompareTag("Blocks")))
+        movement = ctx.ReadValue<Vector2>();
+    }
+    public void Dash(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed && canDash)
         {
-            var collider = interactableObjects.First(o => o.transform.CompareTag("Blocks"));
-            var objectDetected = collider.transform;
-
-            if (objectDetected != this.objectDetected && this.objectDetected != null)
-                this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
-
-            objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 1);
-            this.objectDetected = objectDetected;
-
-            return;
-        }
-
-        if (this.objectDetected != null)
-        {
-            this.objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
-            this.objectDetected = null;
+            canDash = false;
+            isDashing = true;
+            dashTimer = 0f;
         }
     }
 
     public void Interact(InputAction.CallbackContext ctx)
     {
-
         if (ctx.performed)
         {
             if (IsInAssembler)
@@ -195,16 +166,13 @@ public class CharacterController : MonoBehaviour
             }
             else
             {
-                var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
+                var interactableObjectsNear = GetColliderAroundPlayerOrderByDistance(getTriggerCollider : true);
+                var interactableObjectsInFront = GetColliderInFrontPlayerOrderByDistance();
 
-                var interactableObjects = new List<Collider2D>();
-                var contactFilter = new ContactFilter2D();
-                contactFilter.useTriggers = true;
-                Physics2D.OverlapCollider(circleTriggerZone, contactFilter, interactableObjects);
-
+                //Si le joueur à un objet il va le déposer
                 if (objectCarried != null)
                 {
-                    if (interactableObjects.Any(o => o.transform.CompareTag("AssemblerButton")))
+                    if (interactableObjectsNear.Any(o => o.transform.CompareTag("AssemblerButton")))
                     {
                         var domino = objectCarried.GetComponent<DominoBehavior>();
                         assemblerManager.CreateSpriteForAddedDomino(domino.domino);
@@ -217,9 +185,10 @@ public class CharacterController : MonoBehaviour
                         DropObject();
                     }
                 }
+                //Sinon il va tenter d'en attraper un
                 else
                 {
-                    if (interactableObjects.Any(o => o.transform.CompareTag("Assembler")) && !assemblerManager.isEmpty())
+                    if ((interactableObjectsNear.Any(o => o.transform.CompareTag("Assembler")) || interactableObjectsInFront.Any(o => o.transform.CompareTag("Assembler"))) && !assemblerManager.IsEmpty())
                     {
                         objectCarried = assemblerManager.GetDomino().transform;
                         objectCarried.GetComponent<Collider2D>().isTrigger = true;
@@ -233,16 +202,6 @@ public class CharacterController : MonoBehaviour
             }
         }
 
-    }
-
-    public void Dash()
-    {
-        if (canDash)
-        {
-            canDash = false;
-            isDashing = true;
-            dashTimer = 0f;
-        }
     }
 
     public void MoveDominosInAssembler(InputAction.CallbackContext ctx)
@@ -319,70 +278,46 @@ public class CharacterController : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Interact with object utils functions
     void GetObjectNear()
     {
-        CapsuleCollider2D c = new CapsuleCollider2D();
+        IEnumerable<Collider2D> interactableObjects = GetColliderInFrontPlayerOrderByDistance();
 
-        var capsuleTriggerZone = interactTriggerZone.GetComponent<CapsuleCollider2D>();
-
-        List<Collider2D> interactableObjects = new List<Collider2D>();
-        Physics2D.OverlapCollider(capsuleTriggerZone, new ContactFilter2D(), interactableObjects);
+        Collider2D block = GetNearestObjectInCollidersByTag(interactableObjects, "Blocks");
 
         //D'abord on vérifie si on peut prendre un bloc devant nous
-        if (interactableObjects.Any(o => o.transform.CompareTag("Blocks")))
+        if (block != null)
         {
-            var collider = interactableObjects.First(o => o.transform.CompareTag("Blocks"));
-            collider.isTrigger = true;
-            objectCarried = collider.transform;
-
+            block.isTrigger = true;
+            objectCarried = block.transform;
             return;
         }
 
-        //Sinon on prend un bloc d'une table
-        if (interactableObjects.Any(o => o.transform.CompareTag("Table")))
+        //Sinon on essaie de prendre un bloc d'une table
+        TableBehaviour tableBehaviour = GetFirstTableWithObject(interactableObjects);
+        if(tableBehaviour != null)
         {
-            var tables = interactableObjects.Where(o => o.transform.CompareTag("Table"));
-
-            //Dans le cas ou il y a plusieurs tables on trie par leurs distance
-            tables = tables.OrderBy(t => Vector2.Distance(t.transform.position, transform.position));
-
-            foreach (var table in tables)
-            {
-                TableBehaviour tableBehaviour = table.GetComponent<TableBehaviour>();
-                if (!tableBehaviour.CanAcceptObject())
-                {
-                    objectCarried = tableBehaviour.GetObjectCarried();
-                    return;
-                }
-            }
+            objectCarried = tableBehaviour.GetObjectCarried();
+            return;
         }
 
-        //Sinon on regarde si on peut prendre un domino d'une caisse
-        if (interactableObjects.Any(o => o.transform.CompareTag("Box")))
+        Collider2D box = GetNearestObjectInCollidersByTag(interactableObjects, "Box");
+        if (box != null)
         {
-            var boxes = interactableObjects.Where(o => o.transform.CompareTag("Box"));
-
-            //Dans le cas ou il y a plusieurs tables on trie par leurs distance
-            boxes = boxes.OrderBy(t => Vector2.Distance(t.transform.position, transform.position));
-
-            foreach (var box in boxes)
-            {
-                BoxBehaviour boxBehaviour = box.GetComponent<BoxBehaviour>();
-                objectCarried = boxBehaviour.GetObject();
-                return;
-            }
+            BoxBehaviour boxBehaviour = box.GetComponent<BoxBehaviour>();
+            objectCarried = boxBehaviour.GetObject();
+            return;
         }
 
-        //Dans le dernier cas on vérifie si on ne peux pas r�cup�rer un bloc proche autour du joueur
-        var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
-        interactableObjects = new List<Collider2D>();
-        Physics2D.OverlapCollider(circleTriggerZone, new ContactFilter2D(), interactableObjects);
 
-        if (interactableObjects.Any(o => o.transform.CompareTag("Blocks")))
+        //Dans le dernier cas on vérifie si on ne peux pas récupérer un bloc proche autour du joueur
+        Collider2D blockAroundPlayer = GetNearestObjectInCollidersByTag(interactableObjects, "Blocks");
+        if (blockAroundPlayer != null)
         {
-            var collider = interactableObjects.First(o => o.transform.CompareTag("Blocks"));
-            collider.isTrigger = true;
-            objectCarried = collider.transform;
+            blockAroundPlayer.isTrigger = true;
+            objectCarried = blockAroundPlayer.transform;
         }
 
     }
@@ -391,17 +326,14 @@ public class CharacterController : MonoBehaviour
     {
         objectCarried.GetComponent<SpriteRenderer>().sortingOrder = 5;
 
-        CapsuleCollider2D c = new CapsuleCollider2D();
+        IEnumerable<Collider2D> interactableObjects = GetColliderInFrontPlayerOrderByDistance();
 
-        var capsuleTriggerZone = interactTriggerZone.GetComponent<CapsuleCollider2D>();
-
-        List<Collider2D> interactableObjects = new List<Collider2D>();
-        Physics2D.OverlapCollider(capsuleTriggerZone, new ContactFilter2D(), interactableObjects);
+        Collider2D deliveryPointTransform = GetNearestObjectInCollidersByTag(interactableObjects, "DeliveryPoint");
 
         //On vérifie si le point de livraison se trouve dans dans notre champs d'action 
-        if (interactableObjects.Any(o => o.transform.CompareTag("DeliveryPoint")))
+        if (deliveryPointTransform != null)
         {
-            var deliveryPoint = interactableObjects.First(o => o.transform.CompareTag("DeliveryPoint")).GetComponent<DeliveryPointBehaviour>();
+            var deliveryPoint = deliveryPointTransform.GetComponent<DeliveryPointBehaviour>();
             var domino = objectCarried.GetComponent<DominoBehavior>().domino;
 
             deliveryPoint.DeliveryDomino(domino);
@@ -415,9 +347,6 @@ public class CharacterController : MonoBehaviour
         {
             var tables = interactableObjects.Where(o => o.transform.CompareTag("Table"));
 
-            //Dans le cas ou il y a plusieurs tables on trie par leurs distance
-            tables = tables.OrderBy(t => Vector2.Distance(t.transform.position, transform.position));
-
             foreach (var table in tables)
             {
                 TableBehaviour tableBehaviour = table.GetComponent<TableBehaviour>();
@@ -430,9 +359,9 @@ public class CharacterController : MonoBehaviour
             }
         }
 
-        //On vérifie que l'objet ne tombe pas dans un mur
+        //On vérifie que l'objet ne tombe pas dans un mur, si c'est le cas on set la position à la position du joueur
         var objectCarriedCollider = objectCarried.GetComponent<Collider2D>();
-        List<Collider2D> collidersWhenDropObjectCarried = new List<Collider2D>();
+        List<Collider2D> collidersWhenDropObjectCarried = new();
         Physics2D.OverlapCollider(objectCarriedCollider, new ContactFilter2D(), collidersWhenDropObjectCarried);
 
         //Ici on compare à la fois les mur et les tables, car si on arrive à ce point dans la fonction c'est que toutes les tables sont prises
@@ -446,7 +375,106 @@ public class CharacterController : MonoBehaviour
 
     }
 
+    //Récupére les Colliders que le joueur colle dans ça zone Circle
+    IEnumerable<Collider2D> GetColliderAroundPlayerOrderByDistance(bool getTriggerCollider = false)
+    {
+        var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
 
+        var colliders = new List<Collider2D>();
+        var contactFilter = new ContactFilter2D
+        {
+            useTriggers = getTriggerCollider
+        };
+        Physics2D.OverlapCollider(circleTriggerZone, contactFilter, colliders);
+
+        return colliders.OrderBy(c => Vector2.Distance(c.transform.position, transform.position)).ToList();
+    }
+
+    //Récupére les Colliders qui sont devant le joueur, dans ça zone Capsule
+    IEnumerable<Collider2D> GetColliderInFrontPlayerOrderByDistance(bool getTriggerCollider = false)
+    {
+        var capsuleTriggerZone = interactTriggerZone.GetComponent<CapsuleCollider2D>();
+
+        var colliders = new List<Collider2D>();
+        var contactFilter = new ContactFilter2D
+        {
+            useTriggers = getTriggerCollider
+        };
+        Physics2D.OverlapCollider(capsuleTriggerZone, contactFilter, colliders);
+
+        return colliders.OrderBy(c => Vector2.Distance(c.transform.position, transform.position)).ToList();
+    }
+
+    Collider2D GetNearestObjectInCollidersByTag(IEnumerable<Collider2D> colliders, string tagName)
+    {
+        //D'abord on vérifie si on peut prendre un bloc devant nous
+        if (colliders.Any(o => o.transform.CompareTag(tagName)))
+        {
+            return colliders.First(o => o.transform.CompareTag(tagName));
+        }
+
+        return null;
+    }
+
+    TableBehaviour GetFirstTableWithObject(IEnumerable<Collider2D> colliders)
+    {
+        if (colliders.Any(o => o.transform.CompareTag("Table")))
+        {
+            var tables = colliders.Where(o => o.transform.CompareTag("Table"));
+
+            foreach (var table in tables)
+            {
+                TableBehaviour tableBehaviour = table.GetComponent<TableBehaviour>();
+                if (!tableBehaviour.CanAcceptObject())
+                {
+                    return tableBehaviour;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    #endregion
+   
+    void UpdateOutlines()
+    {
+        IEnumerable<Collider2D> interactableObjects = GetColliderInFrontPlayerOrderByDistance();
+        Collider2D block = GetNearestObjectInCollidersByTag(interactableObjects, "Blocks");
+        TableBehaviour tableBehaviour = GetFirstTableWithObject(interactableObjects);
+
+        if (block != null)
+        {
+            var newObjectOutlined = block.transform;
+
+            if (newObjectOutlined != objectDetected && objectDetected != null)
+                objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
+
+            newObjectOutlined.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 1);
+            objectDetected = newObjectOutlined;
+
+        }
+
+        //Check si une table se trouve devant nous, dans ce cas on on ajoute une outline sur l'objet dessus
+        else if (tableBehaviour != null)
+        {
+            var newObjectOutlined = tableBehaviour.GetReferenceObjectCarried().transform;
+
+            if (newObjectOutlined != objectDetected && objectDetected != null)
+                objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
+
+            newObjectOutlined.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 1);
+            objectDetected = newObjectOutlined;
+        }
+
+        else if (objectDetected != null)
+        {
+            objectDetected.GetComponent<SpriteRenderer>().material.SetInt("_IsDetected", 0);
+            objectDetected = null;
+        }
+    }
+
+    //Todo : a passer dans une autre classe ?
     public void LoadChooseLevel(InputAction.CallbackContext ctx)
     {
         if (ctx.performed)
@@ -454,4 +482,5 @@ public class CharacterController : MonoBehaviour
             SceneManager.LoadScene("ChooseLvl");
         }
     }
+
 }

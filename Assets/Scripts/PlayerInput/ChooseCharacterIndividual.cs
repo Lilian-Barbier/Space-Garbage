@@ -76,7 +76,7 @@ public class ChooseCharacterIndividual : MonoBehaviour
             checkSprite.color = Color.white;
             selectionValidated = true;
 
-            manager.playerValidate(GetComponent<PlayerInput>().playerIndex, colors[selectedColorIndex]);
+            manager.PlayerValidate(GetComponent<PlayerInput>().playerIndex, colors[selectedColorIndex]);
         }
     }
 

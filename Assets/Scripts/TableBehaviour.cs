@@ -37,6 +37,11 @@ public class TableBehaviour : MonoBehaviour
         return tmpObjectCarried;
     }
 
+    public virtual Transform GetReferenceObjectCarried()
+    {
+        return objectCarried;
+    }
+
     public bool CanAcceptObject()
     {
         return objectCarried == null;

@@ -63,7 +63,7 @@ public class PlayerCharactersManager : MonoBehaviour
         }
     }
 
-    public void playerValidate(int playerIndex, Color playerColor)
+    public void PlayerValidate(int playerIndex, Color playerColor)
     {
         colorsByPlayerIndex.Add(playerIndex, playerColor);
         playersValidate++;

@@ -62,6 +62,7 @@ public class AssemblerManager : MonoBehaviour
     public GameObject GetDomino()
     {
         var newDomino = Instantiate(dominoPrefab);
+        newDomino.transform.position = new Vector2(100, 100);
         currentDomino.isAssembled = true;
         newDomino.GetComponent<DominoBehavior>().domino = currentDomino;
         currentDomino = GetEmptyDomino();
@@ -69,7 +70,7 @@ public class AssemblerManager : MonoBehaviour
         return newDomino;
     }
 
-    public bool isEmpty()
+    public bool IsEmpty()
     {
         for (var i = 0; i < 4; i++)
         {
