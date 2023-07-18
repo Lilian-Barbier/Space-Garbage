@@ -6,21 +6,21 @@ using UnityEngine.SceneManagement;
 
 public class CharacterController : MonoBehaviour
 {
-    bool isStopped;
     Rigidbody2D rigidbodyCharacter;
     Animator animator;
     SpriteRenderer spriteRenderer;
-    AssemblerManager assemblerManager;
+
+    AssemblerBehavior assembler;
 
     Transform objectCarried;
     Transform objectDetected;
 
+    bool isStopped;
     bool isDashing = false;
     bool canDash = true;
     float dashTimer;
 
-    bool IsInAssembler;
-    bool alreadyMoveInAssembler;
+    HologramBehavior assemblerHologram;
 
     Transform interactTriggerZone;
     Vector2 movement = Vector2.zero;
@@ -43,15 +43,15 @@ public class CharacterController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
-        var assembler = GameObject.FindGameObjectWithTag("Assembler");
-        assemblerManager = assembler.GetComponent<AssemblerManager>();
+        var assemblerGameObject = GameObject.FindGameObjectWithTag("Assembler");
+        assembler = assemblerGameObject.GetComponent<AssemblerBehavior>();
 
         interactTriggerZone = transform.GetChild(0);
     }
 
     void FixedUpdate()
     {
-        if(IsInAssembler) return;
+        if(assemblerHologram != null) return;
         
         UpdateMovements();
         UpdateOutlines();
@@ -106,13 +106,13 @@ public class CharacterController : MonoBehaviour
                     interactTriggerZone.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.down, lastDirection));
                     rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + speed * Time.fixedDeltaTime * movement);
 
+                }
+
             }
 
-        }
-
-        animator.SetBool("isMovingSide", isMovingSide);
-        animator.SetBool("isMovingUp", isMovingUp);
-        animator.SetBool("isMovingDown", isMovingDown);
+            animator.SetBool("isMovingSide", isMovingSide);
+            animator.SetBool("isMovingUp", isMovingUp);
+            animator.SetBool("isMovingDown", isMovingDown);
 
             if (objectCarried != null)
             {
@@ -149,45 +149,29 @@ public class CharacterController : MonoBehaviour
     {
         if (!ctx.performed) return;
 
-        if (IsInAssembler)
+        if (assemblerHologram != null)
         {
-            // TODO : Move logic to assembler
-            var domino = objectCarried.GetComponent<DominoBehavior>().domino;
-            if (assemblerManager.CanAddDomino(domino))
-            {
-                assemblerManager.AddDomino(domino);
-                objectCarried.gameObject.SetActive(false);
-                objectCarried = null;
-                IsInAssembler = false;
-            }
+            QuitAssemblerAndInsertDomino();
         }
         else
         {
-            var interactableObjectsNear = GetColliderAroundPlayerOrderByDistance(getTriggerCollider : true);
-            var interactableObjectsInFront = GetColliderInFrontPlayerOrderByDistance();
+            var interactibleObjectsNear = GetColliderAroundPlayerOrderByDistance(getTriggerCollider : true);
+            var interactibleObjectsInFront = GetColliderInFrontPlayerOrderByDistance();
 
             //Si le joueur à un objet il va le déposer
             if (objectCarried != null)
             {
-                if (interactableObjectsNear.Any(o => o.transform.CompareTag("AssemblerButton")))
-                {
-                    var domino = objectCarried.GetComponent<DominoBehavior>();
-                    assemblerManager.CreateSpriteForAddedDomino(domino.domino);
-
-                    objectCarried.position = new Vector3(100, 100);
-                    IsInAssembler = true;
-                }
+                if (interactibleObjectsNear.Any(o => o.transform.CompareTag("AssemblerButton")))
+                    AddHologramToAssembler();
                 else
-                {
                     DropObject();
-                }
             }
             //Sinon il va tenter d'en attraper un
             else
             {
-                if ((interactableObjectsNear.Any(o => o.transform.CompareTag("Assembler")) || interactableObjectsInFront.Any(o => o.transform.CompareTag("Assembler"))) && !assemblerManager.IsEmpty())
-                {
-                    objectCarried = assemblerManager.GetDomino().transform;
+                if ((interactibleObjectsNear.Any(o => o.transform.CompareTag("Assembler")) || interactibleObjectsInFront.Any(o => o.transform.CompareTag("Assembler"))) && !assembler.IsEmpty())
+                {   
+                    objectCarried = assembler.TakeDominoOut().transform;
                     objectCarried.GetComponent<Collider2D>().isTrigger = true;
                 }
                 else
@@ -202,75 +186,49 @@ public class CharacterController : MonoBehaviour
     public void MoveDominosInAssembler(InputAction.CallbackContext ctx)
     {
 
-        if (ctx.performed)
+        if (!ctx.started) return;
+
+        if (assemblerHologram != null)
         {
+            var domino = objectCarried.GetComponent<DominoBehavior>();
 
-            if (IsInAssembler && !alreadyMoveInAssembler)
-            {
-                alreadyMoveInAssembler = true;
+            Vector2 movement = ctx.ReadValue<Vector2>();
 
-                var domino = objectCarried.GetComponent<DominoBehavior>();
+            if (movement.x > 0.5)
+                domino.MoveDominoRight();
+            else if (movement.x < -0.5)
+                domino.MoveDominoLeft();
+            else if (movement.y < 0)
+                domino.MoveDominoDown();
+            else if (movement.y > 0)
+                domino.MoveDominoUp();
 
-                Vector2 movement = ctx.ReadValue<Vector2>();
-
-                if (movement.x > 0.5)
-                {
-                    domino.MoveDominoRight();
-                }
-                else if (movement.x < -0.5)
-                {
-                    domino.MoveDominoLeft();
-                }
-                else if (movement.y < 0)
-                {
-                    domino.MoveDominoDown();
-                }
-                else if (movement.y > 0)
-                {
-                    domino.MoveDominoUp();
-                }
-
-                assemblerManager.CreateSpriteForAddedDomino(domino.domino);
-            }
-
+            assemblerHologram.SetDomino(domino.domino);
         }
-        else if (ctx.canceled)
-        {
-            alreadyMoveInAssembler = false;
-        }
-
     }
 
     public void RotateClockwise(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
-        {
-            if (objectCarried != null)
-            {
-                var domino = objectCarried.GetComponent<DominoBehavior>();
-                domino.RotateDominoClockwise();
-                if (IsInAssembler)
-                {
-                    assemblerManager.CreateSpriteForAddedDomino(domino.domino);
-                }
-            }
-        }
+        if (!ctx.performed) return;
+        RotateDomino(true);
     }
 
     public void RotateCounterClockwise(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
-        {
-            if (objectCarried != null)
-            {
-                var domino = objectCarried.GetComponent<DominoBehavior>();
-                domino.RotateDominoCounterClockwise();
-                if (IsInAssembler)
-                {
-                    assemblerManager.CreateSpriteForAddedDomino(domino.domino);
-                }
-            }
-        }
+        if (!ctx.performed) return;
+        RotateDomino(false);
+    }
+
+    private void RotateDomino(bool clockwise)
+    {
+        if (objectCarried == null) return;
+
+        var domino = objectCarried.GetComponent<DominoBehavior>();
+
+        if (clockwise) domino.RotateDominoClockwise();
+        else domino.RotateDominoCounterClockwise();
+
+        if (assemblerHologram != null) assemblerHologram.SetDomino(domino.domino);
     }
 
     #endregion
@@ -315,6 +273,25 @@ public class CharacterController : MonoBehaviour
             objectCarried = blockAroundPlayer.transform;
         }
 
+    }
+
+    private void AddHologramToAssembler()
+    {
+        var domino = objectCarried.GetComponent<DominoBehavior>();
+        assemblerHologram = assembler.AddHologram(domino.domino);
+    }
+
+    private void QuitAssemblerAndInsertDomino()
+    {
+        if (assembler.TryInsertHologram(assemblerHologram))
+        {
+            
+            Destroy(objectCarried.gameObject);
+            objectCarried = null;
+
+            Destroy(assemblerHologram.gameObject);
+            assemblerHologram = null;
+        }
     }
 
     void DropObject()
@@ -370,7 +347,7 @@ public class CharacterController : MonoBehaviour
 
     }
 
-    //Récupére les Colliders que le joueur colle dans ça zone Circle
+    //Récupére les Colliders que le joueur colle, dans sa zone Circle
     IEnumerable<Collider2D> GetColliderAroundPlayerOrderByDistance(bool getTriggerCollider = false)
     {
         var circleTriggerZone = interactTriggerZone.GetComponent<CircleCollider2D>();
@@ -385,7 +362,7 @@ public class CharacterController : MonoBehaviour
         return colliders.OrderBy(c => Vector2.Distance(c.transform.position, transform.position)).ToList();
     }
 
-    //Récupére les Colliders qui sont devant le joueur, dans ça zone Capsule
+    //Récupére les Colliders qui sont devant le joueur, dans sa zone Capsule
     IEnumerable<Collider2D> GetColliderInFrontPlayerOrderByDistance(bool getTriggerCollider = false)
     {
         var capsuleTriggerZone = interactTriggerZone.GetComponent<CapsuleCollider2D>();
