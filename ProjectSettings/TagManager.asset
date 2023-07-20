@@ -11,11 +11,11 @@ TagManager:
   - AssemblerButton
   - AssemblerOutButton
   - Painter
-  - Box
   - DeliveryPoint
   - SpawnP1
   - SpawnP2
   - Spawns
+  - Crate
   layers:
   - Default
   - TransparentFX

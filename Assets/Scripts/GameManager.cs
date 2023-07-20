@@ -1,8 +1,11 @@
 using Enums;
 using Models;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Utils;
+using static GameManager;
 
 public class GameManager : MonoBehaviour
 {
@@ -21,6 +24,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite redBlockSprite;
     [SerializeField] private Sprite lightRedBlockSprite;
     [SerializeField] private Sprite blackBlockSprite;
+
+    //Dictionnaire contenants les événements ainsi que les timers 
+    [Serializable]
+    public struct FactoryEvent
+    {
+        public float timer;
+        //Todo: essayer de passer à une référence de script plutot que via un prefab
+        public GameObject eventToStart;
+        public bool loop;
+    }
+
+    [SerializeField] private FactoryEvent[] events;
 
     private static readonly float minUpperBound = 20f;
     private static readonly float initialUpperBound = 32f;
@@ -61,8 +76,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        //Todo : spawn players
-
         hearthManager = FindObjectOfType<HearthManager>().GetComponent<HearthManager>();
 
         HudCanvas = GameObject.Find("HUD");
@@ -73,7 +86,22 @@ public class GameManager : MonoBehaviour
         hudRequestList = new List<GameObject>();
 
         playerList = GetRandomPlayers();
+
+        foreach(FactoryEvent f in events)
+        {
+            StartCoroutine(StartEvent(f));
+        }
     }
+
+    private IEnumerator StartEvent(FactoryEvent factoryEvent)
+    {
+        yield return new WaitForSeconds(factoryEvent.timer);
+        factoryEvent.eventToStart.GetComponent<IEvent>().StartEvent();
+
+        if(factoryEvent.loop)
+            StartCoroutine(StartEvent(factoryEvent));
+    }
+
 
     void FixedUpdate()
     {
@@ -161,9 +189,9 @@ public class GameManager : MonoBehaviour
     private void AddRandomDominoRequest()
     {
         timeSinceLastBlockRequest = 0f;
-        timeBeforeNextBlockRequest = Random.Range(delayBetweenRequestsLowerBound, delayBetweenRequestsUpperBound);
+        timeBeforeNextBlockRequest = UnityEngine.Random.Range(delayBetweenRequestsLowerBound, delayBetweenRequestsUpperBound);
 
-        var playerIndex = Random.Range(0, playerList.Count);
+        var playerIndex = UnityEngine.Random.Range(0, playerList.Count);
         var player = playerList[playerIndex];
         playerList.RemoveAt(playerIndex);
 

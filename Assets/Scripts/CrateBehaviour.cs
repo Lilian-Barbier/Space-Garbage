@@ -2,18 +2,17 @@ using Models;
 using UnityEngine;
 using Utils;
 
-public class BoxBehaviour : MonoBehaviour
+public class CrateBehaviour : MonoBehaviour
 {
     [SerializeField] GameObject dominoPrefab;
     [SerializeField] int dominoLength = 1;
 
 
-
-    public Transform GetObject()
+    public Transform GetObject(bool instantiateWithColliderTrigger = true)
     {
         //Dégueu
         var newDomino = Instantiate(dominoPrefab, new Vector3(100, 100, 0), Quaternion.identity);
-        newDomino.GetComponent<Collider2D>().isTrigger = true; 
+        newDomino.GetComponent<Collider2D>().isTrigger = instantiateWithColliderTrigger; 
         switch (dominoLength)
         {
             case 1:
