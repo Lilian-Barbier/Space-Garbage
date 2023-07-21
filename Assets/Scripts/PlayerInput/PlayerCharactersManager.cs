@@ -72,11 +72,11 @@ public class PlayerCharactersManager : MonoBehaviour
             isStarted = true;
 
             //Trigger Animation before start
-            StartCoroutine(StartLevelAfterDelay(1.5f));
+            StartCoroutine(StartLevelAfterDelay());
         }
     }
 
-    IEnumerator StartLevelAfterDelay(float delay)
+    IEnumerator StartLevelAfterDelay()
     {
         text.text = "";
 
@@ -85,7 +85,10 @@ public class PlayerCharactersManager : MonoBehaviour
         inputManager.joinBehavior = PlayerJoinBehavior.JoinPlayersManually;
         inputManager.playerPrefab = playerPrefab;
 
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSeconds(1f);
+        GameObject.FindGameObjectWithTag("LevelLoader").GetComponentInChildren<Animator>().SetTrigger("End");  
+
+        yield return new WaitForSeconds(1.5f);
         SceneManager.LoadScene("ChooseLvl");
     }
     #endregion 

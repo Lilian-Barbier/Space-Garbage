@@ -11,12 +11,12 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private int life = 3;
 
-    private static readonly float initialDominoRequestDuration = 42f;
-    private static readonly float minDominoRequestDuration = 34f;
+    private static readonly float initialDominoRequestDuration = 40f;
+    private static readonly float minDominoRequestDuration = 30f;
     
     public float dominoRequestDuration = initialDominoRequestDuration;
 
-    private static readonly  float timeToReachMinimumRequestDuration = 900f;
+    private static readonly  float timeToReachMinimumRequestDuration = 180;
 
     [SerializeField] private Sprite defaultBlockSprite;
     [SerializeField] private Sprite blueBlockSprite;
@@ -37,12 +37,12 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private FactoryEvent[] events;
 
-    private static readonly float minUpperBound = 20f;
-    private static readonly float initialUpperBound = 32f;
-    private static readonly float minLowerBound = 8f;
-    private static readonly float initialLowerBound = 16f;
+    private static readonly float minUpperBound = 30f;
+    private static readonly float initialUpperBound = 40f;
+    private static readonly float minLowerBound = 15f;
+    private static readonly float initialLowerBound = 25f;
 
-    private static readonly  float timeToReachMinimumDelayBetweenRequests = 600f;
+    private static readonly  float timeToReachMinimumDelayBetweenRequests = 180;
 
     private float delayBetweenRequestsLowerBound = initialLowerBound;
     private float delayBetweenRequestsUpperBound = initialUpperBound;
@@ -145,6 +145,7 @@ public class GameManager : MonoBehaviour
             if (dominoRequestList[i].RemainingTime < 0)
             {
                 life--;
+                CameraShake.Instance.MediumShake();
                 hearthManager.LifeChanged(life);
                 if (life <= 0)
                 {
