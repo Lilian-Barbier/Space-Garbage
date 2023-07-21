@@ -6,6 +6,7 @@ public class CrateBehaviour : MonoBehaviour
 {
     [SerializeField] GameObject dominoPrefab;
     [SerializeField] int dominoLength = 1;
+    [SerializeField] Vector2 releaseDirection = Vector2.up;
 
 
     public Transform GetObject(bool instantiateWithColliderTrigger = true)
@@ -28,5 +29,11 @@ public class CrateBehaviour : MonoBehaviour
         
         return newDomino.transform;
         //Proc Animation
+    }
+
+    public void ReleaseDomino()
+    {
+        var block = GetObject(instantiateWithColliderTrigger: false);
+        block.transform.position = transform.position + (Vector3)releaseDirection;
     }
 }

@@ -3,17 +3,18 @@ using UnityEngine;
 public class EarthQuakeCratesEvents : MonoBehaviour, IEvent
 {
     double eventDuration;
-    double spawnBlocksByHalfSecond;
+    double spawnBlocksByDuration;
     GameObject[] crates;
+    float duration = 0.8f;
 
     public void StartEvent()
     {
-        eventDuration = 3;
-        spawnBlocksByHalfSecond = 1;
+        eventDuration = 4;
+        spawnBlocksByDuration = 2;
 
         crates = GameObject.FindGameObjectsWithTag("Crate");
 
-        InvokeRepeating(nameof(InstantiateBlocks), 0.5f, 0.5f);
+        InvokeRepeating(nameof(InstantiateBlocks), duration, duration);
     }
 
 
@@ -21,18 +22,14 @@ public class EarthQuakeCratesEvents : MonoBehaviour, IEvent
     {
         CameraShake.Instance.Shake(0.025f, 0.4f);
 
-        eventDuration--;
+        eventDuration -= duration;
 
-        for (int i = 0; i < spawnBlocksByHalfSecond; i++)
+        for (int i = 0; i < spawnBlocksByDuration; i++)
         {
-            var crate = crates[Random.Range(0, crates.Length)].GetComponent<CrateBehaviour>();
-            var block = crate.GetObject(instantiateWithColliderTrigger: false);
-
-            block.transform.position = crate.transform.position;
+            crates[Random.Range(0, crates.Length)].GetComponent<CrateBehaviour>().ReleaseDomino();
         }
 
         if (eventDuration < 1)
-
         {
             CancelInvoke(nameof(InstantiateBlocks));
         }
