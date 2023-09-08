@@ -1,13 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using static SocketDominoManager;
 
-public class CharacterController : MonoBehaviour
+public class DistantCharacterController : MonoBehaviour
 {
     bool isStopped;
     Rigidbody2D rigidbodyCharacter;
@@ -41,8 +39,10 @@ public class CharacterController : MonoBehaviour
     [SerializeField] float dashCooldown;
 
     SocketDominoManager socketManager;
-    float movementUpdateTimer = 0f;
-    float movementUpdateCooldown = 0.2f;
+    public string socketId;
+
+
+    Vector2 targetPosition;
 
     void Start()
     {
@@ -57,7 +57,17 @@ public class CharacterController : MonoBehaviour
 
         socketManager = Camera.main.GetComponent<SocketDominoManager>();
 
+        targetPosition = transform.position;
 
+        socketManager.socket.On("playerMoved", (response) =>
+        {
+            var obj = response.GetValue<PlayerInformation>();
+            if(obj.id == socketId)
+            {
+                Debug.Log(obj);
+                targetPosition = new Vector2(obj.x, obj.y);
+            }
+        });
     }
 
     void FixedUpdate()
@@ -68,86 +78,60 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
-            movementUpdateTimer += Time.deltaTime;
-            if (movement != Vector2.zero && movementUpdateTimer > movementUpdateCooldown)
+            if(targetPosition != (Vector2)transform.position)
             {
-                movementUpdateTimer = 0f;
-                socketManager.Move(transform.position);
+                var newPosition = Vector2.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+                movement = newPosition - (Vector2)transform.position;
+
+                transform.position = newPosition;
+
+                var isMovingSide = false;
+                var isMovingUp = false;
+                var isMovingDown = false;
+
+                if (movement != Vector2.zero && movement.magnitude > 0.8)
+                {
+                    lastDirection = movement;
+                }
+
+                if (movement.x > 0.5 || movement.x < -0.5)
+                {
+                    isMovingSide = true;
+                    spriteRenderer.flipX = movement.x < 0;
+                }
+                else if (movement.y < 0)
+                {
+                    isMovingDown = true;
+                }
+                else if (movement.y > 0)
+                {
+                    isMovingUp = true;
+                }
+
+                animator.SetBool("isMovingSide", isMovingSide);
+                animator.SetBool("isMovingUp", isMovingUp);
+                animator.SetBool("isMovingDown", isMovingDown);
+
+
             }
 
 
-            #region Move player
-            var isMovingSide = false;
-            var isMovingUp = false;
-            var isMovingDown = false;
 
-            if (!isStopped)
-            {
-                dashTimer += Time.deltaTime;
+            //if (objectCarried != null)
+            //{
+            //    if (movement != Vector2.zero)
+            //    {
+            //        objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor + offsetObjectCarriedDistance;
+            //        objectCarried.GetComponent<SpriteRenderer>().sortingOrder = movement.y < 0 && movement.x < 0.4 && movement.x > -0.4 ? 15 : 5;
+            //    }
+            //    else
+            //    {
+            //        objectCarried.position = transform.position + (Vector3)(lastDirection * objectCarriedDistanceFactor) + offsetObjectCarriedDistance;
+            //        objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirection.y > 0.5 ? 5 : 15;
+            //    }
 
-                if (dashTimer > dashCooldown)
-                {
-                    canDash = true;
-                }
+            //}
 
-                if (isDashing)
-                {
-                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + dashSpeed * Time.deltaTime * lastDirection);
-
-
-                    if (dashTimer > dashDuration)
-                    {
-                        isDashing = false;
-                    }
-                }
-                else
-                {
-                    if (movement != Vector2.zero && movement.magnitude > 0.8)
-                    {
-                        lastDirection = movement;
-                    }
-
-                    if (movement.x > 0.5 || movement.x < -0.5)
-                    {
-                        isMovingSide = true;
-                        spriteRenderer.flipX = movement.x < 0;
-                    }
-                    else if (movement.y < 0)
-                    {
-                        isMovingDown = true;
-                    }
-                    else if (movement.y > 0)
-                    {
-                        isMovingUp = true;
-                    }
-
-                    interactTriggerZone.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.down, lastDirection));
-                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + speed * Time.deltaTime * movement);
-
-                }
-
-            }
-
-            animator.SetBool("isMovingSide", isMovingSide);
-            animator.SetBool("isMovingUp", isMovingUp);
-            animator.SetBool("isMovingDown", isMovingDown);
-
-            if (objectCarried != null)
-            {
-                if (movement != Vector2.zero)
-                {
-                    objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor + offsetObjectCarriedDistance;
-                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = movement.y < 0 && movement.x < 0.4 && movement.x > -0.4 ? 15 : 5;
-                }
-                else
-                {
-                    objectCarried.position = transform.position + (Vector3)(lastDirection * objectCarriedDistanceFactor) + offsetObjectCarriedDistance;
-                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirection.y > 0.5 ? 5 : 15;
-                }
-
-            }
-
-            #endregion In movement
 
             UpdateOutlines();
         }

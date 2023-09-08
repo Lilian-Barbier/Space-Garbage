@@ -17,6 +17,7 @@ TagManager:
   - Spawns
   - Crate
   - LevelLoader
+  - DistantPlayer
   layers:
   - Default
   - TransparentFX
