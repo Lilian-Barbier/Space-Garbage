@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 
 public class CharacterController : MonoBehaviour
 {
@@ -37,6 +38,25 @@ public class CharacterController : MonoBehaviour
     [SerializeField] float dashDuration;
     [SerializeField] float dashCooldown;
 
+    [SerializeField] TileBase tileConveyorRight;
+    [SerializeField] TileBase tileConveyorLeft;
+
+    private Tilemap conveyorBeltRight;
+    private Tilemap conveyorBeltLeft;
+    private Tilemap conveyorBeltDown;
+    private Tilemap conveyorBeltUp;
+    private Tilemap conveyorBeltHologram;
+
+    private Direction conveyorDirection = Direction.Right;
+
+    enum Direction
+    {
+        Right,
+        Left,
+        Up,
+        Down
+    }
+
     void Start()
     {
         rigidbodyCharacter = GetComponent<Rigidbody2D>();
@@ -47,6 +67,10 @@ public class CharacterController : MonoBehaviour
         assembler = assemblerGameObject.GetComponent<AssemblerBehavior>();
 
         interactTriggerZone = transform.GetChild(0);
+
+        conveyorBeltRight = GameObject.FindGameObjectWithTag("ConveyorBeltRight").GetComponent<Tilemap>();
+        conveyorBeltLeft = GameObject.FindGameObjectWithTag("ConveyorBeltLeft").GetComponent<Tilemap>();
+        conveyorBeltHologram = GameObject.FindGameObjectWithTag("ConveyorBeltHologram").GetComponent<Tilemap>();
     }
 
     void FixedUpdate()
@@ -55,6 +79,25 @@ public class CharacterController : MonoBehaviour
         
         UpdateMovements();
         UpdateOutlines();
+
+        UpdateHologramConstruction();
+    }
+
+    void UpdateHologramConstruction()
+    {
+        TileBase selectedConveyorTile = tileConveyorRight;
+        switch(conveyorDirection)
+        {
+            case Direction.Right:
+                selectedConveyorTile = tileConveyorRight;
+                break;
+            case Direction.Left:
+                selectedConveyorTile = tileConveyorLeft;
+                break;
+        }
+
+        conveyorBeltHologram.ClearAllTiles();  
+        conveyorBeltHologram.SetTile(conveyorBeltHologram.WorldToCell(transform.position + (Vector3)lastDirection), selectedConveyorTile);
     }
 
     void UpdateMovements()
@@ -156,30 +199,50 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
-            var interactibleObjectsNear = GetColliderAroundPlayerOrderByDistance(getTriggerCollider : true);
-            var interactibleObjectsInFront = GetColliderInFrontPlayerOrderByDistance();
+            //In construction mode : 
 
-            //Si le joueur à un objet il va le déposer
-            if (objectCarried != null)
+            TileBase selectedConveyorTile = tileConveyorRight;
+            Tilemap selectedTilemap = conveyorBeltRight;
+            switch (conveyorDirection)
             {
-                if (interactibleObjectsNear.Any(o => o.transform.CompareTag("AssemblerButton")))
-                    AddHologramToAssembler();
-                else
-                    DropObject();
+                case Direction.Right:
+                    selectedConveyorTile = tileConveyorRight;
+                    selectedTilemap = conveyorBeltRight;
+                    break;
+                case Direction.Left:
+                    selectedConveyorTile = tileConveyorLeft;
+                    selectedTilemap = conveyorBeltLeft;
+                    break;
             }
-            //Sinon il va tenter d'en attraper un
-            else
-            {
-                if ((interactibleObjectsNear.Any(o => o.transform.CompareTag("Assembler")) || interactibleObjectsInFront.Any(o => o.transform.CompareTag("Assembler"))) && !assembler.IsEmpty())
-                {   
-                    objectCarried = assembler.TakeDominoOut().transform;
-                    objectCarried.GetComponent<Collider2D>().isTrigger = true;
-                }
-                else
-                {
-                    GetObjectNear();
-                }
-            }
+
+            selectedTilemap.SetTile(selectedTilemap.WorldToCell(transform.position + (Vector3)lastDirection), selectedConveyorTile);
+
+
+
+            //var interactibleObjectsNear = GetColliderAroundPlayerOrderByDistance(getTriggerCollider : true);
+            //var interactibleObjectsInFront = GetColliderInFrontPlayerOrderByDistance();
+
+            ////Si le joueur à un objet il va le déposer
+            //if (objectCarried != null)
+            //{
+            //    if (interactibleObjectsNear.Any(o => o.transform.CompareTag("AssemblerButton")))
+            //        AddHologramToAssembler();
+            //    else
+            //        DropObject();
+            //}
+            ////Sinon il va tenter d'en attraper un
+            //else
+            //{
+            //    if ((interactibleObjectsNear.Any(o => o.transform.CompareTag("Assembler")) || interactibleObjectsInFront.Any(o => o.transform.CompareTag("Assembler"))) && !assembler.IsEmpty())
+            //    {   
+            //        objectCarried = assembler.TakeDominoOut().transform;
+            //        objectCarried.GetComponent<Collider2D>().isTrigger = true;
+            //    }
+            //    else
+            //    {
+            //        GetObjectNear();
+            //    }
+            //}
 
         }
     }
@@ -211,13 +274,40 @@ public class CharacterController : MonoBehaviour
     public void RotateClockwise(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
-        RotateDomino(true);
+
+        //In construction mode 
+        RotateConveyor(true);
+        
+        //RotateDomino(true);
     }
 
     public void RotateCounterClockwise(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
-        RotateDomino(false);
+
+        //In construction mode 
+        RotateConveyor(true);
+
+        //RotateDomino(false);
+    }
+
+    private void RotateConveyor(bool clockwise)
+    {
+        switch (conveyorDirection)
+        {
+            case Direction.Right:
+                conveyorDirection = clockwise ? Direction.Down : Direction.Up;
+                break;
+            case Direction.Left:
+                conveyorDirection = clockwise ? Direction.Up : Direction.Down;
+                break;
+            case Direction.Up:
+                conveyorDirection = clockwise ? Direction.Right : Direction.Left;
+                break;
+            case Direction.Down:
+                conveyorDirection = clockwise ? Direction.Left : Direction.Right;
+                break;
+        }
     }
 
     private void RotateDomino(bool clockwise)
