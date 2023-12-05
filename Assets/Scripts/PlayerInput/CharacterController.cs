@@ -139,6 +139,7 @@ public class CharacterController : MonoBehaviour
     {
         if (ctx.performed && canDash)
         {
+            CameraShake.Instance.LittleShake();
             canDash = false;
             isDashing = true;
             dashTimer = 0f;
@@ -256,10 +257,10 @@ public class CharacterController : MonoBehaviour
             return;
         }
 
-        Collider2D box = GetNearestObjectInCollidersByTag(interactableObjects, "Box");
+        Collider2D box = GetNearestObjectInCollidersByTag(interactableObjects, "Crate");
         if (box != null)
         {
-            BoxBehaviour boxBehaviour = box.GetComponent<BoxBehaviour>();
+            CrateBehaviour boxBehaviour = box.GetComponent<CrateBehaviour>();
             objectCarried = boxBehaviour.GetObject();
             return;
         }

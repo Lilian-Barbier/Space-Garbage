@@ -1,27 +1,48 @@
+using Enums;
+using Models;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Utils;
-using Models;
+using static GameManager;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private int life = 3;
 
-    // Domino Request Management
-
-    private static readonly float initialDominoRequestDuration = 42f;
-    private static readonly float minDominoRequestDuration = 34f;
+    private static readonly float initialDominoRequestDuration = 40f;
+    private static readonly float minDominoRequestDuration = 30f;
     
     public float dominoRequestDuration = initialDominoRequestDuration;
 
-    private static readonly  float timeToReachMinimumRequestDuration = 900f;
+    private static readonly  float timeToReachMinimumRequestDuration = 180;
 
-    private static readonly float minUpperBound = 20f;
-    private static readonly float initialUpperBound = 32f;
-    private static readonly float minLowerBound = 8f;
-    private static readonly float initialLowerBound = 16f;
+    [SerializeField] private Sprite defaultBlockSprite;
+    [SerializeField] private Sprite blueBlockSprite;
+    [SerializeField] private Sprite lightBlueBlockSprite;
+    [SerializeField] private Sprite redBlockSprite;
+    [SerializeField] private Sprite lightRedBlockSprite;
+    [SerializeField] private Sprite blackBlockSprite;
 
-    private static readonly  float timeToReachMinimumDelayBetweenRequests = 600f;
+    //Dictionnaire contenants les événements ainsi que les timers 
+    [Serializable]
+    public struct FactoryEvent
+    {
+        public float timer;
+        //Todo: essayer de passer à une référence de script plutot que via un prefab
+        public GameObject eventToStart;
+        public bool loop;
+    }
+
+    [SerializeField] private FactoryEvent[] events;
+
+    private static readonly float minUpperBound = 30f;
+    private static readonly float initialUpperBound = 40f;
+    private static readonly float minLowerBound = 15f;
+    private static readonly float initialLowerBound = 25f;
+
+    private static readonly  float timeToReachMinimumDelayBetweenRequests = 180;
 
     private float delayBetweenRequestsLowerBound = initialLowerBound;
     private float delayBetweenRequestsUpperBound = initialUpperBound;
@@ -62,7 +83,22 @@ public class GameManager : MonoBehaviour
         hudRequestList = new List<GameObject>();
 
         playerList = GetRandomPlayers();
+
+        foreach(FactoryEvent f in events)
+        {
+            StartCoroutine(StartEvent(f));
+        }
     }
+
+    private IEnumerator StartEvent(FactoryEvent factoryEvent)
+    {
+        yield return new WaitForSeconds(factoryEvent.timer);
+        factoryEvent.eventToStart.GetComponent<IEvent>().StartEvent();
+
+        if(factoryEvent.loop)
+            StartCoroutine(StartEvent(factoryEvent));
+    }
+
 
     void FixedUpdate()
     {
@@ -106,7 +142,8 @@ public class GameManager : MonoBehaviour
             if (dominoRequestList[i].RemainingTime < 0)
             {
                 life--;
-                // hearthManager.LifeChanged(life);
+                CameraShake.Instance.MediumShake();
+                //hearthManager.LifeChanged(life);
                 if (life <= 0)
                 {
                     EndLevel();
@@ -150,9 +187,9 @@ public class GameManager : MonoBehaviour
     private void AddRandomDominoRequest()
     {
         timeSinceLastBlockRequest = 0f;
-        timeBeforeNextBlockRequest = Random.Range(delayBetweenRequestsLowerBound, delayBetweenRequestsUpperBound);
+        timeBeforeNextBlockRequest = UnityEngine.Random.Range(delayBetweenRequestsLowerBound, delayBetweenRequestsUpperBound);
 
-        var playerIndex = Random.Range(0, playerList.Count);
+        var playerIndex = UnityEngine.Random.Range(0, playerList.Count);
         var player = playerList[playerIndex];
         playerList.RemoveAt(playerIndex);
 
