@@ -40,6 +40,8 @@ public class CharacterController : MonoBehaviour
 
     [SerializeField] TileBase tileConveyorRight;
     [SerializeField] TileBase tileConveyorLeft;
+    [SerializeField] TileBase tileConveyorUp;
+    [SerializeField] TileBase tileConveyorDown;
 
     private Tilemap conveyorBeltRight;
     private Tilemap conveyorBeltLeft;
@@ -70,13 +72,15 @@ public class CharacterController : MonoBehaviour
 
         conveyorBeltRight = GameObject.FindGameObjectWithTag("ConveyorBeltRight").GetComponent<Tilemap>();
         conveyorBeltLeft = GameObject.FindGameObjectWithTag("ConveyorBeltLeft").GetComponent<Tilemap>();
+        conveyorBeltUp = GameObject.FindGameObjectWithTag("ConveyorBeltUp").GetComponent<Tilemap>();
+        conveyorBeltDown = GameObject.FindGameObjectWithTag("ConveyorBeltDown").GetComponent<Tilemap>();
         conveyorBeltHologram = GameObject.FindGameObjectWithTag("ConveyorBeltHologram").GetComponent<Tilemap>();
     }
 
     void FixedUpdate()
     {
-        if(assemblerHologram != null) return;
-        
+        if (assemblerHologram != null) return;
+
         UpdateMovements();
         UpdateOutlines();
 
@@ -86,7 +90,7 @@ public class CharacterController : MonoBehaviour
     void UpdateHologramConstruction()
     {
         TileBase selectedConveyorTile = tileConveyorRight;
-        switch(conveyorDirection)
+        switch (conveyorDirection)
         {
             case Direction.Right:
                 selectedConveyorTile = tileConveyorRight;
@@ -94,9 +98,15 @@ public class CharacterController : MonoBehaviour
             case Direction.Left:
                 selectedConveyorTile = tileConveyorLeft;
                 break;
+            case Direction.Up:
+                selectedConveyorTile = tileConveyorUp;
+                break;
+            case Direction.Down:
+                selectedConveyorTile = tileConveyorDown;
+                break;
         }
 
-        conveyorBeltHologram.ClearAllTiles();  
+        conveyorBeltHologram.ClearAllTiles();
         conveyorBeltHologram.SetTile(conveyorBeltHologram.WorldToCell(transform.position + (Vector3)lastDirection), selectedConveyorTile);
     }
 
@@ -115,60 +125,60 @@ public class CharacterController : MonoBehaviour
                 canDash = true;
             }
 
-                if (isDashing)
+            if (isDashing)
+            {
+                rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + dashSpeed * Time.fixedDeltaTime * lastDirection);
+
+
+                if (dashTimer > dashDuration)
                 {
-                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + dashSpeed * Time.fixedDeltaTime * lastDirection);
-
-
-                    if (dashTimer > dashDuration)
-                    {
-                        isDashing = false;
-                    }
+                    isDashing = false;
                 }
-                else
+            }
+            else
+            {
+                if (movement != Vector2.zero && movement.magnitude > 0.8)
                 {
-                    if (movement != Vector2.zero && movement.magnitude > 0.8)
-                    {
-                        lastDirection = movement;
-                    }
-
-                    if (movement.y < -0.5)
-                    {
-                        isMovingDown = true;
-                    }
-                    else if (movement.y > 0.5)
-                    {
-                        isMovingUp = true;
-                    }
-                    else if (movement.x != 0)
-                    {
-                        isMovingSide = true;
-                        spriteRenderer.flipX = movement.x < 0;
-                    }
-
-                    interactTriggerZone.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.down, lastDirection));
-                    rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + speed * Time.fixedDeltaTime * movement);
-
+                    lastDirection = movement;
                 }
+
+                if (movement.y < -0.5)
+                {
+                    isMovingDown = true;
+                }
+                else if (movement.y > 0.5)
+                {
+                    isMovingUp = true;
+                }
+                else if (movement.x != 0)
+                {
+                    isMovingSide = true;
+                    spriteRenderer.flipX = movement.x < 0;
+                }
+
+                interactTriggerZone.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.down, lastDirection));
+                rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + speed * Time.fixedDeltaTime * movement);
 
             }
 
-            animator.SetBool("isMovingSide", isMovingSide);
-            animator.SetBool("isMovingUp", isMovingUp);
-            animator.SetBool("isMovingDown", isMovingDown);
+        }
 
-            if (objectCarried != null)
+        animator.SetBool("isMovingSide", isMovingSide);
+        animator.SetBool("isMovingUp", isMovingUp);
+        animator.SetBool("isMovingDown", isMovingDown);
+
+        if (objectCarried != null)
+        {
+            if (movement != Vector2.zero)
             {
-                if (movement != Vector2.zero)
-                {
-                    objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor + offsetObjectCarriedDistance;
-                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = movement.y < 0 && movement.x < 0.4 && movement.x > -0.4 ? 15 : 5;
-                }
-                else
-                {
-                    objectCarried.position = transform.position + (Vector3)(lastDirection * objectCarriedDistanceFactor) + offsetObjectCarriedDistance;
-                    objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirection.y > 0.5 ? 5 : 15;
-                }
+                objectCarried.position = transform.position + (Vector3)movement.normalized * objectCarriedDistanceFactor + offsetObjectCarriedDistance;
+                objectCarried.GetComponent<SpriteRenderer>().sortingOrder = movement.y < 0 && movement.x < 0.4 && movement.x > -0.4 ? 15 : 5;
+            }
+            else
+            {
+                objectCarried.position = transform.position + (Vector3)(lastDirection * objectCarriedDistanceFactor) + offsetObjectCarriedDistance;
+                objectCarried.GetComponent<SpriteRenderer>().sortingOrder = lastDirection.y > 0.5 ? 5 : 15;
+            }
 
         }
     }
@@ -203,6 +213,9 @@ public class CharacterController : MonoBehaviour
 
             TileBase selectedConveyorTile = tileConveyorRight;
             Tilemap selectedTilemap = conveyorBeltRight;
+
+            Debug.Log(conveyorDirection);
+
             switch (conveyorDirection)
             {
                 case Direction.Right:
@@ -212,6 +225,14 @@ public class CharacterController : MonoBehaviour
                 case Direction.Left:
                     selectedConveyorTile = tileConveyorLeft;
                     selectedTilemap = conveyorBeltLeft;
+                    break;
+                case Direction.Up:
+                    selectedConveyorTile = tileConveyorUp;
+                    selectedTilemap = conveyorBeltUp;
+                    break;
+                case Direction.Down:
+                    selectedConveyorTile = tileConveyorDown;
+                    selectedTilemap = conveyorBeltDown;
                     break;
             }
 
@@ -277,7 +298,7 @@ public class CharacterController : MonoBehaviour
 
         //In construction mode 
         RotateConveyor(true);
-        
+
         //RotateDomino(true);
     }
 
@@ -341,7 +362,7 @@ public class CharacterController : MonoBehaviour
 
         //Sinon on essaie de prendre un bloc d'une table
         TableBehaviour tableBehaviour = GetFirstTableWithObject(interactableObjects);
-        if(tableBehaviour != null)
+        if (tableBehaviour != null)
         {
             objectCarried = tableBehaviour.GetObjectCarried();
             return;
@@ -376,7 +397,7 @@ public class CharacterController : MonoBehaviour
     {
         if (assembler.TryInsertHologram(assemblerHologram))
         {
-            
+
             Destroy(objectCarried.gameObject);
             objectCarried = null;
 
@@ -499,7 +520,7 @@ public class CharacterController : MonoBehaviour
     }
 
     #endregion
-   
+
     void UpdateOutlines()
     {
         IEnumerable<Collider2D> interactableObjects = GetColliderInFrontPlayerOrderByDistance();
