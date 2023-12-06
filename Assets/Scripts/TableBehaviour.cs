@@ -13,7 +13,7 @@ public class TableBehaviour : MonoBehaviour
         
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.transform.CompareTag("Blocks") && objectCarried == null)
         {
@@ -26,12 +26,15 @@ public class TableBehaviour : MonoBehaviour
         timeOnTable = 0;
         objectCarried = newObjectCarried;
         objectCarried.GetComponent<Collider2D>().isTrigger = true;
+        objectCarried.GetComponent<Rigidbody2D>().isKinematic = true;
         objectCarried.position = transform.position + new Vector3(0, 0.25f, 0);
     }
 
     public virtual Transform GetObjectCarried()
     {
         timeOnTable = 0;
+        objectCarried.GetComponent<Collider2D>().isTrigger = false;
+        objectCarried.GetComponent<Rigidbody2D>().isKinematic = false;
         var tmpObjectCarried = objectCarried;
         objectCarried = null;
         return tmpObjectCarried;

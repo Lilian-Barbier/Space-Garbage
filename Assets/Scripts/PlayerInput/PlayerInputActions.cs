@@ -89,6 +89,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChangeAction"",
+                    ""type"": ""Button"",
+                    ""id"": ""1fe27b60-e35a-46ec-bdf0-9eec4259104f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -553,6 +562,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Selection"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""309a1a7f-163e-4c89-ba7a-793db479a9ee"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeAction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -568,6 +588,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_RotateClockwise = m_Player.FindAction("RotateClockwise", throwIfNotFound: true);
         m_Player_RotateCounterClockwise = m_Player.FindAction("RotateCounterClockwise", throwIfNotFound: true);
         m_Player_Start = m_Player.FindAction("Start", throwIfNotFound: true);
+        m_Player_ChangeAction = m_Player.FindAction("ChangeAction", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -636,6 +657,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_RotateClockwise;
     private readonly InputAction m_Player_RotateCounterClockwise;
     private readonly InputAction m_Player_Start;
+    private readonly InputAction m_Player_ChangeAction;
     public struct PlayerActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -647,6 +669,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @RotateClockwise => m_Wrapper.m_Player_RotateClockwise;
         public InputAction @RotateCounterClockwise => m_Wrapper.m_Player_RotateCounterClockwise;
         public InputAction @Start => m_Wrapper.m_Player_Start;
+        public InputAction @ChangeAction => m_Wrapper.m_Player_ChangeAction;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -677,6 +700,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Start.started += instance.OnStart;
             @Start.performed += instance.OnStart;
             @Start.canceled += instance.OnStart;
+            @ChangeAction.started += instance.OnChangeAction;
+            @ChangeAction.performed += instance.OnChangeAction;
+            @ChangeAction.canceled += instance.OnChangeAction;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -702,6 +728,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Start.started -= instance.OnStart;
             @Start.performed -= instance.OnStart;
             @Start.canceled -= instance.OnStart;
+            @ChangeAction.started -= instance.OnChangeAction;
+            @ChangeAction.performed -= instance.OnChangeAction;
+            @ChangeAction.canceled -= instance.OnChangeAction;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -728,5 +757,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnRotateClockwise(InputAction.CallbackContext context);
         void OnRotateCounterClockwise(InputAction.CallbackContext context);
         void OnStart(InputAction.CallbackContext context);
+        void OnChangeAction(InputAction.CallbackContext context);
     }
 }

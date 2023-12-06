@@ -67,6 +67,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ChangeAction",
+                    "type": "Button",
+                    "id": "1fe27b60-e35a-46ec-bdf0-9eec4259104f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -531,6 +540,17 @@
                     "action": "Selection",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "309a1a7f-163e-4c89-ba7a-793db479a9ee",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ChangeAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

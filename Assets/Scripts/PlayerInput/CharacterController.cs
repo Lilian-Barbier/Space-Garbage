@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 public class CharacterController : MonoBehaviour
 {
@@ -51,6 +53,19 @@ public class CharacterController : MonoBehaviour
 
     private Direction conveyorDirection = Direction.Right;
 
+    private PlayerAction selectedAction;
+
+    [SerializeField] Image handImageUI;
+    [SerializeField] Image eraseImageUI;
+    [SerializeField] Image constructImageUI;
+
+    enum PlayerAction
+    {
+        TakeObject,
+        RemoveConstruction,
+        Construct,
+    }
+
     enum Direction
     {
         Right,
@@ -75,6 +90,8 @@ public class CharacterController : MonoBehaviour
         conveyorBeltUp = GameObject.FindGameObjectWithTag("ConveyorBeltUp").GetComponent<Tilemap>();
         conveyorBeltDown = GameObject.FindGameObjectWithTag("ConveyorBeltDown").GetComponent<Tilemap>();
         conveyorBeltHologram = GameObject.FindGameObjectWithTag("ConveyorBeltHologram").GetComponent<Tilemap>();
+
+        selectedAction = PlayerAction.TakeObject;
     }
 
     void FixedUpdate()
@@ -82,9 +99,12 @@ public class CharacterController : MonoBehaviour
         if (assemblerHologram != null) return;
 
         UpdateMovements();
-        UpdateOutlines();
 
-        UpdateHologramConstruction();
+        if (selectedAction == PlayerAction.TakeObject)
+            UpdateOutlines();
+
+        else if (selectedAction == PlayerAction.Construct)
+            UpdateHologramConstruction();
     }
 
     void UpdateHologramConstruction()
@@ -108,6 +128,11 @@ public class CharacterController : MonoBehaviour
 
         conveyorBeltHologram.ClearAllTiles();
         conveyorBeltHologram.SetTile(conveyorBeltHologram.WorldToCell(transform.position + (Vector3)lastDirection), selectedConveyorTile);
+    }
+
+    void ClearHologramConstruction()
+    {
+        conveyorBeltHologram.ClearAllTiles();
     }
 
     void UpdateMovements()
@@ -210,67 +235,77 @@ public class CharacterController : MonoBehaviour
         else
         {
             //In construction mode : 
-
-            TileBase selectedConveyorTile = tileConveyorRight;
-            Tilemap selectedTilemap = conveyorBeltRight;
-
-            Debug.Log(conveyorDirection);
-
-            switch (conveyorDirection)
+            if (selectedAction == PlayerAction.Construct)
             {
-                case Direction.Right:
-                    selectedConveyorTile = tileConveyorRight;
-                    selectedTilemap = conveyorBeltRight;
-                    break;
-                case Direction.Left:
-                    selectedConveyorTile = tileConveyorLeft;
-                    selectedTilemap = conveyorBeltLeft;
-                    break;
-                case Direction.Up:
-                    selectedConveyorTile = tileConveyorUp;
-                    selectedTilemap = conveyorBeltUp;
-                    break;
-                case Direction.Down:
-                    selectedConveyorTile = tileConveyorDown;
-                    selectedTilemap = conveyorBeltDown;
-                    break;
+                TileBase selectedConveyorTile = tileConveyorRight;
+                Tilemap selectedTilemap = conveyorBeltRight;
+
+                Debug.Log(conveyorDirection);
+
+                switch (conveyorDirection)
+                {
+                    case Direction.Right:
+                        selectedConveyorTile = tileConveyorRight;
+                        selectedTilemap = conveyorBeltRight;
+                        break;
+                    case Direction.Left:
+                        selectedConveyorTile = tileConveyorLeft;
+                        selectedTilemap = conveyorBeltLeft;
+                        break;
+                    case Direction.Up:
+                        selectedConveyorTile = tileConveyorUp;
+                        selectedTilemap = conveyorBeltUp;
+                        break;
+                    case Direction.Down:
+                        selectedConveyorTile = tileConveyorDown;
+                        selectedTilemap = conveyorBeltDown;
+                        break;
+                }
+
+                selectedTilemap.SetTile(selectedTilemap.WorldToCell(transform.position + (Vector3)lastDirection), selectedConveyorTile);
+
             }
 
-            selectedTilemap.SetTile(selectedTilemap.WorldToCell(transform.position + (Vector3)lastDirection), selectedConveyorTile);
+            else if (selectedAction == PlayerAction.RemoveConstruction)
+            {
+                conveyorBeltRight.SetTile(conveyorBeltRight.WorldToCell(transform.position + (Vector3)lastDirection), null);
+                conveyorBeltLeft.SetTile(conveyorBeltRight.WorldToCell(transform.position + (Vector3)lastDirection), null);
+                conveyorBeltUp.SetTile(conveyorBeltRight.WorldToCell(transform.position + (Vector3)lastDirection), null);
+                conveyorBeltDown.SetTile(conveyorBeltRight.WorldToCell(transform.position + (Vector3)lastDirection), null);
+            }
 
+            else if (selectedAction == PlayerAction.TakeObject)
+            {
+                var interactibleObjectsNear = GetColliderAroundPlayerOrderByDistance(getTriggerCollider: true);
+                var interactibleObjectsInFront = GetColliderInFrontPlayerOrderByDistance();
 
-
-            //var interactibleObjectsNear = GetColliderAroundPlayerOrderByDistance(getTriggerCollider : true);
-            //var interactibleObjectsInFront = GetColliderInFrontPlayerOrderByDistance();
-
-            ////Si le joueur à un objet il va le déposer
-            //if (objectCarried != null)
-            //{
-            //    if (interactibleObjectsNear.Any(o => o.transform.CompareTag("AssemblerButton")))
-            //        AddHologramToAssembler();
-            //    else
-            //        DropObject();
-            //}
-            ////Sinon il va tenter d'en attraper un
-            //else
-            //{
-            //    if ((interactibleObjectsNear.Any(o => o.transform.CompareTag("Assembler")) || interactibleObjectsInFront.Any(o => o.transform.CompareTag("Assembler"))) && !assembler.IsEmpty())
-            //    {   
-            //        objectCarried = assembler.TakeDominoOut().transform;
-            //        objectCarried.GetComponent<Collider2D>().isTrigger = true;
-            //    }
-            //    else
-            //    {
-            //        GetObjectNear();
-            //    }
-            //}
-
+                //Si le joueur à un objet il va le déposer
+                if (objectCarried != null)
+                {
+                    if (interactibleObjectsNear.Any(o => o.transform.CompareTag("AssemblerButton")))
+                        AddHologramToAssembler();
+                    else
+                        DropObject();
+                }
+                //Sinon il va tenter d'en attraper un
+                else
+                {
+                    if ((interactibleObjectsNear.Any(o => o.transform.CompareTag("Assembler")) || interactibleObjectsInFront.Any(o => o.transform.CompareTag("Assembler"))) && !assembler.IsEmpty())
+                    {
+                        objectCarried = assembler.TakeDominoOut().transform;
+                        objectCarried.GetComponent<Collider2D>().isTrigger = true;
+                    }
+                    else
+                    {
+                        GetObjectNear();
+                    }
+                }
+            }
         }
     }
 
     public void MoveDominosInAssembler(InputAction.CallbackContext ctx)
     {
-
         if (!ctx.started) return;
 
         if (assemblerHologram != null)
@@ -296,20 +331,54 @@ public class CharacterController : MonoBehaviour
     {
         if (!ctx.performed) return;
 
-        //In construction mode 
-        RotateConveyor(true);
+        if (selectedAction == PlayerAction.Construct)
+            RotateConveyor(true);
 
-        //RotateDomino(true);
+        if (selectedAction == PlayerAction.TakeObject)
+            RotateDomino(true);
     }
 
     public void RotateCounterClockwise(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
 
-        //In construction mode 
-        RotateConveyor(true);
+        if (selectedAction == PlayerAction.Construct)
+            RotateConveyor(false);
 
-        //RotateDomino(false);
+        if (selectedAction == PlayerAction.TakeObject)
+            RotateDomino(false);
+    }
+
+    public void ChangeAction(InputAction.CallbackContext ctx)
+    {
+        if (!ctx.performed) return;
+
+        handImageUI.color = new Color(1, 1, 1, 0.5f);
+        eraseImageUI.color = new Color(1, 1, 1, 0.5f);
+        constructImageUI.color = new Color(1, 1, 1, 0.5f);
+
+        switch (selectedAction){
+            case PlayerAction.Construct:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.TakeObject;
+                handImageUI.color = new Color(1, 1, 1, 1);
+                break;
+
+            case PlayerAction.RemoveConstruction:
+                selectedAction = PlayerAction.Construct;
+                constructImageUI.color = new Color(1, 1, 1, 1);
+
+                break;
+
+            case PlayerAction.TakeObject:
+                if (objectCarried != null)
+                    DropObject();
+
+                selectedAction = PlayerAction.RemoveConstruction;
+                eraseImageUI.color = new Color(1, 1, 1, 1);
+                break;
+        };
+
     }
 
     private void RotateConveyor(bool clockwise)

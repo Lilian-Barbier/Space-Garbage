@@ -140,7 +140,7 @@ Transform:
   - {fileID: 8224879395397601629}
   - {fileID: 1863614193529994349}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5246783677351079528
 SpriteRenderer:
@@ -212,6 +212,13 @@ MonoBehaviour:
   dashSpeed: 8
   dashDuration: 0.2
   dashCooldown: 1
+  tileConveyorRight: {fileID: 11400000, guid: d2335248efaba124a8a8809d128bf704, type: 2}
+  tileConveyorLeft: {fileID: 11400000, guid: 40e3dd5010873514ea8b19ad2abd1ea3, type: 2}
+  tileConveyorUp: {fileID: 11400000, guid: e58faa84501c3eb42b6ddf68a3e045bb, type: 2}
+  tileConveyorDown: {fileID: 11400000, guid: 28e78c8e4eed2114bbbeadfc1889be1d, type: 2}
+  handImageUI: {fileID: 0}
+  eraseImageUI: {fileID: 0}
+  constructImageUI: {fileID: 0}
 --- !u!50 &7708331017817771909
 Rigidbody2D:
   serializedVersion: 4
@@ -397,6 +404,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 4ba3924b-05ae-4545-8917-3bb5e7c192e0
     m_ActionName: Redomino/Start[/Keyboard/enter,/DualShock4GamepadHID/start,/Keyboard/escape]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8608328819623727129}
+        m_TargetAssemblyTypeName: CharacterController, Assembly-CSharp
+        m_MethodName: ChangeAction
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 1fe27b60-e35a-46ec-bdf0-9eec4259104f
+    m_ActionName: Player/ChangeAction[/Keyboard/f]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
