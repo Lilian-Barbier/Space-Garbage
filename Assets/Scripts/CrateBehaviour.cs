@@ -17,13 +17,13 @@ public class CrateBehaviour : MonoBehaviour
         switch (dominoLength)
         {
             case 1:
-                newDomino.GetComponent<DominoBehavior>().domino = new Domino(DominoUtils.SingleBlock);
+                newDomino.GetComponent<TrashBehaviour>().trash = new Trash(TrashUtils.SingleBlock);
                 break;
             case 2:
-                newDomino.GetComponent<DominoBehavior>().domino = new Domino(DominoUtils.DoubleBlock);
+                newDomino.GetComponent<TrashBehaviour>().trash = new Trash(TrashUtils.DoubleBlock);
                 break;
             default:
-                newDomino.GetComponent<DominoBehavior>().domino = new Domino(DominoUtils.TripleBlock);
+                newDomino.GetComponent<TrashBehaviour>().trash = new Trash(TrashUtils.TripleBlock);
                 break;
         }
         

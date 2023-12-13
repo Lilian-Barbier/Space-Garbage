@@ -31,9 +31,9 @@ public class PainterBehaviour : TableBehaviour
         {
             if (objectCarried != null)
             {
-                var dominoBehaviour = objectCarried.GetComponent<DominoBehavior>();
+                var dominoBehaviour = objectCarried.GetComponent<TrashBehaviour>();
 
-                if(dominoBehaviour.domino.GetColor() != Enums.BlockColor.Failed)
+                if(dominoBehaviour.trash.GetColor() != Enums.BlockColor.Failed)
                 {
                     timeOnTable += Time.deltaTime;
                     slider.value = timeOnTable / timeForPaint;

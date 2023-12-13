@@ -4,8 +4,9 @@ using UnityEngine;
 using Utils;
 using Enums;
 using Models;
+using Assets.Scripts.Enums;
 
-public class DominoGenerator : MonoBehaviour
+public class TrashGenerator : MonoBehaviour
 {
     [SerializeField] private Sprite defaultBlockSprite;
     [SerializeField] private Sprite redBlockSprite;
@@ -25,9 +26,9 @@ public class DominoGenerator : MonoBehaviour
     private static readonly int blockSideSize = 5 * blockPixelSize;
     private static readonly int fullBlockHeight = blockSizeY + blockSideSize;
 
-    public Sprite GenerateDominoSprite(Domino domino, bool centerSprite = true)
+    public Sprite GenerateTrashSprite(Trash domino, bool centerSprite = true)
     {   
-        var minArea = centerSprite ? DominoUtils.GetMinimumDominoArea(domino): domino;
+        var minArea = centerSprite ? TrashUtils.GetMinimumDominoArea(domino): domino;
 
         int dominoPixelHeight = (minArea.Blocks.Length + 1) * blockSizeY;
         int dominoPixelWidth = minArea.Blocks[0].Length * blockSizeX;
@@ -56,7 +57,7 @@ public class DominoGenerator : MonoBehaviour
                 
                 if (!minArea.Blocks[blockY][blockX].Exists) continue;
 
-                var blockSprite = GetSpriteFromColor(minArea.Blocks[blockY][blockX].Color);
+                var blockSprite = GetSpriteFromMaterial(minArea.Blocks[blockY][blockX].Material);
                 
                 var posX = dominoPaddingLeft + blockX * blockSizeX;
                 var posY = spriteSize - 1 - dominoPaddingBottom - (blockY * (blockSizeY-1)) - fullBlockHeight;
@@ -76,24 +77,14 @@ public class DominoGenerator : MonoBehaviour
         return finalSprite;
     }
 
-    private Sprite GetSpriteFromColor(BlockColor color)
+    private Sprite GetSpriteFromMaterial(MaterialType color)
     {
         switch (color)
         {
-            case BlockColor.Red:
-                return redBlockSprite;
-            case BlockColor.Green:
+            case MaterialType.Organic:
                 return greenBlockSprite;
-            case BlockColor.Blue:
-                return blueBlockSprite;
-            case BlockColor.Purple:
-                return purpleBlockSprite;
-            case BlockColor.Yellow:
-                return yellowBlockSprite;
-            case BlockColor.Cyan:
-                return cyanBlockSprite;
-            case BlockColor.Failed:
-                return blackBlockSprite;
+            case MaterialType.Metal:
+                return defaultBlockSprite;
             default:
                 return defaultBlockSprite;
         }

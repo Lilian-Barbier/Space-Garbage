@@ -1,52 +1,55 @@
+using Assets.Scripts.Enums;
 using Enums;
 using Models;
 using System;
+using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 using Utils;
 
-public class DominoBehavior : MonoBehaviour
+public class TrashBehaviour : MonoBehaviour
 {
     [SerializeField]
     private bool setRandomDomino = false;
 
     SpriteRenderer spriteRenderer;
-    DominoGenerator dominoGenerator;
-    public Domino domino;
+    TrashGenerator dominoGenerator;
+    public Trash trash;
 
     int paintingLayer = 0;
 
     void Start()
     {
-        dominoGenerator = FindObjectOfType<DominoGenerator>().GetComponent<DominoGenerator>();
+        dominoGenerator = FindObjectOfType<TrashGenerator>().GetComponent<TrashGenerator>();
 
         if (setRandomDomino)
-            domino = new Domino(DominoUtils.GetRandomValidDomino(), DominoUtils.GetRandomColor());
+            trash = new Trash(TrashUtils.GetRandomValidDomino());
 
         SetSpriteAndCollider();
     }
 
-    public void SetDomino(Domino domino)
+    public void SetTrash(Trash domino)
     {
-        this.domino = domino;
+        this.trash = domino;
+        dominoGenerator = FindObjectOfType<TrashGenerator>().GetComponent<TrashGenerator>();
         SetSpriteAndCollider();
     }
 
     public void RotateDominoClockwise()
     {
-        domino.Blocks = DominoUtils.RotateDominoClockwise(domino.Blocks);
+        trash.Blocks = TrashUtils.RotateDominoClockwise(trash.Blocks);
         SetSpriteAndCollider();
     }
 
     public void RotateDominoCounterClockwise()
     {
-        domino.Blocks = DominoUtils.RotateDominoCounterClockwise(domino.Blocks);
+        trash.Blocks = TrashUtils.RotateDominoCounterClockwise(trash.Blocks);
         SetSpriteAndCollider();
     }
 
     void SetSpriteAndCollider()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = dominoGenerator.GenerateDominoSprite(domino);
+        spriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(trash);
 
         Sprite sprite = spriteRenderer.sprite;
         BoxCollider2D collider = gameObject.GetComponent<BoxCollider2D>();
@@ -66,51 +69,51 @@ public class DominoBehavior : MonoBehaviour
     //Fonctions utilisés dans l'assembleur
     public void MoveDominoUp()
     {
-        domino.Blocks = DominoUtils.MoveDominoUp(domino.Blocks);
+        trash.Blocks = TrashUtils.MoveDominoUp(trash.Blocks);
     }
     public void MoveDominoRight()
     {
-        domino.Blocks = DominoUtils.MoveDominoRight(domino.Blocks);
+        trash.Blocks = TrashUtils.MoveDominoRight(trash.Blocks);
     }
     public void MoveDominoLeft()
     {
-        domino.Blocks = DominoUtils.MoveDominoLeft(domino.Blocks);
+        trash.Blocks = TrashUtils.MoveDominoLeft(trash.Blocks);
     }
     public void MoveDominoDown()
     {
-        domino.Blocks = DominoUtils.MoveDominoDown(domino.Blocks);
+        trash.Blocks = TrashUtils.MoveDominoDown(trash.Blocks);
     }
 
     internal void AddColor(bool isPainterBlue, bool isPainterRed)
     {
         paintingLayer++;
 
-        if(domino.isAssembled)
+        if(trash.isAssembled)
         {
-            domino.SetColor(BlockColor.Failed);
+            trash.SetColor(BlockColor.Failed);
             SetSpriteAndCollider();
             return;
         }
 
         if (isPainterBlue)
         {
-            var color = domino.GetColor();
+            var color = trash.GetColor();
             if (color == BlockColor.Failed || color == BlockColor.Red || color == BlockColor.LightRed)
             {
-                domino.SetColor(BlockColor.Failed);
+                trash.SetColor(BlockColor.Failed);
             }
             else
             {
                 switch (paintingLayer)
                 {
                     case 1:
-                        domino.SetColor(BlockColor.LightBlue);
+                        trash.SetColor(BlockColor.LightBlue);
                         break;
                     case 2:
-                        domino.SetColor(BlockColor.Blue);
+                        trash.SetColor(BlockColor.Blue);
                         break;
                     case 3:
-                        domino.SetColor(BlockColor.Failed);
+                        trash.SetColor(BlockColor.Failed);
                         break;
                 }
             }
@@ -118,27 +121,55 @@ public class DominoBehavior : MonoBehaviour
         }
         else if (isPainterRed)
         {
-            var color = domino.GetColor();
+            var color = trash.GetColor();
             if (color == BlockColor.Failed || color == BlockColor.Blue || color == BlockColor.LightBlue)
             {
-                domino.SetColor(BlockColor.Failed);
+                trash.SetColor(BlockColor.Failed);
             }
             else
             {
                 switch (paintingLayer)
                 {
                     case 1:
-                        domino.SetColor(BlockColor.LightRed);
+                        trash.SetColor(BlockColor.LightRed);
                         break;
                     case 2:
-                        domino.SetColor(BlockColor.Red);
+                        trash.SetColor(BlockColor.Red);
                         break;
                     case 3:
-                        domino.SetColor(BlockColor.Failed);
+                        trash.SetColor(BlockColor.Failed);
                         break;
                 }
             }
         }
         SetSpriteAndCollider();
     }
+
+    public int GetTrashSize()
+    {
+        int size = 0;
+        foreach (var line in trash.Blocks)
+        {
+            foreach(var block in line)
+            {
+                if(block.Exists)
+                    size++;
+            }
+        }
+        return size;
+    }
+
+    public bool IsOnlyOneMaterialTrash(MaterialType material)
+    {
+        foreach (var line in trash.Blocks)
+        {
+            foreach (var block in line)
+            {
+                if (block.Exists && block.Material != material)
+                    return false;
+            }
+        }
+        return true;
+    }
+
 }

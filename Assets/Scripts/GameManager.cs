@@ -186,24 +186,24 @@ public class GameManager : MonoBehaviour
 
     private void AddRandomDominoRequest()
     {
-        timeSinceLastBlockRequest = 0f;
-        timeBeforeNextBlockRequest = UnityEngine.Random.Range(delayBetweenRequestsLowerBound, delayBetweenRequestsUpperBound);
+        //timeSinceLastBlockRequest = 0f;
+        //timeBeforeNextBlockRequest = UnityEngine.Random.Range(delayBetweenRequestsLowerBound, delayBetweenRequestsUpperBound);
 
-        var playerIndex = UnityEngine.Random.Range(0, playerList.Count);
-        var player = playerList[playerIndex];
-        playerList.RemoveAt(playerIndex);
+        //var playerIndex = UnityEngine.Random.Range(0, playerList.Count);
+        //var player = playerList[playerIndex];
+        //playerList.RemoveAt(playerIndex);
 
-        var dominoRequest = new DominoRequest()
-        {
-            Blocks = DominoUtils.GetRandomValidDomino(),
-            Color = DominoUtils.GetRandomColor(),
-            Player = player,
-            InitialDuration = dominoRequestDuration,
-            RemainingTime = dominoRequestDuration,
-        };
+        //var dominoRequest = new DominoRequest()
+        //{
+        //    Blocks = TrashUtils.GetRandomValidDomino(),
+        //    Color = TrashUtils.GetRandomColor(),
+        //    Player = player,
+        //    InitialDuration = dominoRequestDuration,
+        //    RemainingTime = dominoRequestDuration,
+        //};
 
-        dominoRequestList.Add(dominoRequest);
-        AddDominoRequestToHUD(dominoRequest);
+        //dominoRequestList.Add(dominoRequest);
+        //AddDominoRequestToHUD(dominoRequest);
     }
 
     private void AddDominoRequestToHUD(DominoRequest dominoRequest)

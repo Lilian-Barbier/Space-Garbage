@@ -4,24 +4,24 @@ using Utils;
 
 public class HologramBehavior : MonoBehaviour
 {
-    Domino _domino;
-    public Domino domino { get => _domino; }
+    Trash _domino;
+    public Trash domino { get => _domino; }
 
-    DominoGenerator dominoGenerator;
+    TrashGenerator dominoGenerator;
 
     private void Start()
     {
-        dominoGenerator = FindObjectOfType<DominoGenerator>().GetComponent<DominoGenerator>();
+        dominoGenerator = FindObjectOfType<TrashGenerator>().GetComponent<TrashGenerator>();
     }
 
 
-    public void SetDomino(Domino domino)
+    public void SetDomino(Trash domino)
     {
         if (dominoGenerator == null)
-            dominoGenerator = FindObjectOfType<DominoGenerator>().GetComponent<DominoGenerator>();
+            dominoGenerator = FindObjectOfType<TrashGenerator>().GetComponent<TrashGenerator>();
         
         this._domino = domino;
         var hologramSpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        hologramSpriteRenderer.sprite = dominoGenerator.GenerateDominoSprite(domino, false);
+        hologramSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(domino, false);
     }
 }

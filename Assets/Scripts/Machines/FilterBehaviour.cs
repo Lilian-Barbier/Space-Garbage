@@ -28,7 +28,7 @@ public class FilterBehaviour : TableBehaviour
 
         if (objectCarried != null)
         {
-            var dominoBehaviour = objectCarried.GetComponent<DominoBehavior>();
+            var dominoBehaviour = objectCarried.GetComponent<TrashBehaviour>();
 
             timeOnTable += Time.deltaTime;
             slider.value = timeOnTable / timeForFilter;
@@ -36,7 +36,7 @@ public class FilterBehaviour : TableBehaviour
             if (timeOnTable > timeForFilter)
             {
                 var domino = GetObjectCarried();
-                if (dominoBehaviour.domino.Blocks.Length == dominoFilterSize)
+                if (dominoBehaviour.trash.Blocks.Length == dominoFilterSize)
                 {
                     domino.transform.position = transform.position + Vector3.up;
                 }

@@ -1,10 +1,23 @@
+using Assets.Scripts.Enums;
 using Enums;
 
-namespace Models {
-  public class Block
-  {
-    public bool Exists { get; set; }
-    public BlockColor Color { get; set; }
-  }
+namespace Models
+{
+    public class Block
+    {
+        public bool Exists { get; set; }
+        public MaterialType Material { get; set; }
+
+        public Block(MaterialType material)
+        {
+            Exists = true;
+            Material = material;
+        }
+        
+        public Block()
+        {
+            Exists = false;
+        }
+    }
 }
 

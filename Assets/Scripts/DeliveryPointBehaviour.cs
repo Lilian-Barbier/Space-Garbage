@@ -7,7 +7,7 @@ using Utils;
 
 public class DeliveryPointBehaviour : MonoBehaviour
 {
-    public List<Domino> distribuedDomino = new List<Domino>();
+    public List<Trash> distribuedDomino = new List<Trash>();
  
     GameManager gameManager;
     private void Start()
@@ -15,22 +15,22 @@ public class DeliveryPointBehaviour : MonoBehaviour
         gameManager = FindObjectOfType<GameManager>().GetComponent<GameManager>();
     }
 
-    public void DeliveryDomino(Domino domino)
+    public void DeliveryDomino(Trash domino)
     {
-        distribuedDomino.Add(domino);
-        for (var i = gameManager.dominoRequestList.Count - 1; i > -1; i--)
-        {
-            var dominoReq = gameManager.dominoRequestList[i];
-            var res = DominoUtils.isDominoFullfillingRequest(domino, dominoReq);
+        //distribuedDomino.Add(domino);
+        //for (var i = gameManager.dominoRequestList.Count - 1; i > -1; i--)
+        //{
+        //    var dominoReq = gameManager.dominoRequestList[i];
+        //    var res = TrashUtils.isDominoFullfillingRequest(domino, dominoReq);
 
-            if (res)
-            {
-                gameManager.DeleteDominoRequest(i);
-                gameManager.GainScore(dominoReq.RemainingTime/dominoReq.InitialDuration);
-                return;
-            }
-        }
+        //    if (res)
+        //    {
+        //        gameManager.DeleteDominoRequest(i);
+        //        gameManager.GainScore(dominoReq.RemainingTime/dominoReq.InitialDuration);
+        //        return;
+        //    }
+        //}
 
-        gameManager.LooseScore();
+        //gameManager.LooseScore();
     }
 }

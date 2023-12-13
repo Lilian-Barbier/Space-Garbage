@@ -9,15 +9,15 @@ public class AssemblerBehavior : MonoBehaviour
     [SerializeField] GameObject hologramPrefab;
     [SerializeField] GameObject dominoPrefab;
 
-    private DominoGenerator dominoGenerator;
+    private TrashGenerator dominoGenerator;
 
     private SpriteRenderer dominoSpriteRenderer;
 
-    private Domino currentDomino;
+    private Trash currentDomino;
     
     void Start()
     {
-        dominoGenerator = FindObjectOfType<DominoGenerator>().GetComponent<DominoGenerator>();
+        dominoGenerator = FindObjectOfType<TrashGenerator>().GetComponent<TrashGenerator>();
 
         dominoSpriteRenderer = GetComponentsInChildren<SpriteRenderer>()[1];
 
@@ -26,8 +26,8 @@ public class AssemblerBehavior : MonoBehaviour
 
     private void InitDomino()
     {
-        currentDomino = new Domino(DominoUtils.None);
-        dominoSpriteRenderer.sprite = dominoGenerator.GenerateDominoSprite(currentDomino, false);
+        currentDomino = new Trash(TrashUtils.None);
+        dominoSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(currentDomino, false);
     }
 
     public bool IsEmpty()
@@ -40,7 +40,7 @@ public class AssemblerBehavior : MonoBehaviour
         return true;
     }
 
-    public HologramBehavior AddHologram(Domino domino)
+    public HologramBehavior AddHologram(Trash domino)
     {
         var hologram = Instantiate(hologramPrefab, transform);
 
@@ -58,7 +58,7 @@ public class AssemblerBehavior : MonoBehaviour
                     if (!currentDomino.Blocks[i][j].Exists)
                         currentDomino.Blocks[i][j] = hologram.domino.Blocks[i][j];
 
-            dominoSpriteRenderer.sprite = dominoGenerator.GenerateDominoSprite(currentDomino, false);
+            dominoSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(currentDomino, false);
             return true;
         }
 
@@ -72,7 +72,7 @@ public class AssemblerBehavior : MonoBehaviour
         currentDomino.isAssembled = true;
 
 
-        newDomino.GetComponent<DominoBehavior>().domino = currentDomino;
+        newDomino.GetComponent<TrashBehaviour>().trash = currentDomino;
 
         InitDomino();
         return newDomino;

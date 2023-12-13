@@ -310,7 +310,7 @@ public class CharacterController : MonoBehaviour
 
         if (assemblerHologram != null)
         {
-            var domino = objectCarried.GetComponent<DominoBehavior>();
+            var domino = objectCarried.GetComponent<TrashBehaviour>();
 
             Vector2 movement = ctx.ReadValue<Vector2>();
 
@@ -323,7 +323,7 @@ public class CharacterController : MonoBehaviour
             else if (movement.y > 0)
                 domino.MoveDominoUp();
 
-            assemblerHologram.SetDomino(domino.domino);
+            assemblerHologram.SetDomino(domino.trash);
         }
     }
 
@@ -404,12 +404,12 @@ public class CharacterController : MonoBehaviour
     {
         if (objectCarried == null) return;
 
-        var domino = objectCarried.GetComponent<DominoBehavior>();
+        var domino = objectCarried.GetComponent<TrashBehaviour>();
 
         if (clockwise) domino.RotateDominoClockwise();
         else domino.RotateDominoCounterClockwise();
 
-        if (assemblerHologram != null) assemblerHologram.SetDomino(domino.domino);
+        if (assemblerHologram != null) assemblerHologram.SetDomino(domino.trash);
     }
 
     #endregion
@@ -458,8 +458,8 @@ public class CharacterController : MonoBehaviour
 
     private void AddHologramToAssembler()
     {
-        var domino = objectCarried.GetComponent<DominoBehavior>();
-        assemblerHologram = assembler.AddHologram(domino.domino);
+        var domino = objectCarried.GetComponent<TrashBehaviour>();
+        assemblerHologram = assembler.AddHologram(domino.trash);
     }
 
     private void QuitAssemblerAndInsertDomino()
@@ -487,7 +487,7 @@ public class CharacterController : MonoBehaviour
         if (deliveryPointTransform != null)
         {
             var deliveryPoint = deliveryPointTransform.GetComponent<DeliveryPointBehaviour>();
-            var domino = objectCarried.GetComponent<DominoBehavior>().domino;
+            var domino = objectCarried.GetComponent<TrashBehaviour>().trash;
 
             deliveryPoint.DeliveryDomino(domino);
             objectCarried.gameObject.SetActive(false);

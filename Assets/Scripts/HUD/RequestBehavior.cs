@@ -14,16 +14,16 @@ public class RequestBehavior : MonoBehaviour
   
   private DominoRequest dominoRequest;
 
-  private DominoGenerator dominoGenerator;
+  private TrashGenerator dominoGenerator;
   void Start()
   {
-    dominoGenerator = FindObjectOfType<DominoGenerator>().GetComponent<DominoGenerator>();
+    dominoGenerator = FindObjectOfType<TrashGenerator>().GetComponent<TrashGenerator>();
     
     timerFill = transform.Find("Timer").GetComponent<Image>();
     playerText = transform.Find("PlayerInfos").GetComponent<TextMeshProUGUI>();
     dominoImage = transform.Find("Domino").GetComponent<Image>();
 
-    StartCoroutine(UpdateTimer());
+    //StartCoroutine(UpdateTimer());
   }
 
   public void SetDominoRequest(DominoRequest request)
@@ -31,21 +31,21 @@ public class RequestBehavior : MonoBehaviour
     dominoRequest = request;
   }
 
-  private IEnumerator UpdateTimer()
-  {
-    while (dominoRequest == null)
-      yield return new WaitForSeconds(1/60f);
+  //private IEnumerator UpdateTimer()
+  //{
+  //  while (dominoRequest == null)
+  //    yield return new WaitForSeconds(1/60f);
 
-    playerText.text = dominoRequest.Player.Name + ", " + dominoRequest.Player.Age + " yo";
+  //  playerText.text = dominoRequest.Player.Name + ", " + dominoRequest.Player.Age + " yo";
 
-    var domino = new Domino(dominoRequest.Blocks, dominoRequest.Color);
-    var dominoSprite = dominoGenerator.GenerateDominoSprite(domino);
-    dominoImage.sprite = dominoSprite;
+  //  var domino = new Trash(dominoRequest.Blocks, dominoRequest.Color);
+  //  var dominoSprite = dominoGenerator.GenerateTrashSprite(domino);
+  //  dominoImage.sprite = dominoSprite;
 
-    while (dominoRequest.RemainingTime >= 0f)
-    {
-      timerFill.fillAmount = dominoRequest.RemainingTime / dominoRequest.InitialDuration;
-      yield return new WaitForSeconds(1/60f);
-    }
-  }
+  //  while (dominoRequest.RemainingTime >= 0f)
+  //  {
+  //    timerFill.fillAmount = dominoRequest.RemainingTime / dominoRequest.InitialDuration;
+  //    yield return new WaitForSeconds(1/60f);
+  //  }
+  //}
 }
