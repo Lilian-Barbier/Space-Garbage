@@ -8,25 +8,24 @@ public class CrateBehaviour : MonoBehaviour
     [SerializeField] int dominoLength = 1;
     [SerializeField] Vector2 releaseDirection = Vector2.up;
 
-
     public Transform GetObject(bool instantiateWithColliderTrigger = true)
     {
-        //Dégueu
+        //DÃ©gueu
         var newDomino = Instantiate(dominoPrefab, new Vector3(100, 100, 0), Quaternion.identity);
-        newDomino.GetComponent<Collider2D>().isTrigger = instantiateWithColliderTrigger; 
+        newDomino.GetComponent<Collider2D>().isTrigger = instantiateWithColliderTrigger;
         switch (dominoLength)
         {
             case 1:
-                newDomino.GetComponent<TrashBehaviour>().trash = new Trash(TrashUtils.SingleBlock);
+                newDomino.GetComponent<TrashBehaviour>().trash = new Trash(TrashUtils.SingleBlockMetallic);
                 break;
             case 2:
-                newDomino.GetComponent<TrashBehaviour>().trash = new Trash(TrashUtils.DoubleBlock);
+                newDomino.GetComponent<TrashBehaviour>().trash = new Trash(TrashUtils.DoubleBlockMetallic);
                 break;
             default:
-                newDomino.GetComponent<TrashBehaviour>().trash = new Trash(TrashUtils.TripleBlock);
+                newDomino.GetComponent<TrashBehaviour>().trash = new Trash(TrashUtils.TripleBlockMetallic);
                 break;
         }
-        
+
         return newDomino.transform;
         //Proc Animation
     }

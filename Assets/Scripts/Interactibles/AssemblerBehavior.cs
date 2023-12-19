@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Models;
 using Utils;
@@ -14,7 +13,7 @@ public class AssemblerBehavior : MonoBehaviour
     private SpriteRenderer dominoSpriteRenderer;
 
     private Trash currentDomino;
-    
+
     void Start()
     {
         dominoGenerator = FindObjectOfType<TrashGenerator>().GetComponent<TrashGenerator>();
@@ -36,7 +35,7 @@ public class AssemblerBehavior : MonoBehaviour
             for (var j = 0; j < 4; j++)
                 if (currentDomino.Blocks[i][j].Exists)
                     return false;
-        
+
         return true;
     }
 
@@ -51,7 +50,7 @@ public class AssemblerBehavior : MonoBehaviour
 
     public bool TryInsertHologram(HologramBehavior hologram)
     {
-        if(CanAddHologram(hologram))
+        if (CanAddHologram(hologram))
         {
             for (var i = 0; i < 4; i++)
                 for (var j = 0; j < 4; j++)
@@ -80,12 +79,12 @@ public class AssemblerBehavior : MonoBehaviour
 
     private bool CanAddHologram(HologramBehavior hologram)
     {
-        
+
         for (var i = 0; i < 4; i++)
             for (var j = 0; j < 4; j++)
                 if (currentDomino.Blocks[i][j].Exists && hologram.domino.Blocks[i][j].Exists)
                     return false;
-        
+
         return true;
     }
 }

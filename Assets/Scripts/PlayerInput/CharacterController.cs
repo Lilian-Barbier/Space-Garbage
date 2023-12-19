@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.Machines;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
-using UnityEngine.UI;
 
 public class CharacterController : MonoBehaviour
 {
@@ -45,6 +44,21 @@ public class CharacterController : MonoBehaviour
     [SerializeField] TileBase tileConveyorUp;
     [SerializeField] TileBase tileConveyorDown;
 
+    [SerializeField] TileBase eraseTile;
+
+    //Engines Tiles for hologram
+    [SerializeField] TileBase filterTile;
+    [SerializeField] TileBase fuelTile;
+    [SerializeField] TileBase separatorTile;
+    [SerializeField] TileBase fusionTile;
+
+
+    //Engines prefab 
+    [SerializeField] GameObject fusionMachinePrefab;
+    [SerializeField] GameObject separatorPrefab;
+    [SerializeField] GameObject fuelMachinePrefab;
+    [SerializeField] GameObject filterPrefab;
+
     private Tilemap conveyorBeltRight;
     private Tilemap conveyorBeltLeft;
     private Tilemap conveyorBeltDown;
@@ -53,17 +67,33 @@ public class CharacterController : MonoBehaviour
 
     private Direction conveyorDirection = Direction.Right;
 
-    private PlayerAction selectedAction;
+    public PlayerAction selectedAction;
 
-    [SerializeField] Image handImageUI;
-    [SerializeField] Image eraseImageUI;
-    [SerializeField] Image constructImageUI;
+    [SerializeField] float constructionDistanceRatio = 0.6f;
 
-    enum PlayerAction
+    bool isInComputer = false;
+    bool isInHookMode = false;
+    HookButtonController hookController;
+
+    public int nbOfConveyorBelt = 4;
+    public int nbOfFusionMachine = 0;
+    public int nbOfSeparator = 0;
+    public int nbOfFuelMachine = 0;
+    public int nbOfFilter = 1;
+
+    public bool userUseKeyboard = true;
+
+    SpaceshipManager spaceshipManager;
+
+    public enum PlayerAction
     {
         TakeObject,
         RemoveConstruction,
-        Construct,
+        ConstructConveyor,
+        ConstructFusionMachine,
+        ConstructSeparator,
+        ConstructFuelMachine,
+        ConstructFilter,
     }
 
     enum Direction
@@ -80,8 +110,8 @@ public class CharacterController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
-        var assemblerGameObject = GameObject.FindGameObjectWithTag("Assembler");
-        assembler = assemblerGameObject.GetComponent<AssemblerBehavior>();
+        // var assemblerGameObject = GameObject.FindGameObjectWithTag("Assembler");
+        // assembler = assemblerGameObject.GetComponent<AssemblerBehavior>();
 
         interactTriggerZone = transform.GetChild(0);
 
@@ -92,6 +122,8 @@ public class CharacterController : MonoBehaviour
         conveyorBeltHologram = GameObject.FindGameObjectWithTag("ConveyorBeltHologram").GetComponent<Tilemap>();
 
         selectedAction = PlayerAction.TakeObject;
+
+        spaceshipManager = FindObjectOfType<SpaceshipManager>().GetComponent<SpaceshipManager>();
     }
 
     void FixedUpdate()
@@ -103,8 +135,23 @@ public class CharacterController : MonoBehaviour
         if (selectedAction == PlayerAction.TakeObject)
             UpdateOutlines();
 
-        else if (selectedAction == PlayerAction.Construct)
+        else if (selectedAction == PlayerAction.ConstructConveyor)
             UpdateHologramConstruction();
+
+        else if (selectedAction == PlayerAction.RemoveConstruction)
+            UpdateHologram(eraseTile);
+
+        else if (selectedAction == PlayerAction.ConstructFusionMachine)
+            UpdateHologram(fusionTile);
+
+        else if (selectedAction == PlayerAction.ConstructSeparator)
+            UpdateHologram(separatorTile);
+
+        else if (selectedAction == PlayerAction.ConstructFuelMachine)
+            UpdateHologram(fuelTile);
+
+        else if (selectedAction == PlayerAction.ConstructFilter)
+            UpdateHologram(filterTile);
     }
 
     void UpdateHologramConstruction()
@@ -127,7 +174,16 @@ public class CharacterController : MonoBehaviour
         }
 
         conveyorBeltHologram.ClearAllTiles();
-        conveyorBeltHologram.SetTile(conveyorBeltHologram.WorldToCell(transform.position + (Vector3)lastDirection), selectedConveyorTile);
+
+        var tilePos = transform.position + (Vector3)lastDirection.normalized * constructionDistanceRatio;
+        conveyorBeltHologram.SetTile(conveyorBeltHologram.WorldToCell(tilePos), selectedConveyorTile);
+    }
+
+    void UpdateHologram(TileBase tile)
+    {
+        conveyorBeltHologram.ClearAllTiles();
+        var tilePos = transform.position + (Vector3)lastDirection.normalized * constructionDistanceRatio;
+        conveyorBeltHologram.SetTile(conveyorBeltHologram.WorldToCell(tilePos), tile);
     }
 
     void ClearHologramConstruction()
@@ -211,11 +267,28 @@ public class CharacterController : MonoBehaviour
     #region InputAction CallBack
     public void Move(InputAction.CallbackContext ctx)
     {
+        OnAction(ctx);
+
         movement = ctx.ReadValue<Vector2>();
     }
     public void Dash(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed && canDash)
+        OnAction(ctx);
+
+        if (!ctx.performed) return;
+
+        if (isInHookMode)
+        {
+            isInHookMode = false;
+            isStopped = false;
+        }
+        else if (isInComputer)
+        {
+            isInComputer = false;
+            isStopped = false;
+            spaceshipManager.HideComputer();
+        }
+        else if (canDash)
         {
             CameraShake.Instance.LittleShake();
             canDash = false;
@@ -226,21 +299,29 @@ public class CharacterController : MonoBehaviour
 
     public void Interact(InputAction.CallbackContext ctx)
     {
+        OnAction(ctx);
+
         if (!ctx.performed) return;
 
-        if (assemblerHologram != null)
+        if (isInHookMode)
+        {
+            hookController.LaunchHook();
+        }
+        else if (isInComputer)
+        {
+            spaceshipManager.BuyUpgrade();
+        }
+        else if (assemblerHologram != null)
         {
             QuitAssemblerAndInsertDomino();
         }
         else
         {
             //In construction mode : 
-            if (selectedAction == PlayerAction.Construct)
+            if (selectedAction == PlayerAction.ConstructConveyor && nbOfConveyorBelt > 0 && !AlreadyConstructFront())
             {
                 TileBase selectedConveyorTile = tileConveyorRight;
                 Tilemap selectedTilemap = conveyorBeltRight;
-
-                Debug.Log(conveyorDirection);
 
                 switch (conveyorDirection)
                 {
@@ -262,16 +343,80 @@ public class CharacterController : MonoBehaviour
                         break;
                 }
 
-                selectedTilemap.SetTile(selectedTilemap.WorldToCell(transform.position + (Vector3)lastDirection), selectedConveyorTile);
+                var tilePos = transform.position + (Vector3)lastDirection.normalized * constructionDistanceRatio;
+                selectedTilemap.SetTile(selectedTilemap.WorldToCell(tilePos), selectedConveyorTile);
+                nbOfConveyorBelt--;
+            }
 
+            if (selectedAction == PlayerAction.ConstructFusionMachine && nbOfFusionMachine > 0 && !AlreadyConstructFront())
+            {
+                Instantiate(fusionMachinePrefab, GetPositionOnTilemap(), Quaternion.identity);
+                nbOfFusionMachine--;
+            }
+
+            if (selectedAction == PlayerAction.ConstructSeparator && nbOfSeparator > 0 && !AlreadyConstructFront())
+            {
+                Instantiate(separatorPrefab, GetPositionOnTilemap(), Quaternion.identity);
+                nbOfSeparator--;
+            }
+
+            if (selectedAction == PlayerAction.ConstructFuelMachine && nbOfFuelMachine > 0 && !AlreadyConstructFront())
+            {
+                Instantiate(fuelMachinePrefab, GetPositionOnTilemap(), Quaternion.identity);
+                nbOfFuelMachine--;
+            }
+
+            if (selectedAction == PlayerAction.ConstructFilter && nbOfFilter > 0 && !AlreadyConstructFront())
+            {
+                Instantiate(filterPrefab, GetPositionOnTilemap(), Quaternion.identity);
+                nbOfFilter--;
             }
 
             else if (selectedAction == PlayerAction.RemoveConstruction)
             {
-                conveyorBeltRight.SetTile(conveyorBeltRight.WorldToCell(transform.position + (Vector3)lastDirection), null);
-                conveyorBeltLeft.SetTile(conveyorBeltRight.WorldToCell(transform.position + (Vector3)lastDirection), null);
-                conveyorBeltUp.SetTile(conveyorBeltRight.WorldToCell(transform.position + (Vector3)lastDirection), null);
-                conveyorBeltDown.SetTile(conveyorBeltRight.WorldToCell(transform.position + (Vector3)lastDirection), null);
+                var tileRemove = conveyorBeltRight.WorldToCell(transform.position + (Vector3)lastDirection.normalized * constructionDistanceRatio);
+
+                if (conveyorBeltRight.GetTile(tileRemove) != null)
+                    nbOfConveyorBelt++;
+                else if (conveyorBeltLeft.GetTile(tileRemove) != null)
+                    nbOfConveyorBelt++;
+                else if (conveyorBeltUp.GetTile(tileRemove) != null)
+                    nbOfConveyorBelt++;
+                else if (conveyorBeltDown.GetTile(tileRemove) != null)
+                    nbOfConveyorBelt++;
+
+                conveyorBeltRight.SetTile(tileRemove, null);
+                conveyorBeltLeft.SetTile(tileRemove, null);
+                conveyorBeltUp.SetTile(tileRemove, null);
+                conveyorBeltDown.SetTile(tileRemove, null);
+
+                Vector2 positionToCheck = new Vector2(tileRemove.x + 0.5f, tileRemove.y + 0.5f);
+                Collider2D hitCollider = Physics2D.OverlapPoint(positionToCheck);
+
+                if (hitCollider != null &&
+                    hitCollider.transform.CompareTag("Table") &&
+                    hitCollider.name != "DeliveryPointFuel" &&
+                    hitCollider.name != "DeliveryPoint")
+                {
+                    if (hitCollider.transform.GetComponent<FusionBehaviour>() != null)
+                    {
+                        nbOfFusionMachine++;
+                    }
+                    else if (hitCollider.transform.GetComponent<SeparatorBehaviour>() != null)
+                    {
+                        nbOfSeparator++;
+                    }
+                    else if (hitCollider.transform.GetComponent<FuelCreatorBehaviour>() != null)
+                    {
+                        nbOfFuelMachine++;
+                    }
+                    else if (hitCollider.transform.GetComponent<FilterBehaviour>() != null)
+                    {
+                        nbOfFilter++;
+                    }
+
+                    Destroy(hitCollider.gameObject);
+                }
             }
 
             else if (selectedAction == PlayerAction.TakeObject)
@@ -290,11 +435,24 @@ public class CharacterController : MonoBehaviour
                 //Sinon il va tenter d'en attraper un
                 else
                 {
-                    if ((interactibleObjectsNear.Any(o => o.transform.CompareTag("Assembler")) || interactibleObjectsInFront.Any(o => o.transform.CompareTag("Assembler"))) && !assembler.IsEmpty())
+                    if (interactibleObjectsNear.Any(o => o.transform.CompareTag("GrapplingHookButton")))
                     {
-                        objectCarried = assembler.TakeDominoOut().transform;
-                        objectCarried.GetComponent<Collider2D>().isTrigger = true;
+                        isInHookMode = true;
+                        isStopped = true;
+                        hookController = interactibleObjectsNear.First(o => o.transform.CompareTag("GrapplingHookButton")).GetComponent<HookButtonController>();
                     }
+                    if (interactibleObjectsNear.Any(o => o.transform.CompareTag("ComputerButton")))
+                    {
+                        isInComputer = true;
+                        isStopped = true;
+                        spaceshipManager.ShowComputer();
+                    }
+                    else if (interactibleObjectsInFront.Any(o => o.transform.CompareTag("Table")) && interactibleObjectsInFront.First(o => o.transform.CompareTag("Table")).GetComponent<FilterBehaviour>() != null)
+                    {
+                        var filter = interactibleObjectsInFront.First(o => o.transform.CompareTag("Table")).GetComponent<FilterBehaviour>();
+                        filter.ChangeFilterSize();
+                    }
+
                     else
                     {
                         GetObjectNear();
@@ -304,8 +462,39 @@ public class CharacterController : MonoBehaviour
         }
     }
 
+    private Vector3 GetPositionOnTilemap()
+    {
+        var tilePos = transform.position + (Vector3)lastDirection.normalized * constructionDistanceRatio;
+        var cellPos = conveyorBeltHologram.WorldToCell(tilePos);
+        tilePos = conveyorBeltHologram.CellToWorld(cellPos);
+        tilePos += new Vector3(0.5f, 0.5f, 0);
+        return tilePos;
+    }
+
+    private bool AlreadyConstructFront()
+    {
+        var cellPos = conveyorBeltDown.WorldToCell(transform.position + (Vector3)lastDirection.normalized * constructionDistanceRatio);
+
+        if (conveyorBeltDown.GetTile(cellPos) != null || conveyorBeltUp.GetTile(cellPos) != null || conveyorBeltRight.GetTile(cellPos) != null || conveyorBeltLeft.GetTile(cellPos) != null)
+        {
+            return true;
+        }
+
+        Vector2 positionToCheck = new Vector2(cellPos.x + 0.5f, cellPos.y + 0.5f);
+        Collider2D hitCollider = Physics2D.OverlapPoint(positionToCheck);
+
+        if (hitCollider != null && !hitCollider.transform.CompareTag("Player") && !hitCollider.transform.CompareTag("Blocks"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public void MoveDominosInAssembler(InputAction.CallbackContext ctx)
     {
+        OnAction(ctx);
+
         if (!ctx.started) return;
 
         if (assemblerHologram != null)
@@ -325,13 +514,33 @@ public class CharacterController : MonoBehaviour
 
             assemblerHologram.SetDomino(domino.trash);
         }
+        else if (isInHookMode)
+        {
+            Vector2 movement = ctx.ReadValue<Vector2>();
+
+            if (movement.y < -0.2)
+                hookController.UpHook();
+            else if (movement.y > 0.2)
+                hookController.DownHook();
+        }
+        else if (isInComputer)
+        {
+            Vector2 movement = ctx.ReadValue<Vector2>();
+
+            if (movement.y < -0.2)
+                spaceshipManager.SelectNextComputer();
+            else if (movement.y > 0.2)
+                spaceshipManager.SelectPreviousComputer();
+        }
     }
 
     public void RotateClockwise(InputAction.CallbackContext ctx)
     {
+        OnAction(ctx);
+
         if (!ctx.performed) return;
 
-        if (selectedAction == PlayerAction.Construct)
+        if (selectedAction == PlayerAction.ConstructConveyor)
             RotateConveyor(true);
 
         if (selectedAction == PlayerAction.TakeObject)
@@ -340,9 +549,11 @@ public class CharacterController : MonoBehaviour
 
     public void RotateCounterClockwise(InputAction.CallbackContext ctx)
     {
+        OnAction(ctx);
+
         if (!ctx.performed) return;
 
-        if (selectedAction == PlayerAction.Construct)
+        if (selectedAction == PlayerAction.ConstructConveyor)
             RotateConveyor(false);
 
         if (selectedAction == PlayerAction.TakeObject)
@@ -351,23 +562,40 @@ public class CharacterController : MonoBehaviour
 
     public void ChangeAction(InputAction.CallbackContext ctx)
     {
+        OnAction(ctx);
+
         if (!ctx.performed) return;
 
-        handImageUI.color = new Color(1, 1, 1, 0.5f);
-        eraseImageUI.color = new Color(1, 1, 1, 0.5f);
-        constructImageUI.color = new Color(1, 1, 1, 0.5f);
-
-        switch (selectedAction){
-            case PlayerAction.Construct:
+        switch (selectedAction)
+        {
+            case PlayerAction.ConstructFuelMachine:
                 ClearHologramConstruction();
                 selectedAction = PlayerAction.TakeObject;
-                handImageUI.color = new Color(1, 1, 1, 1);
+                break;
+
+            case PlayerAction.ConstructFusionMachine:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.ConstructFuelMachine;
+                break;
+
+            case PlayerAction.ConstructSeparator:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.ConstructFusionMachine;
+                break;
+
+            case PlayerAction.ConstructFilter:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.ConstructSeparator;
+                break;
+
+            case PlayerAction.ConstructConveyor:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.ConstructFilter;
                 break;
 
             case PlayerAction.RemoveConstruction:
-                selectedAction = PlayerAction.Construct;
-                constructImageUI.color = new Color(1, 1, 1, 1);
-
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.ConstructConveyor;
                 break;
 
             case PlayerAction.TakeObject:
@@ -375,7 +603,56 @@ public class CharacterController : MonoBehaviour
                     DropObject();
 
                 selectedAction = PlayerAction.RemoveConstruction;
-                eraseImageUI.color = new Color(1, 1, 1, 1);
+                break;
+        };
+
+    }
+
+    public void ChangeActionPrevious(InputAction.CallbackContext ctx)
+    {
+        OnAction(ctx);
+
+        if (!ctx.performed) return;
+
+        switch (selectedAction)
+        {
+            case PlayerAction.ConstructFuelMachine:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.ConstructFusionMachine;
+                break;
+
+            case PlayerAction.ConstructFusionMachine:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.ConstructSeparator;
+                break;
+
+            case PlayerAction.ConstructSeparator:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.ConstructFilter;
+                break;
+
+            case PlayerAction.ConstructFilter:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.ConstructConveyor;
+                break;
+
+            case PlayerAction.ConstructConveyor:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.RemoveConstruction;
+                break;
+
+            case PlayerAction.RemoveConstruction:
+                ClearHologramConstruction();
+                selectedAction = PlayerAction.TakeObject;
+                break;
+
+            case PlayerAction.TakeObject:
+                if (objectCarried != null)
+                    DropObject();
+                ClearHologramConstruction();
+
+
+                selectedAction = PlayerAction.ConstructFuelMachine;
                 break;
         };
 
@@ -482,18 +759,6 @@ public class CharacterController : MonoBehaviour
         IEnumerable<Collider2D> interactableObjects = GetColliderInFrontPlayerOrderByDistance();
 
         Collider2D deliveryPointTransform = GetNearestObjectInCollidersByTag(interactableObjects, "DeliveryPoint");
-
-        //On vérifie si le point de livraison se trouve dans dans notre champs d'action 
-        if (deliveryPointTransform != null)
-        {
-            var deliveryPoint = deliveryPointTransform.GetComponent<DeliveryPointBehaviour>();
-            var domino = objectCarried.GetComponent<TrashBehaviour>().trash;
-
-            deliveryPoint.DeliveryDomino(domino);
-            objectCarried.gameObject.SetActive(false);
-            objectCarried = null;
-            return;
-        }
 
         //On vérifie si une table se trouve dans notre champs d'action
         if (interactableObjects.Any(o => o.transform.CompareTag("Table")))
@@ -633,6 +898,20 @@ public class CharacterController : MonoBehaviour
         if (ctx.performed)
         {
             SceneManager.LoadScene("ChooseLvl");
+        }
+    }
+
+    public void OnAction(InputAction.CallbackContext context)
+    {
+        var device = context.control.device;
+
+        if (device is Keyboard)
+        {
+            userUseKeyboard = true;
+        }
+        else if (device is Gamepad)
+        {
+            userUseKeyboard = false;
         }
     }
 

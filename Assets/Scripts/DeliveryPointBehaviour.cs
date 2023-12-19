@@ -1,36 +1,33 @@
-using Models;
-using System.Collections;
-using System.Collections.Generic;
+using Assets.Scripts.Enums;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using Utils;
 
-public class DeliveryPointBehaviour : MonoBehaviour
+public class DeliveryPointBehaviour : TableBehaviour
 {
-    public List<Trash> distribuedDomino = new List<Trash>();
- 
-    GameManager gameManager;
+    SpaceshipManager spaceshipManager;
     private void Start()
     {
-        gameManager = FindObjectOfType<GameManager>().GetComponent<GameManager>();
+        spaceshipManager = FindObjectOfType<SpaceshipManager>().GetComponent<SpaceshipManager>();
     }
 
-    public void DeliveryDomino(Trash domino)
+    public override void SetObjectCarried(Transform newObjectCarried)
     {
-        //distribuedDomino.Add(domino);
-        //for (var i = gameManager.dominoRequestList.Count - 1; i > -1; i--)
-        //{
-        //    var dominoReq = gameManager.dominoRequestList[i];
-        //    var res = TrashUtils.isDominoFullfillingRequest(domino, dominoReq);
+        TrashBehaviour trashBehaviour = newObjectCarried.GetComponent<TrashBehaviour>();
 
-        //    if (res)
-        //    {
-        //        gameManager.DeleteDominoRequest(i);
-        //        gameManager.GainScore(dominoReq.RemainingTime/dominoReq.InitialDuration);
-        //        return;
-        //    }
-        //}
+        if (!trashBehaviour.IsOnlyOneMaterialTrash(MaterialType.Metal) && trashBehaviour.GetTrashSize() != 4)
+        {
+            EjectPiece(newObjectCarried);
+        }
+        else
+        {
+            spaceshipManager.money++;
+            Destroy(newObjectCarried.gameObject);
+        }
+    }
 
-        //gameManager.LooseScore();
+    private void EjectPiece(Transform trash)
+    {
+        trash.transform.position = transform.position + Vector3.right;
+        trash.GetComponent<Collider2D>().isTrigger = false;
+        trash.GetComponent<Rigidbody2D>().isKinematic = false;
     }
 }

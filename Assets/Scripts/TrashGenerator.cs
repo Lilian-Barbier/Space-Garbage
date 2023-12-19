@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Utils;
-using Enums;
 using Models;
 using Assets.Scripts.Enums;
 
@@ -18,8 +15,8 @@ public class TrashGenerator : MonoBehaviour
     [SerializeField] private Sprite blackBlockSprite;
 
     private static readonly int spriteSize = 256;
-    private static readonly uint spritePadding = (uint) Mathf.Floor(1.25f*(spriteSize/32));
-    private static readonly int blockPixelSize = spriteSize/32;
+    private static readonly uint spritePadding = (uint)Mathf.Floor(1.25f * (spriteSize / 32));
+    private static readonly int blockPixelSize = spriteSize / 32;
     private static readonly int blockSizeY = 6 * blockPixelSize;
     private static readonly int blockSizeX = 7 * blockPixelSize;
 
@@ -27,14 +24,14 @@ public class TrashGenerator : MonoBehaviour
     private static readonly int fullBlockHeight = blockSizeY + blockSideSize;
 
     public Sprite GenerateTrashSprite(Trash domino, bool centerSprite = true)
-    {   
-        var minArea = centerSprite ? TrashUtils.GetMinimumDominoArea(domino): domino;
+    {
+        var minArea = centerSprite ? TrashUtils.GetMinimumDominoArea(domino) : domino;
 
         int dominoPixelHeight = (minArea.Blocks.Length + 1) * blockSizeY;
         int dominoPixelWidth = minArea.Blocks[0].Length * blockSizeX;
 
-        int dominoPaddingLeft = (int) Mathf.Floor((spriteSize - dominoPixelWidth) / 2);
-        int dominoPaddingBottom = (int) Mathf.Floor((spriteSize - dominoPixelHeight) / 2);
+        int dominoPaddingLeft = (int)Mathf.Floor((spriteSize - dominoPixelWidth) / 2);
+        int dominoPaddingBottom = (int)Mathf.Floor((spriteSize - dominoPixelHeight) / 2);
 
         Resources.UnloadUnusedAssets();
         Color32 transparent = new Color32(0, 0, 0, 0);
@@ -43,27 +40,12 @@ public class TrashGenerator : MonoBehaviour
 
         // INIT BACKGROUND
 
-        var pixelArray = new Color32[spriteSize*spriteSize];
+        var pixelArray = new Color32[spriteSize * spriteSize];
 
         for (var i = 0; i < pixelArray.Length; i++)
             pixelArray[i] = transparent;
 
         newTexture.SetPixels32(pixelArray);
-
-        // DRAW BLOCKS
-
-        for (var blockY = 0; blockY < minArea.Blocks.Length; blockY++) {
-            for (var blockX = 0; blockX < minArea.Blocks[blockY].Length; blockX++) {
-                
-                if (!minArea.Blocks[blockY][blockX].Exists) continue;
-
-                var blockSprite = GetSpriteFromMaterial(minArea.Blocks[blockY][blockX].Material);
-                
-                var posX = dominoPaddingLeft + blockX * blockSizeX;
-                var posY = spriteSize - 1 - dominoPaddingBottom - (blockY * (blockSizeY-1)) - fullBlockHeight;
-                Graphics.CopyTexture(blockSprite.texture, 0, 0, 0, 0, blockSizeX, fullBlockHeight, newTexture, 0, 0, posX, posY);
-            }
-        }
 
         // CONFIG TEXTURE & SPRITE
 
@@ -71,6 +53,23 @@ public class TrashGenerator : MonoBehaviour
         newTexture.wrapMode = TextureWrapMode.Clamp;
 
         newTexture.Apply();
+
+        // DRAW BLOCKS
+
+        for (var blockY = 0; blockY < minArea.Blocks.Length; blockY++)
+        {
+            for (var blockX = 0; blockX < minArea.Blocks[blockY].Length; blockX++)
+            {
+
+                if (!minArea.Blocks[blockY][blockX].Exists) continue;
+
+                var blockSprite = GetSpriteFromMaterial(minArea.Blocks[blockY][blockX].Material);
+
+                var posX = dominoPaddingLeft + blockX * blockSizeX;
+                var posY = spriteSize - 1 - dominoPaddingBottom - (blockY * (blockSizeY - 1)) - fullBlockHeight;
+                Graphics.CopyTexture(blockSprite.texture, 0, 0, 0, 0, blockSizeX, fullBlockHeight, newTexture, 0, 0, posX, posY);
+            }
+        }
 
         var finalSprite = Sprite.Create(newTexture, new Rect(0, 0, spriteSize, spriteSize), new Vector2(0.5f, 0.5f), spriteSize, spritePadding, SpriteMeshType.Tight);
         finalSprite.name = "DominoSprite";
@@ -85,6 +84,8 @@ public class TrashGenerator : MonoBehaviour
                 return greenBlockSprite;
             case MaterialType.Metal:
                 return defaultBlockSprite;
+            case MaterialType.Fuel:
+                return blackBlockSprite;
             default:
                 return defaultBlockSprite;
         }

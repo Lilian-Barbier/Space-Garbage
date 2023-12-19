@@ -1,11 +1,8 @@
-using Enums;
 using Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Utils;
-using static GameManager;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,10 +10,10 @@ public class GameManager : MonoBehaviour
 
     private static readonly float initialDominoRequestDuration = 40f;
     private static readonly float minDominoRequestDuration = 30f;
-    
+
     public float dominoRequestDuration = initialDominoRequestDuration;
 
-    private static readonly  float timeToReachMinimumRequestDuration = 180;
+    private static readonly float timeToReachMinimumRequestDuration = 180;
 
     [SerializeField] private Sprite defaultBlockSprite;
     [SerializeField] private Sprite blueBlockSprite;
@@ -25,12 +22,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite lightRedBlockSprite;
     [SerializeField] private Sprite blackBlockSprite;
 
-    //Dictionnaire contenants les événements ainsi que les timers 
+    //Dictionnaire contenants les ï¿½vï¿½nements ainsi que les timers 
     [Serializable]
     public struct FactoryEvent
     {
         public float timer;
-        //Todo: essayer de passer à une référence de script plutot que via un prefab
+        //Todo: essayer de passer ï¿½ une rï¿½fï¿½rence de script plutot que via un prefab
         public GameObject eventToStart;
         public bool loop;
     }
@@ -42,7 +39,7 @@ public class GameManager : MonoBehaviour
     private static readonly float minLowerBound = 15f;
     private static readonly float initialLowerBound = 25f;
 
-    private static readonly  float timeToReachMinimumDelayBetweenRequests = 180;
+    private static readonly float timeToReachMinimumDelayBetweenRequests = 180;
 
     private float delayBetweenRequestsLowerBound = initialLowerBound;
     private float delayBetweenRequestsUpperBound = initialUpperBound;
@@ -84,7 +81,7 @@ public class GameManager : MonoBehaviour
 
         playerList = GetRandomPlayers();
 
-        foreach(FactoryEvent f in events)
+        foreach (FactoryEvent f in events)
         {
             StartCoroutine(StartEvent(f));
         }
@@ -95,7 +92,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(factoryEvent.timer);
         factoryEvent.eventToStart.GetComponent<IEvent>().StartEvent();
 
-        if(factoryEvent.loop)
+        if (factoryEvent.loop)
             StartCoroutine(StartEvent(factoryEvent));
     }
 
@@ -240,19 +237,19 @@ public class GameManager : MonoBehaviour
 
     private void CalculateNewDurations()
     {
-      var dominoRequestDelta = (initialDominoRequestDuration - minDominoRequestDuration) * Time.fixedDeltaTime / timeToReachMinimumRequestDuration;
-      dominoRequestDuration -= dominoRequestDelta;
+        var dominoRequestDelta = (initialDominoRequestDuration - minDominoRequestDuration) * Time.fixedDeltaTime / timeToReachMinimumRequestDuration;
+        dominoRequestDuration -= dominoRequestDelta;
 
-      var delayBetweenRequestsDelta = (initialUpperBound - minUpperBound) * Time.fixedDeltaTime / timeToReachMinimumDelayBetweenRequests;
-      delayBetweenRequestsUpperBound -= delayBetweenRequestsDelta;
+        var delayBetweenRequestsDelta = (initialUpperBound - minUpperBound) * Time.fixedDeltaTime / timeToReachMinimumDelayBetweenRequests;
+        delayBetweenRequestsUpperBound -= delayBetweenRequestsDelta;
 
-      delayBetweenRequestsDelta = (initialLowerBound - minLowerBound) * Time.fixedDeltaTime / timeToReachMinimumDelayBetweenRequests;
-      delayBetweenRequestsLowerBound -= delayBetweenRequestsDelta;
+        delayBetweenRequestsDelta = (initialLowerBound - minLowerBound) * Time.fixedDeltaTime / timeToReachMinimumDelayBetweenRequests;
+        delayBetweenRequestsLowerBound -= delayBetweenRequestsDelta;
     }
 
     public void GainScore(float result)
     {
-        score += 60 + (int) Mathf.Floor(180 * result);
+        score += 60 + (int)Mathf.Floor(180 * result);
     }
 
     public void LooseScore()

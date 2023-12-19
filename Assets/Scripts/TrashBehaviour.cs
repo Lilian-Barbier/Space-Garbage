@@ -1,15 +1,14 @@
 using Assets.Scripts.Enums;
 using Enums;
 using Models;
-using System;
-using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 using Utils;
 
 public class TrashBehaviour : MonoBehaviour
 {
-    [SerializeField]
-    private bool setRandomDomino = false;
+    [SerializeField] private bool setRandomDomino = false;
+    [SerializeField] private bool setBlockMetalOrg = false;
+    [SerializeField] private bool setLMetalOrg = false;
 
     SpriteRenderer spriteRenderer;
     TrashGenerator dominoGenerator;
@@ -23,6 +22,10 @@ public class TrashBehaviour : MonoBehaviour
 
         if (setRandomDomino)
             trash = new Trash(TrashUtils.GetRandomValidDomino());
+        else if (setBlockMetalOrg)
+            trash = new Trash(TrashUtils.Square);
+        else if (setLMetalOrg)
+            trash = new Trash(TrashUtils.L);
 
         SetSpriteAndCollider();
     }
@@ -88,7 +91,7 @@ public class TrashBehaviour : MonoBehaviour
     {
         paintingLayer++;
 
-        if(trash.isAssembled)
+        if (trash.isAssembled)
         {
             trash.SetColor(BlockColor.Failed);
             SetSpriteAndCollider();
@@ -150,9 +153,9 @@ public class TrashBehaviour : MonoBehaviour
         int size = 0;
         foreach (var line in trash.Blocks)
         {
-            foreach(var block in line)
+            foreach (var block in line)
             {
-                if(block.Exists)
+                if (block.Exists)
                     size++;
             }
         }
@@ -172,4 +175,34 @@ public class TrashBehaviour : MonoBehaviour
         return true;
     }
 
+    public bool IsOnlyOneMaterialTrash()
+    {
+        MaterialType material = MaterialType.None;
+        foreach (var line in trash.Blocks)
+        {
+            foreach (var block in line)
+            {
+                if (block.Exists && material == MaterialType.None)
+                {
+                    material = block.Material;
+                }
+                else if (block.Exists && block.Material != material)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    public MaterialType GetTrashMaterial()
+    {
+        foreach (var line in trash.Blocks)
+        {
+            foreach (var block in line)
+            {
+                if (block.Exists)
+                    return block.Material;
+            }
+        }
+        return MaterialType.None;
+    }
 }

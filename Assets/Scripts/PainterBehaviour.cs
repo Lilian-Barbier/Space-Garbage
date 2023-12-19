@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,13 +24,13 @@ public class PainterBehaviour : TableBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isPainterRed|| isPainterBlue)
+        if (isPainterRed || isPainterBlue)
         {
             if (objectCarried != null)
             {
                 var dominoBehaviour = objectCarried.GetComponent<TrashBehaviour>();
 
-                if(dominoBehaviour.trash.GetColor() != Enums.BlockColor.Failed)
+                if (dominoBehaviour.trash.GetColor() != Enums.BlockColor.Failed)
                 {
                     timeOnTable += Time.deltaTime;
                     slider.value = timeOnTable / timeForPaint;
@@ -58,19 +55,21 @@ public class PainterBehaviour : TableBehaviour
     }
 
 
-    public override void SetObjectCarried(Transform newObjectCarried) {
-      slider.gameObject.SetActive(true);
+    public override void SetObjectCarried(Transform newObjectCarried)
+    {
+        slider.gameObject.SetActive(true);
 
-      base.SetObjectCarried(newObjectCarried);
-      animator.SetBool("IsPainting", true);
+        base.SetObjectCarried(newObjectCarried);
+        animator.SetBool("IsPainting", true);
     }
 
-    public override Transform GetObjectCarried() {
-      slider.gameObject.SetActive(false);
+    public override Transform GetObjectCarried()
+    {
+        slider.gameObject.SetActive(false);
 
-      var obj = base.GetObjectCarried();
-      animator.SetBool("IsPainting", false);
-      return obj;
+        var obj = base.GetObjectCarried();
+        animator.SetBool("IsPainting", false);
+        return obj;
 
 
     }

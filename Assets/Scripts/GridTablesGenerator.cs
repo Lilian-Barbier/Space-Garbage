@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -7,7 +5,7 @@ public class GridTablesGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject tablePrefab;
 
-    //Par défaut les tables vont se placer au point d'ancrage des tiles, c.a.d. dans le coin inférieur gauche. Pour compenser cela on applique un offset de 0.5 en x et y
+    //Par dï¿½faut les tables vont se placer au point d'ancrage des tiles, c.a.d. dans le coin infï¿½rieur gauche. Pour compenser cela on applique un offset de 0.5 en x et y
     [SerializeField] private Vector2 offset = new(0.5f, 0.5f);
 
     // Start is called before the first frame update
@@ -34,6 +32,6 @@ public class GridTablesGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

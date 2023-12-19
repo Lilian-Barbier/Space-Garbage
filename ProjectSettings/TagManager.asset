@@ -22,6 +22,9 @@ TagManager:
   - ConveyorBeltUp
   - ConveyorBeltDown
   - ConveyorBeltHologram
+  - GrapplingHookButton
+  - ComputerButton
+  - PieceRemove
   layers:
   - Default
   - TransparentFX

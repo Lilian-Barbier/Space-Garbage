@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Models;
@@ -7,25 +6,25 @@ using Assets.Scripts.Enums;
 
 namespace Utils
 {
-  public class TrashUtils
-  {
-      #region Dominos
+    public class TrashUtils
+    {
+        #region Dominos
 
-      public static readonly Block[][] Skew = new Block[][] {
+        public static readonly Block[][] Skew = new Block[][] {
         new Block[] { new Block(MaterialType.Organic),  new Block(),                    new Block(), new Block() },
         new Block[] { new Block(MaterialType.Organic),  new Block(MaterialType.Metal),  new Block(), new Block() },
         new Block[] { new Block(),                      new Block(MaterialType.Metal),  new Block(), new Block() },
         new Block[] { new Block(),                      new Block(),                    new Block(), new Block() }
       };
 
-      public static readonly Block[][] ReverseSkew = new Block[][] {
+        public static readonly Block[][] ReverseSkew = new Block[][] {
         new Block[] { new Block(),                      new Block(MaterialType.Organic),    new Block(), new Block() },
         new Block[] { new Block(MaterialType.Organic),  new Block(MaterialType.Organic),    new Block(), new Block() },
         new Block[] { new Block(MaterialType.Metal),    new Block(),                        new Block(), new Block() },
         new Block[] { new Block(),                      new Block(),                        new Block(), new Block() }
       };
 
-      public static readonly Block[][] Square = new Block[][] {
+        public static readonly Block[][] Square = new Block[][] {
         new Block[] { new Block(MaterialType.Metal),    new Block(MaterialType.Organic),    new Block(), new Block() },
         new Block[] { new Block(MaterialType.Metal),    new Block(MaterialType.Organic),    new Block(), new Block() },
         new Block[] { new Block(),                      new Block(),                        new Block(), new Block() },
@@ -39,6 +38,20 @@ namespace Utils
         new Block[] { new Block(),                      new Block(),                        new Block(), new Block() }
       };
 
+        public static readonly Block[][] OrganicSquare = new Block[][] {
+        new Block[] { new Block(MaterialType.Organic),    new Block(MaterialType.Organic),    new Block(), new Block() },
+        new Block[] { new Block(MaterialType.Organic),    new Block(MaterialType.Organic),    new Block(), new Block() },
+        new Block[] { new Block(),                      new Block(),                        new Block(), new Block() },
+        new Block[] { new Block(),                      new Block(),                        new Block(), new Block() }
+      };
+
+        public static readonly Block[][] Fuel = new Block[][] {
+        new Block[] { new Block(MaterialType.Fuel),     new Block(),    new Block(), new Block() },
+        new Block[] { new Block(),                      new Block(),    new Block(), new Block() },
+        new Block[] { new Block(),                      new Block(),    new Block(), new Block() },
+        new Block[] { new Block(),                      new Block(),    new Block(), new Block() }
+      };
+
         public static readonly Block[][] L = new Block[][] {
         new Block[] {  new Block(MaterialType.Metal),   new Block(),                    new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Metal),   new Block(),                    new Block(), new Block() },
@@ -46,28 +59,28 @@ namespace Utils
         new Block[] {  new Block(),                     new Block(),                    new Block(), new Block() }
       };
 
-      public static readonly Block[][] ReverseL = new Block[][] {
+        public static readonly Block[][] ReverseL = new Block[][] {
         new Block[] { new Block(),                      new Block(MaterialType.Metal),   new Block(), new Block() },
         new Block[] { new Block(),                      new Block(MaterialType.Organic), new Block(), new Block() },
         new Block[] { new Block(MaterialType.Organic),  new Block(MaterialType.Organic), new Block(), new Block() },
         new Block[] { new Block(),                      new Block(),                     new Block(), new Block() }
       };
 
-      public static readonly Block[][] T = new Block[][] {
+        public static readonly Block[][] T = new Block[][] {
         new Block[] {  new Block(MaterialType.Organic), new Block(),                    new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Metal),   new Block(MaterialType.Metal),  new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Metal), new Block(),                    new Block(), new Block() },
         new Block[] {  new Block(),                     new Block(),                    new Block(), new Block() }
       };
 
-      public static readonly Block[][] Line = new Block[][] {
+        public static readonly Block[][] Line = new Block[][] {
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Metal), new Block(), new Block(), new Block() }
       };
 
-      public static readonly Block[][][] ValidDomino = new Block[][][] {
+        public static readonly Block[][][] ValidDomino = new Block[][][] {
         Skew,
         ReverseSkew,
         Square,
@@ -77,34 +90,55 @@ namespace Utils
         Line
       };
 
-      public static readonly Block[][] SingleBlock = new Block[][] {
+        public static readonly Block[][] SingleBlockOrganic = new Block[][] {
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] { new Block(), new Block(), new Block(), new Block() },
         new Block[] { new Block(), new Block(), new Block(), new Block() },
         new Block[] { new Block(), new Block(), new Block(), new Block() }
       };
 
-      public static readonly Block[][] DoubleBlock = new Block[][] {
+        public static readonly Block[][] DoubleBlockOrganic = new Block[][] {
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] { new Block(), new Block(), new Block(), new Block() },
         new Block[] { new Block(), new Block(), new Block(), new Block() }
       };
 
-      public static readonly Block[][] TripleBlock = new Block[][] {
+        public static readonly Block[][] TripleBlockOrganic = new Block[][] {
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Organic),  new Block(MaterialType.Organic), new Block(), new Block() },
         new Block[] { new Block(), new Block(), new Block(), new Block() },
         new Block[] { new Block(), new Block(), new Block(), new Block() }
       };
 
-      public static readonly Block[][][] DominoPieces = new Block[][][] {
-        SingleBlock,
-        DoubleBlock,
-        TripleBlock
+        public static readonly Block[][] SingleBlockMetallic = new Block[][] {
+        new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
+        new Block[] { new Block(), new Block(), new Block(), new Block() },
+        new Block[] { new Block(), new Block(), new Block(), new Block() },
+        new Block[] { new Block(), new Block(), new Block(), new Block() }
       };
 
-      public static readonly Block[][] None = new Block[][] {
+        public static readonly Block[][] DoubleBlockMetallic = new Block[][] {
+        new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
+        new Block[] { new Block(), new Block(), new Block(), new Block() },
+        new Block[] { new Block(), new Block(), new Block(), new Block() }
+      };
+
+        public static readonly Block[][] TripleBlockMetallic = new Block[][] {
+        new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Organic),  new Block(MaterialType.Organic), new Block(), new Block() },
+        new Block[] { new Block(), new Block(), new Block(), new Block() },
+        new Block[] { new Block(), new Block(), new Block(), new Block() }
+      };
+
+        public static readonly Block[][][] DominoPieces = new Block[][][] {
+        SingleBlockOrganic,
+        DoubleBlockOrganic,
+        TripleBlockOrganic
+      };
+
+        public static readonly Block[][] None = new Block[][] {
         new Block[] { new Block(), new Block(), new Block(), new Block() },
         new Block[] { new Block(), new Block(), new Block(), new Block() },
         new Block[] { new Block(), new Block(), new Block(), new Block() },
@@ -115,11 +149,12 @@ namespace Utils
 
         public static Block[][] GetRandomValidDomino()
         {
-          return ValidDomino[Random.Range(0, ValidDomino.Length)];
+            return ValidDomino[Random.Range(0, ValidDomino.Length)];
         }
 
-        public static Block[][] GetRandomDominoPiece() {
-          return DominoPieces[Random.Range(0, DominoPieces.Length)];
+        public static Block[][] GetRandomDominoPiece()
+        {
+            return DominoPieces[Random.Range(0, DominoPieces.Length)];
         }
 
         public static Block[][] GetMinimumDominoArea(Block[][] domino)
@@ -133,7 +168,7 @@ namespace Utils
             {
                 for (int col = 0; col < domino[row].Length; col++)
                 {
-                    if (domino[row][col]  != null)
+                    if (domino[row][col] != null)
                     {
                         if (row < minRow) minRow = row;
                         if (row > maxRow) maxRow = row;
@@ -182,7 +217,7 @@ namespace Utils
                 }
             }
 
-            if (!exists) 
+            if (!exists)
                 return new Trash(None);
 
             Block[][] minimumDominoArea = new Block[maxRow - minRow + 1][];
@@ -221,12 +256,12 @@ namespace Utils
             {
                 for (int y = 0; y < domino[x].Length; y++)
                 {
-                    movedDomino[x-1][y] = domino[x][y];
+                    movedDomino[x - 1][y] = domino[x][y];
                 }
             }
             for (int y = 0; y < domino[0].Length; y++)
             {
-                movedDomino[domino[0].Length-1][y] = null;
+                movedDomino[domino[0].Length - 1][y] = null;
             }
 
             return movedDomino;
@@ -253,7 +288,7 @@ namespace Utils
             {
                 for (int y = 0; y < domino[x].Length; y++)
                 {
-                    movedDomino[x+1][y] = domino[x][y];
+                    movedDomino[x + 1][y] = domino[x][y];
                 }
             }
             for (int y = 0; y < domino[0].Length; y++)
@@ -283,9 +318,9 @@ namespace Utils
 
             for (int x = 0; x < domino.Length; x++)
             {
-                for (int y = 0; y < domino[x].Length -1; y++)
+                for (int y = 0; y < domino[x].Length - 1; y++)
                 {
-                    movedDomino[x][y+1] = domino[x][y];
+                    movedDomino[x][y + 1] = domino[x][y];
                 }
                 movedDomino[x][0] = null;
             }
@@ -314,9 +349,9 @@ namespace Utils
             {
                 for (int y = 0; y < domino[x].Length - 1; y++)
                 {
-                    movedDomino[x][y] = domino[x][y+1];
+                    movedDomino[x][y] = domino[x][y + 1];
                 }
-                movedDomino[x][domino.Length-1] = null;
+                movedDomino[x][domino.Length - 1] = null;
             }
 
             return movedDomino;
@@ -365,15 +400,16 @@ namespace Utils
         }
 
 
-        public static bool CompareAllDominosRotations(Block[][] domino1, Block[][] domino2) {
-          var rotatedDomino1 = RotateDominoClockwise(domino1);
-          var rotatedDomino2 = RotateDominoClockwise(rotatedDomino1);
-          var rotatedDomino3 = RotateDominoClockwise(rotatedDomino2);
+        public static bool CompareAllDominosRotations(Block[][] domino1, Block[][] domino2)
+        {
+            var rotatedDomino1 = RotateDominoClockwise(domino1);
+            var rotatedDomino2 = RotateDominoClockwise(rotatedDomino1);
+            var rotatedDomino3 = RotateDominoClockwise(rotatedDomino2);
 
-          return CompareDominos(domino1, domino2) || 
-            CompareDominos(rotatedDomino1, domino2) || 
-            CompareDominos(rotatedDomino2, domino2) ||
-            CompareDominos(rotatedDomino3, domino2);
+            return CompareDominos(domino1, domino2) ||
+              CompareDominos(rotatedDomino1, domino2) ||
+              CompareDominos(rotatedDomino2, domino2) ||
+              CompareDominos(rotatedDomino3, domino2);
         }
 
         public static bool CompareDominos(Block[][] domino1, Block[][] domino2)
@@ -383,12 +419,12 @@ namespace Utils
 
             if (minDomino1.Length == minDomino2.Length && minDomino1[0].Length == minDomino2[0].Length)
             {
-              for (int x = 0; x < minDomino1.Length; x++)
-                  for (int y = 0; y < minDomino1[x].Length; y++)
-                      if (minDomino1[x][y] != minDomino2[x][y])
-                          return false;
+                for (int x = 0; x < minDomino1.Length; x++)
+                    for (int y = 0; y < minDomino1[x].Length; y++)
+                        if (minDomino1[x][y] != minDomino2[x][y])
+                            return false;
 
-              return true;
+                return true;
             }
 
 

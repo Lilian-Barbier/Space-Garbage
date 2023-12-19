@@ -76,6 +76,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ChangeActionPrevious",
+                    "type": "Button",
+                    "id": "93df1e64-fb36-4747-b55f-45f0711776c3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -549,6 +558,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ChangeAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "91d3bb49-acac-4f7c-b783-ee9123c0d99e",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ChangeActionPrevious",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

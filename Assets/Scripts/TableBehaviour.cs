@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TableBehaviour : MonoBehaviour
@@ -10,7 +8,7 @@ public class TableBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void OnCollisionStay2D(Collision2D collision)

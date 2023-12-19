@@ -1,5 +1,4 @@
 using Assets.Scripts.Enums;
-using Enums;
 
 namespace Models
 {
@@ -13,7 +12,7 @@ namespace Models
             Exists = true;
             Material = material;
         }
-        
+
         public Block()
         {
             Exists = false;

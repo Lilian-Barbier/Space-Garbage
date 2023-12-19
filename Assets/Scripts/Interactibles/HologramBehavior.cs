@@ -1,6 +1,5 @@
 using Models;
 using UnityEngine;
-using Utils;
 
 public class HologramBehavior : MonoBehaviour
 {
@@ -19,7 +18,7 @@ public class HologramBehavior : MonoBehaviour
     {
         if (dominoGenerator == null)
             dominoGenerator = FindObjectOfType<TrashGenerator>().GetComponent<TrashGenerator>();
-        
+
         this._domino = domino;
         var hologramSpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         hologramSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(domino, false);

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -8,15 +7,15 @@ using UnityEngine.SceneManagement;
 
 
 /// <summary>
-/// Cette classe est utilisé pour gérer le choix des Personnages, puis la gestions PlayerInput / Device connecté à chaque joueurs.
-/// Elle ne seras donc pas détruite aux changement de scène.
+/// Cette classe est utilisï¿½ pour gï¿½rer le choix des Personnages, puis la gestions PlayerInput / Device connectï¿½ ï¿½ chaque joueurs.
+/// Elle ne seras donc pas dï¿½truite aux changement de scï¿½ne.
 /// </summary>
 public class PlayerCharactersManager : MonoBehaviour
 {
     public List<InputDevice> playersDevice = new();
     public Dictionary<int, Color> colorsByPlayerIndex = new();
 
-    //Todo: voir si ça vaut le coup de plutot le récupérer avec un Ressource.Load()
+    //Todo: voir si ï¿½a vaut le coup de plutot le rï¿½cupï¿½rer avec un Ressource.Load()
     [SerializeField] GameObject playerPrefab;
     [SerializeField] TextMeshProUGUI text;
 
@@ -80,13 +79,13 @@ public class PlayerCharactersManager : MonoBehaviour
     {
         text.text = "";
 
-        //A partir du moment ou on quitte la scene de jeu, on passe sur une gestion manuelle pour éviter que de nouveau joueur se connecte.
+        //A partir du moment ou on quitte la scene de jeu, on passe sur une gestion manuelle pour ï¿½viter que de nouveau joueur se connecte.
         //On instanciera des playerPrefab
         inputManager.joinBehavior = PlayerJoinBehavior.JoinPlayersManually;
         inputManager.playerPrefab = playerPrefab;
 
         yield return new WaitForSeconds(1f);
-        GameObject.FindGameObjectWithTag("LevelLoader").GetComponentInChildren<Animator>().SetTrigger("End");  
+        GameObject.FindGameObjectWithTag("LevelLoader").GetComponentInChildren<Animator>().SetTrigger("End");
 
         yield return new WaitForSeconds(1.5f);
         SceneManager.LoadScene("ChooseLvl");
@@ -103,7 +102,7 @@ public class PlayerCharactersManager : MonoBehaviour
             spawns = GameObject.FindGameObjectsWithTag("Spawns");
             foreach (InputDevice device in playersDevice)
             {
-                //On instancie un nouveau prefab du joueur lié au bon controller.
+                //On instancie un nouveau prefab du joueur liï¿½ au bon controller.
                 var player = inputManager.JoinPlayer(pairWithDevice: device);
                 player.transform.position = spawns[player.playerIndex].transform.position;
                 player.GetComponent<SpriteRenderer>().color = colorsByPlayerIndex[player.playerIndex];

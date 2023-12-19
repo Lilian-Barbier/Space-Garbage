@@ -1,7 +1,3 @@
-using Models;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
@@ -46,15 +42,19 @@ public class SeparatorBehaviour : TableBehaviour
 
                 GameObject metalTrash = Instantiate(trashPrefab, transform.position + Vector3.down, Quaternion.identity);
                 metalTrash.GetComponent<TrashBehaviour>().SetTrash(trashSeparate[1]);
+
+                if (!TutorielManager.Instance.tutorialDividerPassed)
+                {
+                    TutorielManager.Instance.tutorialDividerPassed = true;
+                    TutorielManager.Instance.NextTutorial();
+                }
             }
         }
         else
         {
             slider.value = 0;
         }
-
     }
-
 
     public override void SetObjectCarried(Transform newObjectCarried)
     {

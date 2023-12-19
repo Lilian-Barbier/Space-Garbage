@@ -3,6 +3,8 @@
     public enum MaterialType
     {
         Organic,
-        Metal
+        Metal,
+        Fuel,
+        None
     }
 }

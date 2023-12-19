@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Models;
-using Utils;
 using TMPro;
 
 public class RequestBehavior : MonoBehaviour
@@ -11,14 +8,14 @@ public class RequestBehavior : MonoBehaviour
   private Image timerFill;
   private TMP_Text playerText;
   private Image dominoImage;
-  
+
   private DominoRequest dominoRequest;
 
   private TrashGenerator dominoGenerator;
   void Start()
   {
     dominoGenerator = FindObjectOfType<TrashGenerator>().GetComponent<TrashGenerator>();
-    
+
     timerFill = transform.Find("Timer").GetComponent<Image>();
     playerText = transform.Find("PlayerInfos").GetComponent<TextMeshProUGUI>();
     dominoImage = transform.Find("Domino").GetComponent<Image>();

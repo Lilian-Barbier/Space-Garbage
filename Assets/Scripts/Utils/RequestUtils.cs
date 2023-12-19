@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RequestUtils
@@ -42,7 +40,7 @@ public class RequestUtils
     "Maxine",
     "Chloe",
     "Rachel",
-    
+
     "Greg",
     "James",
     "Lisa",
@@ -72,7 +70,7 @@ public class RequestUtils
     "Karen",
     "Holly",
     "Erin",
-    
+
     "Michael",
     "Eleanor",
     "Chidi",
@@ -86,20 +84,21 @@ public class RequestUtils
     "Gren",
     "Yello"
   };
-  
-  public static string GetRandomPlayerName() {
+
+  public static string GetRandomPlayerName()
+  {
     return playerNames[Random.Range(0, playerNames.Length)];
   }
 
 
-  private static float[] GenerateAgeWeights() 
+  private static float[] GenerateAgeWeights()
   {
     float[] weights = new float[93];
     for (int i = 0; i < 93; i++)
     {
-        float x = i + 8;
-        float weight = Mathf.Exp(-Mathf.Pow(x - 22, 2) / (2 * Mathf.Pow(10, 2)));
-        weights[i] = weight;
+      float x = i + 8;
+      float weight = Mathf.Exp(-Mathf.Pow(x - 22, 2) / (2 * Mathf.Pow(10, 2)));
+      weights[i] = weight;
     }
 
     return weights;
@@ -107,23 +106,23 @@ public class RequestUtils
 
   public static int GetRandomPlayerAge()
   {
-      float totalWeight = 0;
-      foreach (float weight in ageWeights)
-      {
-          totalWeight += weight;
-      }
+    float totalWeight = 0;
+    foreach (float weight in ageWeights)
+    {
+      totalWeight += weight;
+    }
 
-      double randomNumber = random.NextDouble() * totalWeight;
-      double weightSum = 0;
-      for (int i = 0; i < 93; i++)
+    double randomNumber = random.NextDouble() * totalWeight;
+    double weightSum = 0;
+    for (int i = 0; i < 93; i++)
+    {
+      weightSum += ageWeights[i];
+      if (randomNumber < weightSum)
       {
-          weightSum += ageWeights[i];
-          if (randomNumber < weightSum)
-          {
-              return i + 8;
-          }
+        return i + 8;
       }
+    }
 
-      return 99;
+    return 99;
   }
 }
