@@ -1,3 +1,4 @@
+using Assets.Scripts.Enums;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
@@ -11,12 +12,14 @@ public class SeparatorBehaviour : TableBehaviour
     private Animator animator;
 
     private Slider slider;
+    AudioSource audioSource;
 
     private void Start()
     {
         slider = GetComponentInChildren<Slider>();
         animator = GetComponent<Animator>();
 
+        audioSource = GetComponent<AudioSource>();
         slider.gameObject.SetActive(false);
     }
 
@@ -33,15 +36,27 @@ public class SeparatorBehaviour : TableBehaviour
 
             if (timeOnTable > timeForSeparate)
             {
-                var trash = GetObjectCarried();
+                var trash = base.GetObjectCarried();
+
+                animator.SetBool("IsPainting", false);
+                audioSource.Stop();
+
+                slider.gameObject.SetActive(false);
+
                 var trashSeparate = TrashUtils.SeparateTrash(trash.GetComponent<TrashBehaviour>().trash);
                 Destroy(trash.gameObject);
 
-                GameObject organicTrash = Instantiate(trashPrefab, transform.position + Vector3.up, Quaternion.identity);
-                organicTrash.GetComponent<TrashBehaviour>().SetTrash(trashSeparate[0]);
+                if (trashSeparate[0].GetTrashSize() != 0)
+                {
+                    GameObject organicTrash = Instantiate(trashPrefab, transform.position + Vector3.up, Quaternion.identity);
+                    organicTrash.GetComponent<TrashBehaviour>().SetTrash(trashSeparate[0]);
+                }
 
-                GameObject metalTrash = Instantiate(trashPrefab, transform.position + Vector3.down, Quaternion.identity);
-                metalTrash.GetComponent<TrashBehaviour>().SetTrash(trashSeparate[1]);
+                if (trashSeparate[1].GetTrashSize() != 0)
+                {
+                    GameObject metalTrash = Instantiate(trashPrefab, transform.position + Vector3.down, Quaternion.identity);
+                    metalTrash.GetComponent<TrashBehaviour>().SetTrash(trashSeparate[1]);
+                }
 
                 if (!TutorielManager.Instance.tutorialDividerPassed)
                 {
@@ -58,18 +73,25 @@ public class SeparatorBehaviour : TableBehaviour
 
     public override void SetObjectCarried(Transform newObjectCarried)
     {
+        TrashBehaviour trashBehaviour = newObjectCarried.GetComponent<TrashBehaviour>();
+
+        if (trashBehaviour.IsOnlyOneMaterialTrash())
+        {
+            newObjectCarried.GetComponent<Collider2D>().isTrigger = false;
+            newObjectCarried.GetComponent<Rigidbody2D>().isKinematic = false;
+            return;
+        }
+
         slider.gameObject.SetActive(true);
 
         base.SetObjectCarried(newObjectCarried);
         animator.SetBool("IsPainting", true);
+        audioSource.Play();
+
     }
 
     public override Transform GetObjectCarried()
     {
-        slider.gameObject.SetActive(false);
-
-        var obj = base.GetObjectCarried();
-        animator.SetBool("IsPainting", false);
-        return obj;
+        return null;
     }
 }

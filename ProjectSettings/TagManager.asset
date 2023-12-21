@@ -25,6 +25,7 @@ TagManager:
   - GrapplingHookButton
   - ComputerButton
   - PieceRemove
+  - TriggerZone
   layers:
   - Default
   - TransparentFX

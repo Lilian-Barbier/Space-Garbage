@@ -25,6 +25,8 @@ public class TableBehaviour : MonoBehaviour
         objectCarried = newObjectCarried;
         objectCarried.GetComponent<Collider2D>().isTrigger = true;
         objectCarried.GetComponent<Rigidbody2D>().isKinematic = true;
+        objectCarried.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+
         objectCarried.position = transform.position + new Vector3(0, 0.25f, 0);
     }
 

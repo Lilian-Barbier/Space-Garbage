@@ -24,9 +24,24 @@ namespace Utils
         new Block[] { new Block(),                      new Block(),                        new Block(), new Block() }
       };
 
+        public static readonly Block[][] ReverseSkew2 = new Block[][] {
+        new Block[] { new Block(),                      new Block(MaterialType.Organic),    new Block(), new Block() },
+        new Block[] { new Block(MaterialType.Metal),  new Block(MaterialType.Metal),    new Block(), new Block() },
+        new Block[] { new Block(MaterialType.Metal),    new Block(),                        new Block(), new Block() },
+        new Block[] { new Block(),                      new Block(),                        new Block(), new Block() }
+      };
+
+
         public static readonly Block[][] Square = new Block[][] {
+        new Block[] { new Block(MaterialType.Metal),    new Block(MaterialType.Metal),    new Block(), new Block() },
         new Block[] { new Block(MaterialType.Metal),    new Block(MaterialType.Organic),    new Block(), new Block() },
+        new Block[] { new Block(),                      new Block(),                        new Block(), new Block() },
+        new Block[] { new Block(),                      new Block(),                        new Block(), new Block() }
+      };
+
+        public static readonly Block[][] Square2 = new Block[][] {
         new Block[] { new Block(MaterialType.Metal),    new Block(MaterialType.Organic),    new Block(), new Block() },
+        new Block[] { new Block(MaterialType.Organic),    new Block(MaterialType.Organic),    new Block(), new Block() },
         new Block[] { new Block(),                      new Block(),                        new Block(), new Block() },
         new Block[] { new Block(),                      new Block(),                        new Block(), new Block() }
       };
@@ -75,19 +90,58 @@ namespace Utils
 
         public static readonly Block[][] Line = new Block[][] {
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Metal), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Metal), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Metal), new Block(), new Block(), new Block() }
+      };
+
+        public static readonly Block[][] DoubleMetal = new Block[][] {
+        new Block[] {  new Block(MaterialType.Metal), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Metal), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(), new Block(), new Block(), new Block() }
+      };
+
+        public static readonly Block[][] DoubleOrganic = new Block[][] {
+        new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(), new Block(), new Block(), new Block() }
+      };
+
+
+        public static readonly Block[][] Line2 = new Block[][] {
+        new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Metal), new Block(), new Block(), new Block() },
+        new Block[] {  new Block(MaterialType.Metal), new Block(), new Block(), new Block() }
+      };
+
+        public static readonly Block[][] Line3 = new Block[][] {
+        new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Organic), new Block(), new Block(), new Block() },
         new Block[] {  new Block(MaterialType.Metal), new Block(), new Block(), new Block() }
       };
 
+
+
+
+
         public static readonly Block[][][] ValidDomino = new Block[][][] {
         Skew,
         ReverseSkew,
+        ReverseSkew2,
+        Square2,
         Square,
         L,
         ReverseL,
         T,
-        Line
+        Line,
+        Line2,
+        Line3,
+        DoubleMetal,
+        DoubleOrganic
       };
 
         public static readonly Block[][] SingleBlockOrganic = new Block[][] {

@@ -4,30 +4,38 @@ using UnityEngine;
 public class DeliveryPointBehaviour : TableBehaviour
 {
     SpaceshipManager spaceshipManager;
+    AudioSource audioSource;
     private void Start()
     {
         spaceshipManager = FindObjectOfType<SpaceshipManager>().GetComponent<SpaceshipManager>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     public override void SetObjectCarried(Transform newObjectCarried)
     {
+        base.SetObjectCarried(newObjectCarried);
+
         TrashBehaviour trashBehaviour = newObjectCarried.GetComponent<TrashBehaviour>();
 
-        if (!trashBehaviour.IsOnlyOneMaterialTrash(MaterialType.Metal) && trashBehaviour.GetTrashSize() != 4)
+        var blocks = trashBehaviour.GetBlocksMaterialType();
+
+        if (blocks.Count != 4 || blocks[0] != MaterialType.Metal || blocks[1] != MaterialType.Metal || blocks[2] != MaterialType.Metal || blocks[3] != MaterialType.Metal)
         {
+            Debug.Log("Eject");
             EjectPiece(newObjectCarried);
         }
         else
         {
             spaceshipManager.money++;
+            audioSource.Play();
             Destroy(newObjectCarried.gameObject);
         }
     }
 
     private void EjectPiece(Transform trash)
     {
+        base.GetObjectCarried();
         trash.transform.position = transform.position + Vector3.right;
-        trash.GetComponent<Collider2D>().isTrigger = false;
-        trash.GetComponent<Rigidbody2D>().isKinematic = false;
     }
+
 }

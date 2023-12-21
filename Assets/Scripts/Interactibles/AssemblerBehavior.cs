@@ -26,7 +26,7 @@ public class AssemblerBehavior : MonoBehaviour
     private void InitDomino()
     {
         currentDomino = new Trash(TrashUtils.None);
-        dominoSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(currentDomino, false);
+        dominoSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(currentDomino);
     }
 
     public bool IsEmpty()
@@ -57,7 +57,7 @@ public class AssemblerBehavior : MonoBehaviour
                     if (!currentDomino.Blocks[i][j].Exists)
                         currentDomino.Blocks[i][j] = hologram.domino.Blocks[i][j];
 
-            dominoSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(currentDomino, false);
+            dominoSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(currentDomino);
             return true;
         }
 

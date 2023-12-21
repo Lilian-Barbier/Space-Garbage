@@ -1,9 +1,16 @@
+using System;
 using System.Collections;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class SpaceshipManager : MonoBehaviour
 {
+    //Todo à implémenter
+    public float ConveyorSpeed = 1f;
+    public int CurrentElectricity = 50;
+
 
     private int _money = 0;
     public int money
@@ -12,7 +19,7 @@ public class SpaceshipManager : MonoBehaviour
         set
         {
             _money = value;
-            moneyText.text = _money.ToString() + " #";
+            moneyText.text = _money.ToString();
         }
     }
 
@@ -25,14 +32,22 @@ public class SpaceshipManager : MonoBehaviour
     int distance = 0;
     [SerializeField] TextMeshProUGUI distanceText;
 
+    float currentTime = 0;
+    [SerializeField] TextMeshProUGUI timerText;
+
+
+    [SerializeField] CanvasGroup scoreGroup;
+    [SerializeField] TextMeshProUGUI scoreText;
+
 
     public ChooseComputerUpgrade chooseComputerUpgrade;
 
     public int speedLevel = 1;
 
-    private float timeFor1FuelSpeedLevel1 = 10f;
-    private float timeFor1FuelSpeedLevel2 = 7f;
-    private float timeFor1FuelSpeedLevel3 = 4f;
+    private float timeFor1FuelSpeedLevel1 = 5f;
+    private float timeFor1FuelSpeedLevel2 = 3f;
+    private float timeFor1FuelSpeedLevel3 = 2f;
+    private float timeFor1FuelSpeedLevel4 = 1f;
 
     private float currentFuelConsumption;
     private float lastTimeFuelConsumption = 0f;
@@ -45,20 +60,62 @@ public class SpaceshipManager : MonoBehaviour
     Material spaceBackgroundMaterial;
     [SerializeField] GameObject background;
 
+    AudioSource audioSource;
+
+    private bool scoreShown = false;
     private void Start()
     {
         spaceBackgroundMaterial = background.GetComponent<SpriteRenderer>().material;
+        audioSource = GetComponent<AudioSource>();
+        // money = 100;
+        // DeliveryFuel(50);
     }
 
     void Update()
     {
+        currentTime += Time.deltaTime;
+        string formatTime = MathF.Floor(currentTime / 60).ToString("00") + ":" + (currentTime % 60).ToString("00");
+        timerText.text = formatTime;
+
+        //si le temps est supérieur à 20 minutes, on affiche le score
+        if (currentTime > 1200 && !scoreShown)
+        {
+            Debug.Log("ScoreFinish");
+            scoreShown = true;
+            scoreGroup.alpha = 1;
+            scoreText.text = distance.ToString();
+        }
+
         lastTimeDistance += Time.deltaTime;
 
         if (isMoving && lastTimeDistance > timeFor1Meter)
         {
             lastTimeDistance = 0f;
-            distance += speedLevel * 2;
+            distance += speedLevel * (int)Math.Floor(Mathf.Sqrt(speedLevel));
             distanceText.text = distance.ToString();
+        }
+    }
+
+    public void RemoveScore(InputAction.CallbackContext ctx)
+    {
+        if (!ctx.started) return;
+
+        if (scoreShown)
+        {
+            scoreGroup.alpha = 0;
+        }
+    }
+    public void PlayStopMusic(InputAction.CallbackContext ctx)
+    {
+        if (!ctx.started) return;
+
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+        else
+        {
+            audioSource.Play();
         }
     }
 
@@ -69,7 +126,7 @@ public class SpaceshipManager : MonoBehaviour
             1 => timeFor1FuelSpeedLevel1,
             2 => timeFor1FuelSpeedLevel2,
             3 => timeFor1FuelSpeedLevel3,
-            _ => timeFor1FuelSpeedLevel1,
+            _ => timeFor1FuelSpeedLevel4,
         };
     }
 
@@ -92,7 +149,7 @@ public class SpaceshipManager : MonoBehaviour
     IEnumerator ConsumeFuel()
     {
         isMoving = true;
-        spaceBackgroundMaterial.SetFloat("_Speed", 2 * speedLevel);
+        spaceBackgroundMaterial.SetFloat("_Speed", speedLevel * Mathf.Sqrt(speedLevel));
         currentFuel--;
         fuelText.text = currentFuel.ToString();
         yield return new WaitForSeconds(GetFuelConsumption());

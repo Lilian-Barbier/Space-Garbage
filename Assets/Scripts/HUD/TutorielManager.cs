@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class TutorielManager : Singleton<TutorielManager>
 {
@@ -12,6 +13,8 @@ public class TutorielManager : Singleton<TutorielManager>
     public bool tutorialCarburatorPassed = false;
     public bool tutorialStartPassed = false;
 
+    private bool tutorialPassed = false;
+
     public void NextTutorial()
     {
         if (currentTutorial < tutorials.Length - 1)
@@ -20,11 +23,21 @@ public class TutorielManager : Singleton<TutorielManager>
             currentTutorial++;
             tutorials[currentTutorial].alpha = 1;
         }
-        else
+        else if (!tutorialPassed)
         {
             Debug.Log("End of tutorial");
             tutorials[currentTutorial].alpha = 0;
             GetComponent<CanvasGroup>().alpha = 0;
         }
+    }
+
+    public void PassTutorial(InputAction.CallbackContext ctx)
+    {
+        if (!ctx.started || tutorialPassed) return;
+
+        tutorialPassed = true;
+        tutorials[currentTutorial].alpha = 0;
+        GetComponent<CanvasGroup>().alpha = 0;
+        currentTutorial = tutorials.Length;
     }
 }

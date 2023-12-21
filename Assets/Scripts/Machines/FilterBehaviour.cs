@@ -7,17 +7,20 @@ public class FilterBehaviour : TableBehaviour
 
     [SerializeField] private int dominoFilterSize = 1;
     [SerializeField] private float timeForFilter = 0.5f;
-    private int maxSizeFilter = 5;
+    private int maxSizeFilter = 4;
 
     private Animator animator;
 
     private Slider slider;
     [SerializeField] List<SpriteRenderer> hologramBlock;
 
+    AudioSource audioSource;
+
     private void Start()
     {
         slider = GetComponentInChildren<Slider>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
 
         slider.gameObject.SetActive(false);
 
@@ -40,7 +43,11 @@ public class FilterBehaviour : TableBehaviour
 
             if (timeOnTable > timeForFilter)
             {
-                var domino = GetObjectCarried();
+                var domino = base.GetObjectCarried();
+
+                animator.SetBool("IsPainting", false);
+                slider.gameObject.SetActive(false);
+
                 if (dominoBehaviour.GetTrashSize() == dominoFilterSize)
                 {
                     domino.transform.position = transform.position + Vector3.up;
@@ -49,6 +56,9 @@ public class FilterBehaviour : TableBehaviour
                 {
                     domino.transform.position = transform.position + Vector3.down;
                 }
+
+                audioSource.Stop();
+
             }
         }
         else
@@ -85,14 +95,11 @@ public class FilterBehaviour : TableBehaviour
 
         base.SetObjectCarried(newObjectCarried);
         animator.SetBool("IsPainting", true);
+        audioSource.Play();
     }
 
     public override Transform GetObjectCarried()
     {
-        slider.gameObject.SetActive(false);
-
-        var obj = base.GetObjectCarried();
-        animator.SetBool("IsPainting", false);
-        return obj;
+        return null;
     }
 }

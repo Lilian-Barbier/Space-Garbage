@@ -21,6 +21,6 @@ public class HologramBehavior : MonoBehaviour
 
         this._domino = domino;
         var hologramSpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        hologramSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(domino, false);
+        hologramSpriteRenderer.sprite = dominoGenerator.GenerateTrashSprite(domino);
     }
 }

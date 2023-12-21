@@ -16,12 +16,15 @@ namespace Assets.Scripts.Machines
 
         private Slider slider;
 
+        AudioSource audioSource;
+
         private void Start()
         {
             slider = GetComponentInChildren<Slider>();
             animator = GetComponent<Animator>();
 
             slider.gameObject.SetActive(false);
+            audioSource = GetComponent<AudioSource>();
         }
 
         // Update is called once per frame
@@ -36,7 +39,12 @@ namespace Assets.Scripts.Machines
 
                 if (timeOnTable > timeForFilter)
                 {
-                    var trash = GetObjectCarried();
+                    var trash = base.GetObjectCarried();
+                    animator.SetBool("IsPainting", false);
+                    audioSource.Stop();
+
+                    slider.gameObject.SetActive(false);
+
                     var trashSize = dominoBehaviour.GetTrashSize();
 
                     Destroy(trash.gameObject);
@@ -74,15 +82,13 @@ namespace Assets.Scripts.Machines
 
             base.SetObjectCarried(newObjectCarried);
             animator.SetBool("IsPainting", true);
+            audioSource.Play();
+
         }
 
         public override Transform GetObjectCarried()
         {
-            slider.gameObject.SetActive(false);
-
-            var obj = base.GetObjectCarried();
-            animator.SetBool("IsPainting", false);
-            return obj;
+            return null;
         }
     }
 }

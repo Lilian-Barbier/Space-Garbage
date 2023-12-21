@@ -1,3 +1,4 @@
+using System;
 using Enums;
 
 namespace Models
@@ -11,7 +12,7 @@ namespace Models
 
         public Trash(Block[][] blocks)
         {
-           Blocks = blocks;
+            Blocks = blocks;
         }
 
         public bool[][] GetBlocksAsBools()
@@ -65,6 +66,19 @@ namespace Models
             return BlockColor.None;
         }
 
+        public int GetTrashSize()
+        {
+            int size = 0;
+            foreach (var line in Blocks)
+            {
+                foreach (var block in line)
+                {
+                    if (block.Exists)
+                        size++;
+                }
+            }
+            return size;
+        }
     }
 }
 

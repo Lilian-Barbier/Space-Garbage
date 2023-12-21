@@ -23,9 +23,9 @@ public class TrashGenerator : MonoBehaviour
     private static readonly int blockSideSize = 5 * blockPixelSize;
     private static readonly int fullBlockHeight = blockSizeY + blockSideSize;
 
-    public Sprite GenerateTrashSprite(Trash domino, bool centerSprite = true)
+    public Sprite GenerateTrashSprite(Trash domino)
     {
-        var minArea = centerSprite ? TrashUtils.GetMinimumDominoArea(domino) : domino;
+        var minArea = TrashUtils.GetMinimumDominoArea(domino);
 
         int dominoPixelHeight = (minArea.Blocks.Length + 1) * blockSizeY;
         int dominoPixelWidth = minArea.Blocks[0].Length * blockSizeX;
@@ -34,25 +34,15 @@ public class TrashGenerator : MonoBehaviour
         int dominoPaddingBottom = (int)Mathf.Floor((spriteSize - dominoPixelHeight) / 2);
 
         Resources.UnloadUnusedAssets();
-        Color32 transparent = new Color32(0, 0, 0, 0);
+        Color transparent = new Color(0, 0, 0, 0);
 
-        var newTexture = new Texture2D(spriteSize, spriteSize, TextureFormat.RGBA32, false);
+        var newTexture = new Texture2D(spriteSize, spriteSize);
 
         // INIT BACKGROUND
 
-        var pixelArray = new Color32[spriteSize * spriteSize];
-
-        for (var i = 0; i < pixelArray.Length; i++)
-            pixelArray[i] = transparent;
-
-        newTexture.SetPixels32(pixelArray);
-
-        // CONFIG TEXTURE & SPRITE
-
-        newTexture.filterMode = FilterMode.Point;
-        newTexture.wrapMode = TextureWrapMode.Clamp;
-
-        newTexture.Apply();
+        for (var x = 0; x < spriteSize; x++)
+            for (var y = 0; y < spriteSize; y++)
+                newTexture.SetPixel(x, y, transparent);
 
         // DRAW BLOCKS
 
@@ -65,13 +55,43 @@ public class TrashGenerator : MonoBehaviour
 
                 var blockSprite = GetSpriteFromMaterial(minArea.Blocks[blockY][blockX].Material);
 
-                var posX = dominoPaddingLeft + blockX * blockSizeX;
-                var posY = spriteSize - 1 - dominoPaddingBottom - (blockY * (blockSizeY - 1)) - fullBlockHeight;
-                Graphics.CopyTexture(blockSprite.texture, 0, 0, 0, 0, blockSizeX, fullBlockHeight, newTexture, 0, 0, posX, posY);
+                for (var x = 0; x < blockSizeX; x++)
+                {
+                    for (var y = 0; y < blockSizeY; y++)
+                    {
+                        var pixelColor = blockSprite.texture.GetPixel(x, fullBlockHeight - 1 - y);
+                        if (pixelColor.a == 0) continue;
+
+                        if (pixelColor.a == 1)
+                            newTexture.SetPixel(x + dominoPaddingLeft + blockX * blockSizeX, spriteSize - 1 - dominoPaddingBottom - blockY * blockSizeY - y, pixelColor);
+                        else
+                        { // if the texture is semi-transparent, we need to merge the colors instead of replacing them
+                            var mergedColor = Color.Lerp(newTexture.GetPixel(x + dominoPaddingLeft + blockX * blockSizeX, spriteSize - 1 - dominoPaddingBottom - blockY * blockSizeY - y), pixelColor, pixelColor.a);
+                            newTexture.SetPixel(x + dominoPaddingLeft + blockX * blockSizeX, spriteSize - 1 - dominoPaddingBottom - blockY * blockSizeY - y, mergedColor);
+                        }
+                    }
+                }
+
+                for (var x = 0; x < blockSizeX; x++)
+                {
+                    for (var y = 0; y < blockSideSize; y++)
+                    {
+                        var pixelColor = blockSprite.texture.GetPixel(x, fullBlockHeight - blockSizeY - 1 - y);
+                        if (pixelColor.a != 0)
+                            newTexture.SetPixel(x + dominoPaddingLeft + blockX * blockSizeX, spriteSize - 1 - dominoPaddingBottom - (blockY + 1) * blockSizeY - y, pixelColor);
+                    }
+                }
             }
         }
 
-        var finalSprite = Sprite.Create(newTexture, new Rect(0, 0, spriteSize, spriteSize), new Vector2(0.5f, 0.5f), spriteSize, spritePadding, SpriteMeshType.Tight);
+        // CONFIG TEXTURE & SPRITE
+
+        newTexture.filterMode = FilterMode.Point;
+        newTexture.wrapMode = TextureWrapMode.Clamp;
+
+        newTexture.Apply();
+
+        var finalSprite = Sprite.Create(newTexture, new Rect(0, 0, spriteSize, spriteSize), new Vector2(0.5f, 0.5f), spriteSize);
         finalSprite.name = "DominoSprite";
         return finalSprite;
     }

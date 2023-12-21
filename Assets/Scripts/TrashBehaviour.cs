@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Assets.Scripts.Enums;
 using Enums;
 using Models;
@@ -23,9 +24,9 @@ public class TrashBehaviour : MonoBehaviour
         if (setRandomDomino)
             trash = new Trash(TrashUtils.GetRandomValidDomino());
         else if (setBlockMetalOrg)
-            trash = new Trash(TrashUtils.Square);
+            trash = new Trash(TrashUtils.Skew);
         else if (setLMetalOrg)
-            trash = new Trash(TrashUtils.L);
+            trash = new Trash(TrashUtils.DoubleMetal);
 
         SetSpriteAndCollider();
     }
@@ -150,16 +151,7 @@ public class TrashBehaviour : MonoBehaviour
 
     public int GetTrashSize()
     {
-        int size = 0;
-        foreach (var line in trash.Blocks)
-        {
-            foreach (var block in line)
-            {
-                if (block.Exists)
-                    size++;
-            }
-        }
-        return size;
+        return trash.GetTrashSize();
     }
 
     public bool IsOnlyOneMaterialTrash(MaterialType material)
@@ -204,5 +196,19 @@ public class TrashBehaviour : MonoBehaviour
             }
         }
         return MaterialType.None;
+    }
+
+    public List<MaterialType> GetBlocksMaterialType()
+    {
+        List<MaterialType> materialTypes = new List<MaterialType>();
+        foreach (var line in trash.Blocks)
+        {
+            foreach (var block in line)
+            {
+                if (block.Exists)
+                    materialTypes.Add(block.Material);
+            }
+        }
+        return materialTypes;
     }
 }

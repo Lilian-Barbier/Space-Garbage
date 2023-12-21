@@ -11,7 +11,7 @@ public class HookButtonController : MonoBehaviour
 
     public void ReturnHook()
     {
-        hookController.ReturnHook();
+
     }
 
     public void UpHook()

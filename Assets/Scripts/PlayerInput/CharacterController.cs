@@ -18,7 +18,7 @@ public class CharacterController : MonoBehaviour
     Transform objectDetected;
 
     bool isStopped;
-    bool isDashing = false;
+    bool isRunning = false;
     bool canDash = true;
     float dashTimer;
 
@@ -43,6 +43,11 @@ public class CharacterController : MonoBehaviour
     [SerializeField] TileBase tileConveyorLeft;
     [SerializeField] TileBase tileConveyorUp;
     [SerializeField] TileBase tileConveyorDown;
+
+    [SerializeField] TileBase tileConveyorRightHologram;
+    [SerializeField] TileBase tileConveyorLeftHologram;
+    [SerializeField] TileBase tileConveyorUpHologram;
+    [SerializeField] TileBase tileConveyorDownHologram;
 
     [SerializeField] TileBase eraseTile;
 
@@ -79,11 +84,17 @@ public class CharacterController : MonoBehaviour
     public int nbOfFusionMachine = 0;
     public int nbOfSeparator = 0;
     public int nbOfFuelMachine = 0;
-    public int nbOfFilter = 1;
+    public int nbOfFilter = 0;
 
     public bool userUseKeyboard = true;
 
     SpaceshipManager spaceshipManager;
+
+    float delayMoveHook = 0.05f;
+    float delayMoveHookTimer = 0f;
+
+    float delayMenu = 0.2f;
+    float delayMenuTimer = 0f;
 
     public enum PlayerAction
     {
@@ -103,6 +114,9 @@ public class CharacterController : MonoBehaviour
         Up,
         Down
     }
+
+    AudioSource audioSource;
+    bool isPlaying = false;
 
     void Start()
     {
@@ -124,10 +138,15 @@ public class CharacterController : MonoBehaviour
         selectedAction = PlayerAction.TakeObject;
 
         spaceshipManager = FindObjectOfType<SpaceshipManager>().GetComponent<SpaceshipManager>();
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     void FixedUpdate()
     {
+        delayMoveHookTimer += Time.fixedDeltaTime;
+        delayMenuTimer += Time.fixedDeltaTime;
+
         if (assemblerHologram != null) return;
 
         UpdateMovements();
@@ -160,16 +179,16 @@ public class CharacterController : MonoBehaviour
         switch (conveyorDirection)
         {
             case Direction.Right:
-                selectedConveyorTile = tileConveyorRight;
+                selectedConveyorTile = tileConveyorRightHologram;
                 break;
             case Direction.Left:
-                selectedConveyorTile = tileConveyorLeft;
+                selectedConveyorTile = tileConveyorLeftHologram;
                 break;
             case Direction.Up:
-                selectedConveyorTile = tileConveyorUp;
+                selectedConveyorTile = tileConveyorUpHologram;
                 break;
             case Direction.Down:
-                selectedConveyorTile = tileConveyorDown;
+                selectedConveyorTile = tileConveyorDownHologram;
                 break;
         }
 
@@ -206,42 +225,74 @@ public class CharacterController : MonoBehaviour
                 canDash = true;
             }
 
-            if (isDashing)
+
+            if (movement != Vector2.zero && movement.magnitude > 0.8)
             {
-                rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + dashSpeed * Time.fixedDeltaTime * lastDirection);
-
-
-                if (dashTimer > dashDuration)
-                {
-                    isDashing = false;
-                }
-            }
-            else
-            {
-                if (movement != Vector2.zero && movement.magnitude > 0.8)
-                {
-                    lastDirection = movement;
-                }
-
-                if (movement.y < -0.5)
-                {
-                    isMovingDown = true;
-                }
-                else if (movement.y > 0.5)
-                {
-                    isMovingUp = true;
-                }
-                else if (movement.x != 0)
-                {
-                    isMovingSide = true;
-                    spriteRenderer.flipX = movement.x < 0;
-                }
-
-                interactTriggerZone.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.down, lastDirection));
-                rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + speed * Time.fixedDeltaTime * movement);
-
+                lastDirection = movement;
             }
 
+            if (movement.y < -0.5)
+            {
+                isMovingDown = true;
+            }
+            else if (movement.y > 0.5)
+            {
+                isMovingUp = true;
+            }
+            else if (movement.x != 0)
+            {
+                isMovingSide = true;
+                spriteRenderer.flipX = movement.x < 0;
+            }
+
+            if (movement.magnitude != 0 && !isPlaying)
+            {
+                isPlaying = true;
+                audioSource.Play();
+            }
+
+            if (movement.magnitude == 0 && isPlaying)
+            {
+                isPlaying = false;
+                audioSource.Stop();
+            }
+
+            interactTriggerZone.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.down, lastDirection));
+            var runRatio = isRunning ? speed * 1.7f : speed;
+            rigidbodyCharacter.MovePosition(rigidbodyCharacter.position + runRatio * Time.fixedDeltaTime * movement);
+
+        }
+
+        else if (isInHookMode)
+        {
+            audioSource.Stop();
+
+            if (movement.y < 0 && delayMoveHookTimer > delayMoveHook)
+            {
+                hookController.UpHook();
+                delayMoveHookTimer = 0f;
+            }
+            else if (movement.y > 0 && delayMoveHookTimer > delayMoveHook)
+            {
+                delayMoveHookTimer = 0f;
+                hookController.DownHook();
+            }
+        }
+
+        else if (isInComputer)
+        {
+            audioSource.Stop();
+
+            if (movement.y < 0 && delayMenuTimer > delayMenu)
+            {
+                delayMenuTimer = 0f;
+                spaceshipManager.SelectNextComputer();
+            }
+            else if (movement.y > 0 && delayMenuTimer > delayMenu)
+            {
+                spaceshipManager.SelectPreviousComputer();
+                delayMenuTimer = 0f;
+            }
         }
 
         animator.SetBool("isMovingSide", isMovingSide);
@@ -275,25 +326,32 @@ public class CharacterController : MonoBehaviour
     {
         OnAction(ctx);
 
-        if (!ctx.performed) return;
-
         if (isInHookMode)
         {
+            if (!ctx.performed) return;
             isInHookMode = false;
             isStopped = false;
         }
         else if (isInComputer)
         {
+            if (!ctx.performed) return;
             isInComputer = false;
             isStopped = false;
             spaceshipManager.HideComputer();
         }
-        else if (canDash)
+        else
         {
-            CameraShake.Instance.LittleShake();
-            canDash = false;
-            isDashing = true;
-            dashTimer = 0f;
+            if (ctx.performed)
+            {
+                isRunning = true;
+                audioSource.pitch = 1.3f;
+            }
+
+            if (ctx.canceled)
+            {
+                isRunning = false;
+                audioSource.pitch = 1f;
+            }
         }
     }
 
@@ -477,61 +535,20 @@ public class CharacterController : MonoBehaviour
 
         if (conveyorBeltDown.GetTile(cellPos) != null || conveyorBeltUp.GetTile(cellPos) != null || conveyorBeltRight.GetTile(cellPos) != null || conveyorBeltLeft.GetTile(cellPos) != null)
         {
+            Debug.Log("Already Conveyor");
             return true;
         }
 
         Vector2 positionToCheck = new Vector2(cellPos.x + 0.5f, cellPos.y + 0.5f);
         Collider2D hitCollider = Physics2D.OverlapPoint(positionToCheck);
 
-        if (hitCollider != null && !hitCollider.transform.CompareTag("Player") && !hitCollider.transform.CompareTag("Blocks"))
+        if (hitCollider != null && !hitCollider.transform.CompareTag("Player") && !hitCollider.transform.CompareTag("Blocks") && !hitCollider.transform.CompareTag("TriggerZone"))
         {
+            Debug.Log("Already " + hitCollider.transform.tag);
             return true;
         }
 
         return false;
-    }
-
-    public void MoveDominosInAssembler(InputAction.CallbackContext ctx)
-    {
-        OnAction(ctx);
-
-        if (!ctx.started) return;
-
-        if (assemblerHologram != null)
-        {
-            var domino = objectCarried.GetComponent<TrashBehaviour>();
-
-            Vector2 movement = ctx.ReadValue<Vector2>();
-
-            if (movement.x > 0.5)
-                domino.MoveDominoRight();
-            else if (movement.x < -0.5)
-                domino.MoveDominoLeft();
-            else if (movement.y < 0)
-                domino.MoveDominoDown();
-            else if (movement.y > 0)
-                domino.MoveDominoUp();
-
-            assemblerHologram.SetDomino(domino.trash);
-        }
-        else if (isInHookMode)
-        {
-            Vector2 movement = ctx.ReadValue<Vector2>();
-
-            if (movement.y < -0.2)
-                hookController.UpHook();
-            else if (movement.y > 0.2)
-                hookController.DownHook();
-        }
-        else if (isInComputer)
-        {
-            Vector2 movement = ctx.ReadValue<Vector2>();
-
-            if (movement.y < -0.2)
-                spaceshipManager.SelectNextComputer();
-            else if (movement.y > 0.2)
-                spaceshipManager.SelectPreviousComputer();
-        }
     }
 
     public void RotateClockwise(InputAction.CallbackContext ctx)

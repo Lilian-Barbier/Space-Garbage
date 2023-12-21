@@ -15,20 +15,18 @@ public class DeliveryPointFuel : TableBehaviour
 
         if (!trashBehaviour.IsOnlyOneMaterialTrash(MaterialType.Fuel))
         {
-            EjectPiece(newObjectCarried);
+            newObjectCarried.GetComponent<Collider2D>().isTrigger = false;
+            newObjectCarried.GetComponent<Rigidbody2D>().isKinematic = false;
+            return;
         }
-        else
-        {
-            spaceshipManager.DeliveryFuel(trashBehaviour.GetTrashSize());
-            Destroy(newObjectCarried.gameObject);
-        }
+
+        spaceshipManager.DeliveryFuel(trashBehaviour.GetTrashSize());
+        Destroy(newObjectCarried.gameObject);
     }
 
-    private void EjectPiece(Transform trash)
+    public override Transform GetObjectCarried()
     {
-        trash.transform.position = transform.position + Vector3.right;
-        trash.GetComponent<Collider2D>().isTrigger = false;
-        trash.GetComponent<Rigidbody2D>().isKinematic = false;
+        return null;
     }
 
 }
