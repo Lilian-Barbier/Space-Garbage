@@ -176,6 +176,7 @@ public class ChooseComputerUpgrade : MonoBehaviour
             upgrades[selectedImage].image.color = buyColor;
             StartCoroutine(RestoreColor(selectedImage));
             audioSource.Play();
+        
 
             if (upgrades[selectedImage].limitedUse != -1)
             {
@@ -194,8 +195,10 @@ public class ChooseComputerUpgrade : MonoBehaviour
                 }
             }
 
-
+            //Todo  selecteded image modifié au dessus
             return currentMoney - upgrades[selectedImage].price;
+
+
         }
         else
         {
@@ -206,7 +209,7 @@ public class ChooseComputerUpgrade : MonoBehaviour
     private IEnumerator RestoreColor(int index)
     {
         yield return new WaitForSeconds(0.2f);
-        if (index < upgrades.Count && upgrades[index].limitedUse == -1 || upgrades[index].limitedUse > 0)
+        if (index < upgrades.Count && (upgrades[index].limitedUse == -1 || upgrades[index].limitedUse > 0))
             upgrades[index].image.color = selectedImage == index ? selectColor : defaultColor;
     }
 

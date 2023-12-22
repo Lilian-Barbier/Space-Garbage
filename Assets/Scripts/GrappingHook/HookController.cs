@@ -52,9 +52,11 @@ public class HookController : MonoBehaviour
         {
             var piece = spacePieceSpawn.piecesInstantiate.OrderBy(p => Vector2.Distance(p.transform.position, transform.position)).FirstOrDefault();
 
-            if (piece != null)
+            if (piece != null && Vector3.Distance(piece.transform.position, transform.position) < 7f)
             {
-                var direction = piece.transform.position - transform.position;
+                var piecePosition = piece.transform.position - new Vector3(0, speed.Remap(2, 12, 1.5f, 0.5f));
+
+                var direction = piecePosition - transform.position;
                 var angle = Vector2.SignedAngle(Vector2.left, direction);
                 var angleDifference = angle - angleDirection;
 
@@ -105,4 +107,17 @@ public class HookController : MonoBehaviour
         transform.Rotate(0, 0, -3);
     }
 
+
+
 }
+
+public static class ExtensionMethods
+{
+
+    public static float Remap(this float value, float from1, float to1, float from2, float to2)
+    {
+        return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+    }
+
+}
+

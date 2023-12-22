@@ -67,8 +67,8 @@ public class SpaceshipManager : MonoBehaviour
     {
         spaceBackgroundMaterial = background.GetComponent<SpriteRenderer>().material;
         audioSource = GetComponent<AudioSource>();
-        // money = 100;
-        // DeliveryFuel(50);
+        money = 100;
+        DeliveryFuel(50);
     }
 
     void Update()
